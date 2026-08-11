@@ -18,6 +18,7 @@ const FEATURES = [
   { icon: "🔒", title: "Cumplimiento RGPD", desc: "Datos sanitarios cifrados, hosting en Europa y acuerdos de procesamiento de datos con todos los proveedores. Conforme a la normativa española." },
   { icon: "📊", title: "Informe mensual", desc: "Resumen automático de actividad clínica y financiera cada mes. Listo para revisar en un minuto y compartir con tu asesoría." },
   { icon: "📱", title: "Acceso desde cualquier dispositivo", desc: "Funciona en ordenador, tablet y móvil desde el navegador. Sin instalaciones, siempre actualizado, siempre disponible." },
+  { icon: "📆", title: "Agenda pública de reservas", desc: "Tus pacientes pueden reservar cita directamente desde tu enlace público. Sin llamadas, sin gestión manual. Tú confirmas con un clic." },
 ];
 
 const PLANES = [
@@ -296,11 +297,11 @@ export default function Landing() {
         <div style={{ fontSize: 10, color: C.muted, letterSpacing: "5px", textTransform: "uppercase", marginBottom: 28 }}>gestión clínica</div>
         <div style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontWeight: 400, fontSize: 24, color: C.ink, marginBottom: 28 }}>Menos papeleo. Más presencia.</div>
         <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.7, maxWidth: 520, margin: "0 auto 44px" }}>
-          Para psicólogos, fisioterapeutas, nutricionistas, logopedas y cualquier profesional sanitario que trabaje con pacientes o clientes.
+          Para psicólogos, fisioterapeutas, nutricionistas, logopedas y cualquier profesional sanitario que trabaje con pacientes.
         </p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 80 }}>
           <button onClick={() => navigate("/login")} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
-          <a href="#features" style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "14px 28px", fontSize: 14, fontWeight: 500, cursor: "pointer", textDecoration: "none", display: "inline-block" }}>Ver funcionalidades</a>
+          <a href="#features" style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "14px 28px", fontSize: 14, fontWeight: 500, cursor: "pointer", textDecoration: "none", display: "inline-block" }}>Ver funcionalidades ↓</a>
         </div>
       </section>
 
@@ -308,10 +309,10 @@ export default function Landing() {
       <section style={{ maxWidth: 1000, margin: "0 auto 90px", padding: "0 48px" }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", lineHeight: 1, marginBottom: 10 }}>
-            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 28, color: C.ink, letterSpacing: "-1px" }}>Explora las diferentes secciones de pra</span>
-            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 33, color: C.accent, letterSpacing: "-1px", lineHeight: 0.9, marginLeft: 3 }}>X</span>
-            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 28, color: C.ink, letterSpacing: "-1px" }}>i</span>
-            <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: C.accent, marginLeft: 12, marginBottom: 4 }} />
+            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 18, color: C.ink, letterSpacing: "-0.5px" }}>Explora las diferentes secciones de pra</span>
+            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 21, color: C.accent, letterSpacing: "-0.5px", lineHeight: 0.9, marginLeft: 2 }}>X</span>
+            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 18, color: C.ink, letterSpacing: "-0.5px" }}>i</span>
+            <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: C.accent, marginLeft: 9, marginBottom: 3 }} />
           </div>
         </div>
         <div style={{ background: C.ink, borderRadius: 20, overflow: "hidden", boxShadow: "0 40px 80px rgba(34,22,16,0.2)" }}>
@@ -331,16 +332,19 @@ export default function Landing() {
 
       {/* FEATURES */}
       <section id="features" style={{ maxWidth: 1000, margin: "0 auto 90px", padding: "0 48px" }}>
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <div style={{ fontSize: 10, color: C.accent, textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 600, marginBottom: 12 }}>Funcionalidades</div>
-          <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 36, fontWeight: 400, color: C.ink, margin: 0 }}>Todo lo que necesitas en un solo sitio</h2>
+        <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <h2 style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, fontSize: 22, color: C.ink, margin: 0, letterSpacing: "-0.3px" }}>Todo lo que necesitas en un solo sitio</h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "0 48px" }}>
           {FEATURES.map((f, i) => (
-            <div key={i} style={{ background: C.bone, borderRadius: 14, padding: "24px 20px", border: `1px solid ${C.border}`, textAlign: "center" }}>
-              <div style={{ fontSize: 28, marginBottom: 12 }}>{f.icon}</div>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 16, color: C.ink, marginBottom: 8, lineHeight: 1.3 }}>{f.title}</div>
-              <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7, textAlign: "left" }}>{f.desc}</div>
+            <div key={i} style={{ padding: "28px 0", borderBottom: `1px solid ${C.border}`, display: "grid", gridTemplateColumns: "64px 1fr", gap: 24, alignItems: "start" }}>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, fontSize: 48, color: C.sand, lineHeight: 1, letterSpacing: "-2px", userSelect: "none" }}>
+                {String(i + 1).padStart(2, "0")}
+              </div>
+              <div>
+                <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, fontSize: 17, color: C.ink, marginBottom: 8, lineHeight: 1.3 }}>{f.title}</div>
+                <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.7 }}>{f.desc}</div>
+              </div>
             </div>
           ))}
         </div>
@@ -361,7 +365,14 @@ export default function Landing() {
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{ fontSize: 10, color: C.accent, textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 600, marginBottom: 12 }}>Precios</div>
           <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 36, fontWeight: 400, color: C.ink, margin: "0 0 8px" }}>Simple y sin sorpresas</h2>
-          <p style={{ fontSize: 13, color: C.muted }}>IVA incluido · Cancela cuando quieras</p>
+          <p style={{ fontSize: 13, color: C.muted, marginBottom: 20 }}>IVA incluido · Cancela cuando quieras</p>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: C.ink, borderRadius: 14, padding: "12px 24px" }}>
+            <span style={{ fontSize: 20 }}>🎁</span>
+            <div style={{ textAlign: "left" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.bone, letterSpacing: "-0.2px" }}>Los primeros 3 meses son gratuitos</div>
+              <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>Para los primeros profesionales que soliciten acceso. Sin tarjeta de crédito.</div>
+            </div>
+          </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
           {PLANES.map((p, i) => (
@@ -373,7 +384,7 @@ export default function Landing() {
               <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 24 }}>
                 {p.features.map((f, j) => <div key={j} style={{ fontSize: 12, color: p.destacado ? "#C8A882" : C.muted }}>✓ {f}</div>)}
               </div>
-              <button onClick={() => navigate("/login")} style={{ width: "100%", padding: "11px 0", borderRadius: 10, border: p.destacado ? "none" : `1px solid ${C.border}`, background: p.destacado ? C.accent : "transparent", color: p.destacado ? C.bone : C.accent, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
+              <button onClick={() => navigate("/login")} style={{ width: "100%", padding: "11px 0", borderRadius: 10, border: p.destacado ? "none" : `1px solid ${C.border}`, background: p.destacado ? C.accent : "transparent", color: p.destacado ? C.bone : C.accent, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso →</button>
             </div>
           ))}
         </div>
