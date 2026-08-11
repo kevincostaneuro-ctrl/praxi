@@ -9,12 +9,15 @@ const C = {
 };
 
 const FEATURES = [
-  { icon: "🗂", title: "Ficha clínica completa", desc: "Historia clínica, formulación de caso, evolución por sesión y objetivos terapéuticos estructurados." },
-  { icon: "📅", title: "Agenda inteligente", desc: "Calendario con videollamada integrada y recordatorios automáticos por WhatsApp." },
-  { icon: "✦", title: "Asistente IA", desc: "Conoce a cada paciente y te ayuda a redactar notas, generar informes y analizar casos." },
-  { icon: "🧾", title: "Facturación", desc: "Genera facturas PDF, controla pagos e informes mensuales con un clic." },
-  { icon: "👥", title: "Multi-profesional", desc: "Agenda compartida y administración de equipo para clínicas con varios profesionales." },
-  { icon: "🔒", title: "Seguro y privado", desc: "Datos cifrados, hosting en Europa y cumplimiento RGPD para datos sanitarios." },
+  { icon: "🧠", title: "IA clínica contextual", desc: "El asistente conoce la historia, evolución y formulación de cada paciente. Redacta notas, genera informes de derivación y analiza el caso en segundos." },
+  { icon: "📋", title: "Ficha clínica estructurada", desc: "Historia clínica, formulación de caso por áreas (sueño, familia, trabajo, hábitos), evolución sesión a sesión y seguimiento de objetivos terapéuticos." },
+  { icon: "📅", title: "Agenda con videollamada", desc: "Calendario semanal y diario con videollamada integrada. Recordatorios automáticos por WhatsApp. Sin aplicaciones externas." },
+  { icon: "🧾", title: "Facturación automática", desc: "Genera facturas PDF con un clic, controla pagos pendientes y obtén informes financieros mensuales listos para tu gestor." },
+  { icon: "💬", title: "WhatsApp automático", desc: "Recordatorios de cita enviados automáticamente desde una cuenta de Praxi. Sin configuración, sin costes extra por mensaje." },
+  { icon: "👥", title: "Gestión multi-profesional", desc: "Agenda compartida entre profesionales, pacientes asignados por especialista y panel de administración para el coordinador de la clínica." },
+  { icon: "🔒", title: "Cumplimiento RGPD", desc: "Datos sanitarios cifrados, hosting en Europa y acuerdos de procesamiento de datos con todos los proveedores. Conforme a la normativa española." },
+  { icon: "📊", title: "Informe mensual", desc: "Resumen automático de actividad clínica y financiera cada mes. Listo para revisar en un minuto y compartir con tu asesoría." },
+  { icon: "📱", title: "Acceso desde cualquier dispositivo", desc: "Funciona en ordenador, tablet y móvil desde el navegador. Sin instalaciones, siempre actualizado, siempre disponible." },
 ];
 
 const PLANES = [
@@ -256,11 +259,11 @@ function show(id){
 </script>
 </body></html>`;
 
-const Logo = ({ size = 22 }) => (
+const Logo = ({ size = 22, textColor = C.ink }) => (
   <div style={{ display: "flex", alignItems: "flex-end", lineHeight: 1, gap: 0 }}>
-    <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontWeight: 400, fontSize: size, color: C.accent, letterSpacing: "-0.5px" }}>pra</span>
+    <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontWeight: 400, fontSize: size, color: textColor, letterSpacing: "-0.5px" }}>pra</span>
     <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontWeight: 400, fontSize: size * 1.18, color: C.accent, letterSpacing: "-0.5px", lineHeight: 0.9, marginLeft: 2 }}>X</span>
-    <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontWeight: 400, fontSize: size, color: C.accent, letterSpacing: "-0.5px" }}>i</span>
+    <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontWeight: 400, fontSize: size, color: textColor, letterSpacing: "-0.5px" }}>i</span>
     <span style={{ display: "inline-block", width: size * 0.27, height: size * 0.27, borderRadius: "50%", background: C.accent, marginLeft: size * 0.45, marginBottom: size * 0.13, flexShrink: 0 }} />
   </div>
 );
@@ -293,7 +296,7 @@ export default function Landing() {
         <div style={{ fontSize: 10, color: C.muted, letterSpacing: "5px", textTransform: "uppercase", marginBottom: 28 }}>gestión clínica</div>
         <div style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontWeight: 400, fontSize: 24, color: C.ink, marginBottom: 28 }}>Menos papeleo. Más presencia.</div>
         <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.7, maxWidth: 520, margin: "0 auto 44px" }}>
-          Para psicólogos, fisioterapeutas, nutricionistas, logopedas y cualquier profesional que trabaje con personas. Historia clínica, agenda y facturación en un solo lugar.
+          Para psicólogos, fisioterapeutas, nutricionistas, logopedas y cualquier profesional sanitario que trabaje con pacientes o clientes.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
           <button onClick={() => navigate("/login")} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
@@ -304,8 +307,12 @@ export default function Landing() {
       {/* DEMO INTERACTIVO */}
       <section style={{ maxWidth: 1000, margin: "0 auto 90px", padding: "0 48px" }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div style={{ fontSize: 10, color: C.accent, textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 600, marginBottom: 8 }}>Demo interactivo</div>
-          <p style={{ fontSize: 13, color: C.muted }}>Haz clic en el sidebar para explorar las secciones</p>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", lineHeight: 1, marginBottom: 10 }}>
+            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 28, color: C.ink, letterSpacing: "-1px" }}>Explora las diferentes secciones de pra</span>
+            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 33, color: C.accent, letterSpacing: "-1px", lineHeight: 0.9, marginLeft: 3 }}>X</span>
+            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 28, color: C.ink, letterSpacing: "-1px" }}>i</span>
+            <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: C.accent, marginLeft: 12, marginBottom: 4 }} />
+          </div>
         </div>
         <div style={{ background: C.ink, borderRadius: 20, overflow: "hidden", boxShadow: "0 40px 80px rgba(34,22,16,0.2)" }}>
           <div style={{ background: "#1A0E08", padding: "10px 16px", display: "flex", gap: 6, alignItems: "center" }}>
@@ -330,10 +337,10 @@ export default function Landing() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
           {FEATURES.map((f, i) => (
-            <div key={i} style={{ background: C.bone, borderRadius: 14, padding: 24, border: `1px solid ${C.border}` }}>
-              <div style={{ fontSize: 24, marginBottom: 10 }}>{f.icon}</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: C.ink, marginBottom: 6 }}>{f.title}</div>
-              <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>{f.desc}</div>
+            <div key={i} style={{ background: C.bone, borderRadius: 14, padding: "24px 20px", border: `1px solid ${C.border}`, textAlign: "center" }}>
+              <div style={{ fontSize: 28, marginBottom: 12 }}>{f.icon}</div>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 16, color: C.ink, marginBottom: 8, lineHeight: 1.3 }}>{f.title}</div>
+              <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.7, textAlign: "left" }}>{f.desc}</div>
             </div>
           ))}
         </div>
@@ -375,7 +382,7 @@ export default function Landing() {
       {/* FOOTER */}
       <footer style={{ background: C.ink, padding: "28px 48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <Logo size={18} />
+          <Logo size={18} textColor={C.bone} />
           <div style={{ fontSize: 7, color: C.walnut, letterSpacing: "3px", textTransform: "uppercase", marginTop: 2 }}>gestión clínica</div>
         </div>
         <div style={{ fontSize: 11, color: C.walnut }}>© 2026 Praxi · Hecho en España</div>
