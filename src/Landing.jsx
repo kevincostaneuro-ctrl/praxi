@@ -47,7 +47,8 @@ function Demo() {
     dim:"#B8A898",green:"#4A6438",gD:"#E8EFE2",teal:"#4A7B6B",tD:"rgba(74,123,107,0.12)",
     amber:"#C48C2A",amD:"#FDF3DC",red:"#B85040",rD:"#FAEAE8"
   };
-  const nav = [["dashboard","▪ Dashboard"],["calendario","▪ Calendario"],["pacientes","▪ Pacientes"],["ficha","  ↳ Ficha paciente"],["facturas","▪ Facturas"],["recursos","▪ Recursos"]];
+  const nav = [["dashboard","▪ Dashboard"],["calendario","▪ Calendario"],["pacientes","▪ Pacientes"],["facturas","▪ Facturas"],["recursos","▪ Recursos"]];
+  const [fichaTab, setFichaTab] = useState("evolucion");
 
   const Card = ({children, style={}}) => <div style={{background:D.bone,borderRadius:12,border:`1px solid ${D.border}`,...style}}>{children}</div>;
   const SLabel = ({children}) => <div style={{fontSize:10,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600,marginBottom:10}}>{children}</div>;
@@ -92,11 +93,11 @@ function Demo() {
               <div key={id} onClick={()=>setActive(id)} style={{
                 padding:id==="ficha"?"6px 20px 6px 32px":"9px 20px",
                 fontSize:12,cursor:"pointer",
-                color:active===id?D.accent:D.muted,
-                fontWeight:active===id?600:400,
-                background:active===id?"rgba(166,107,63,0.08)":"transparent",
+                color:(active===id||(id==="pacientes"&&active==="pacientes_ficha"))?D.accent:D.muted,
+                fontWeight:(active===id||(id==="pacientes"&&active==="pacientes_ficha"))?600:400,
+                background:(active===id||(id==="pacientes"&&active==="pacientes_ficha"))?"rgba(166,107,63,0.08)":"transparent",
                 transition:"all 0.15s",
-                borderLeft:active===id?`3px solid ${D.accent}`:"3px solid transparent"
+                borderLeft:(active===id||(id==="pacientes"&&active==="pacientes_ficha"))?`3px solid ${D.accent}`:"3px solid transparent"
               }}>{label}</div>
             ))}
             <div style={{marginTop:"auto",padding:"14px 20px",borderTop:`1px solid ${D.border}`,display:"flex",alignItems:"center",gap:10}}>
@@ -214,7 +215,7 @@ function Demo() {
               </div>
               <Card style={{overflow:"hidden"}}>
                 {[["M","María González López","Ansiedad generalizada · 4 sesiones",false,true],["C","Carlos Ruiz Martínez","Episodio depresivo mayor · 3 sesiones",false,true],["A","Ana Martínez Vega","Fobia social · 3 sesiones",true,true],["J","Javier Fernández Mora","Trastorno adaptativo · 3 sesiones",false,true],["L","Laura Sánchez Díaz","TCA restricción · 5 sesiones",true,true],["P","Pedro López Castillo","TOC comprobación · 3 sesiones",false,true],["S","Sofía Ramírez Torres","Duelo complicado · 2 sesiones",false,true],["M","Miguel García Blanco","Burnout · 4 sesiones",false,true],["E","Elena Vidal Moreno","TDAH adulto · 3 sesiones",false,true],["C","Carmen Herrera","Fobia a agujas · 4 sesiones",false,false]].map(([ini,name,mot,consent,activo],i)=>(
-                  <div key={i} onClick={()=>setActive("ficha")} style={{padding:"11px 16px",borderBottom:`1px solid ${D.border}`,display:"flex",alignItems:"center",gap:12,cursor:"pointer",transition:"background 0.1s"}}>
+                  <div key={i} onClick={()=>{setActive("pacientes_ficha");setFichaTab("evolucion");}} style={{padding:"11px 16px",borderBottom:`1px solid ${D.border}`,display:"flex",alignItems:"center",gap:12,cursor:"pointer",transition:"background 0.1s"}}>
                     <Avatar letter={ini} color={activo?D.accent:D.green}/>
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{fontSize:13,fontWeight:600,color:D.ink,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{name}</div>
@@ -228,50 +229,106 @@ function Demo() {
               <div style={{padding:"8px 0",fontSize:10,color:D.muted,textAlign:"center"}}>Haz clic en un paciente para ver su ficha →</div>
             </div>}
 
-            {/* ── FICHA ── */}
-            {active==="ficha"&&<div>
-              <div style={{display:"flex",gap:14,alignItems:"flex-start",marginBottom:16}}>
-                <Avatar letter="M" size={40}/>
+            {/* ── FICHA PACIENTE ── */}
+            {active==="pacientes_ficha"&&<div>
+              {/* Header */}
+              <div style={{display:"flex",gap:14,alignItems:"flex-start",marginBottom:14}}>
+                <div style={{width:44,height:44,borderRadius:"50%",background:D.accent,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,fontWeight:700,color:D.bone}}>M</div>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:22,fontWeight:800,color:D.ink}}>María González López</div>
-                  <div style={{fontSize:12,color:D.muted,marginTop:2}}>612 345 678 · maria@email.com</div>
-                  <div style={{display:"flex",gap:12,marginTop:6,alignItems:"center"}}>
-                    <span style={{fontSize:12,color:D.walnut,fontWeight:500}}>4 sesiones</span>
+                  <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:2}}>
+                    <button onClick={()=>setActive("pacientes")} style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:D.muted,padding:0}}>← Pacientes</button>
+                  </div>
+                  <div style={{fontSize:20,fontWeight:800,color:D.ink}}>María González López</div>
+                  <div style={{fontSize:11,color:D.muted,marginTop:2}}>612 345 678 · maria@email.com</div>
+                  <div style={{display:"flex",gap:10,marginTop:5,alignItems:"center"}}>
+                    <span style={{fontSize:11,color:D.walnut,fontWeight:500}}>4 sesiones</span>
                     <span style={{color:D.border}}>·</span>
-                    <span style={{fontSize:12,color:D.muted}}>1/2 objetivos</span>
-                    <div style={{height:6,width:80,background:D.sand,borderRadius:999,overflow:"hidden"}}><div style={{height:"100%",width:"50%",background:D.green,borderRadius:999}}/></div>
-                    <span style={{fontSize:11,color:D.muted}}>Última sesión: 2026-03-01</span>
+                    <span style={{fontSize:11,color:D.muted}}>1/2 objetivos</span>
+                    <div style={{height:5,width:70,background:D.sand,borderRadius:999,overflow:"hidden"}}><div style={{height:"100%",width:"50%",background:D.green,borderRadius:999}}/></div>
                   </div>
                 </div>
-                <span style={{background:"rgba(166,107,63,0.1)",color:D.accent,fontSize:11,fontWeight:600,padding:"4px 12px",borderRadius:20}}>Activo</span>
+                <span style={{background:"rgba(166,107,63,0.1)",color:D.accent,fontSize:10,fontWeight:600,padding:"3px 10px",borderRadius:20}}>Activo</span>
               </div>
 
-              <Card style={{padding:"14px 18px",borderLeft:`3px solid ${D.accent}`,marginBottom:14}}>
-                <div style={{fontSize:10,color:D.muted,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:5}}>Motivo de consulta</div>
-                <div style={{fontSize:13,color:D.text,lineHeight:1.7}}>Ansiedad generalizada con episodios frecuentes de preocupación excesiva, insomnio y tensión muscular crónica.</div>
+              {/* Motivo */}
+              <Card style={{padding:"12px 16px",borderLeft:`3px solid ${D.accent}`,marginBottom:12}}>
+                <div style={{fontSize:9,color:D.muted,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:4}}>Motivo de consulta</div>
+                <div style={{fontSize:12,color:D.text,lineHeight:1.6}}>Ansiedad generalizada con episodios frecuentes de preocupación excesiva, insomnio y tensión muscular crónica.</div>
               </Card>
 
-              <div style={{display:"flex",gap:6,marginBottom:14,overflowX:"auto",paddingBottom:2}}>
-                {["Historia clínica","Formulación","Evolución clínica","Objetivos","Pruebas","Informes médicos","Datos","Sesiones y pagos"].map((t,i)=>(
-                  <div key={i} style={{padding:"6px 12px",borderRadius:8,fontSize:11,border:`1px solid ${i===2?D.accent:D.border}`,cursor:"pointer",background:i===2?D.accent:"transparent",color:i===2?D.bone:D.muted,whiteSpace:"nowrap",flexShrink:0}}>{t}</div>
+              {/* Tabs */}
+              <div style={{display:"flex",gap:5,marginBottom:14,overflowX:"auto",paddingBottom:2}}>
+                {[["evolucion","Evolución clínica"],["historia","Historia clínica"],["formulacion","Formulación"],["objetivos","Objetivos"],["pruebas","Pruebas"],["sesiones","Sesiones y pagos"]].map(([id,label])=>(
+                  <div key={id} onClick={()=>setFichaTab(id)} style={{padding:"6px 11px",borderRadius:8,fontSize:11,border:`1px solid ${fichaTab===id?D.accent:D.border}`,cursor:"pointer",background:fichaTab===id?D.accent:"transparent",color:fichaTab===id?D.bone:D.muted,whiteSpace:"nowrap",flexShrink:0}}>{label}</div>
                 ))}
               </div>
 
-              <Card style={{overflow:"hidden"}}>
-                <div style={{padding:"10px 16px",borderBottom:`1px solid ${D.border}`,background:D.sand,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:10,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600}}>Evolución clínica</span>
-                  <span style={{fontSize:11,color:D.muted}}>4 registros</span>
+              {/* Tab content */}
+              {fichaTab==="evolucion"&&<Card style={{overflow:"hidden"}}>
+                <div style={{padding:"10px 14px",borderBottom:`1px solid ${D.border}`,background:D.sand,display:"flex",justifyContent:"space-between"}}>
+                  <span style={{fontSize:9,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600}}>Evolución clínica</span>
+                  <span style={{fontSize:10,color:D.muted}}>4 registros</span>
                 </div>
-                {[["4","2026-03-01","Reestructuración cognitiva. Distorsiones identificadas. Buena adherencia al autorregistro. Paciente refiere mejoría en calidad del sueño."],["3","2026-02-15","Respiración diafragmática. Técnica 4-7-8. La paciente practica diariamente con buenos resultados. Se trabaja la tolerancia a la incertidumbre."],["2","2026-02-01","Psicoeducación sobre ansiedad. Registro de pensamientos automáticos iniciado. Se identifican 3 distorsiones principales."],["1","2026-01-15","Evaluación inicial. Historia clínica completa. Rapport establecido. Se aplica BAI: puntuación 28 (ansiedad moderada)."]].map(([n,f,t],i)=>(
-                  <div key={i} style={{padding:"12px 16px",borderBottom:i<3?`1px solid ${D.border}`:"none"}}>
-                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-                      <span style={{fontSize:11,fontWeight:700,color:D.accent}}>Sesión {n}</span>
-                      <span style={{fontSize:11,color:D.muted}}>{f}</span>
-                    </div>
+                {[["4","2026-03-01","Reestructuración cognitiva. Distorsiones identificadas. Buena adherencia al autorregistro. Paciente refiere mejoría en calidad del sueño."],["3","2026-02-15","Respiración diafragmática. Técnica 4-7-8. La paciente practica con buenos resultados. Se trabaja la tolerancia a la incertidumbre."],["2","2026-02-01","Psicoeducación sobre ansiedad. Registro de pensamientos automáticos iniciado. Se identifican 3 distorsiones principales."],["1","2026-01-15","Evaluación inicial. Historia clínica completa. Rapport establecido. BAI: 28 (ansiedad moderada)."]].map(([n,f,t],i)=>(
+                  <div key={i} style={{padding:"11px 14px",borderBottom:i<3?`1px solid ${D.border}`:"none"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:10,fontWeight:700,color:D.accent}}>Sesión {n}</span><span style={{fontSize:10,color:D.muted}}>{f}</span></div>
                     <div style={{fontSize:12,color:D.text,lineHeight:1.6}}>{t}</div>
                   </div>
                 ))}
-              </Card>
+              </Card>}
+
+              {fichaTab==="historia"&&<Card style={{overflow:"hidden"}}>
+                <div style={{padding:"10px 14px",borderBottom:`1px solid ${D.border}`,background:D.sand}}><span style={{fontSize:9,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600}}>Historia clínica</span></div>
+                <div style={{padding:"18px 16px",fontSize:13,color:D.text,lineHeight:1.9,fontFamily:"'Instrument Serif',serif",minHeight:200}}>
+                  Paciente de 35 años, sin antecedentes psiquiátricos familiares relevantes. Refiere primer episodio de ansiedad a los 28 años en contexto de estrés laboral. Sin tratamientos previos. No toma medicación actualmente. Trabaja como diseñadora gráfica en empresa de publicidad. Relación de pareja estable. Duerme entre 5-6 horas por noche. Practica deporte ocasionalmente.
+                </div>
+              </Card>}
+
+              {fichaTab==="formulacion"&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+                {[["🌙 Sueño","Dificultad para conciliar. Se despierta 2-3 veces por noche con pensamientos rumiativos."],["🏃 Actividad física","Deporte ocasional, 1 vez/semana. Refiere que cuando hace ejercicio se siente mejor."],["🍽 Alimentación","Irregular. Saltea comidas en días de mucho trabajo. Abuso de cafeína."],["👨‍👩‍👧 Familia","Buena relación con familia de origen. Padres mayores, cierta preocupación por su salud."],["💼 Trabajo","Fuente principal de estrés. Perfeccionismo elevado. Dificultad para delegar."],["⚡ Factores estresantes","Plazos de entrega, conflictos con cliente, sensación de no llegar a todo."],["🛡 Factores protectores","Red social activa, pareja de apoyo, motivación para el cambio alta."]].map(([t,d],i)=>(
+                  <Card key={i} style={{overflow:"hidden",gridColumn:i===6?"1 / -1":"auto"}}>
+                    <div style={{padding:"7px 12px",background:D.sand,borderBottom:`1px solid ${D.border}`,fontSize:10,color:D.walnut,fontWeight:600}}>{t}</div>
+                    <div style={{padding:"10px 12px",fontSize:11,color:D.text,lineHeight:1.6}}>{d}</div>
+                  </Card>
+                ))}
+              </div>}
+
+              {fichaTab==="objetivos"&&<Card style={{overflow:"hidden"}}>
+                <div style={{padding:"10px 14px",borderBottom:`1px solid ${D.border}`,background:D.sand}}><span style={{fontSize:9,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600}}>Objetivos terapéuticos</span></div>
+                {[["Reducir episodios de ansiedad de 5 a 2 semanales",false],["Aplicar respiración diafragmática de forma autónoma",true],["Mejorar calidad del sueño — dormir más de 7h",false],["Reducir autocrítica y perfeccionismo en el trabajo",false]].map(([obj,done],i)=>(
+                  <div key={i} style={{padding:"12px 14px",borderBottom:i<3?`1px solid ${D.border}`:"none",display:"flex",gap:10,alignItems:"center"}}>
+                    <div style={{width:18,height:18,borderRadius:5,border:`2px solid ${done?D.green:D.border}`,background:done?D.gD:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                      {done&&<span style={{fontSize:10,color:D.green}}>✓</span>}
+                    </div>
+                    <div style={{fontSize:12,color:done?D.muted:D.text,textDecoration:done?"line-through":"none",flex:1}}>{obj}</div>
+                    <span style={{fontSize:9,fontWeight:600,padding:"2px 8px",borderRadius:20,background:done?D.gD:"rgba(166,107,63,0.08)",color:done?D.green:D.accent}}>{done?"Logrado":"En curso"}</span>
+                  </div>
+                ))}
+              </Card>}
+
+              {fichaTab==="pruebas"&&<Card style={{overflow:"hidden"}}>
+                <div style={{padding:"10px 14px",borderBottom:`1px solid ${D.border}`,background:D.sand}}><span style={{fontSize:9,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600}}>Pruebas realizadas</span></div>
+                {[["2026-01-15","BAI — Inventario de Ansiedad de Beck","Puntuación 28 — Ansiedad moderada",""],["2026-03-15","BAI — Inventario de Ansiedad de Beck","Puntuación 14 — Ansiedad leve","Mejora significativa tras 4 sesiones"]].map(([f,p,r,o],i)=>(
+                  <div key={i} style={{padding:"12px 14px",borderBottom:i<1?`1px solid ${D.border}`:"none"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:11,fontWeight:600,color:D.ink}}>{p}</span><span style={{fontSize:10,color:D.muted}}>{f}</span></div>
+                    <div style={{fontSize:12,color:D.accent,fontWeight:500,marginBottom:o?3:0}}>{r}</div>
+                    {o&&<div style={{fontSize:11,color:D.muted}}>{o}</div>}
+                  </div>
+                ))}
+              </Card>}
+
+              {fichaTab==="sesiones"&&<Card style={{overflow:"hidden"}}>
+                <div style={{padding:"10px 14px",borderBottom:`1px solid ${D.border}`,background:D.sand}}><span style={{fontSize:9,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600}}>Sesiones y pagos</span></div>
+                {[["1","2026-01-15",80,true,"FAC-101","Evaluación inicial"],["2","2026-02-01",80,true,"FAC-102","Psicoeducación ansiedad"],["3","2026-02-15",80,true,"FAC-103","Respiración diafragmática"],["4","2026-03-01",80,false,"FAC-104","Reestructuración cognitiva"]].map(([n,f,p,paid,fac,trab],i)=>(
+                  <div key={i} style={{padding:"11px 14px",borderBottom:i<3?`1px solid ${D.border}`:"none",display:"grid",gridTemplateColumns:"30px 90px 1fr 70px 80px",gap:10,alignItems:"center"}}>
+                    <div style={{fontSize:11,fontWeight:700,color:D.accent}}>{n}</div>
+                    <div style={{fontSize:11,color:D.muted}}>{f}</div>
+                    <div style={{fontSize:11,color:D.text}}>{trab}</div>
+                    <div style={{fontSize:12,fontWeight:600,color:D.ink}}>{p}€</div>
+                    <span style={{background:paid?D.gD:D.amD,color:paid?D.green:D.amber,fontSize:9,fontWeight:600,padding:"2px 8px",borderRadius:20,display:"inline-block"}}>{paid?"Pagada":"Pendiente"}</span>
+                  </div>
+                ))}
+              </Card>}
             </div>}
 
             {/* ── FACTURAS ── */}
@@ -302,23 +359,37 @@ function Demo() {
 
             {/* ── RECURSOS ── */}
             {active==="recursos"&&<div>
-              <div style={{fontFamily:"'Instrument Serif',serif",fontSize:26,color:D.ink,marginBottom:6}}>Recursos</div>
-              <div style={{fontSize:13,color:D.muted,marginBottom:20}}>Biblioteca de materiales clínicos disponibles según tu plan</div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14,marginBottom:16,opacity:0.6}}>
-                <Card style={{padding:28,textAlign:"center"}}>
-                  <div style={{fontSize:36,marginBottom:12}}>👤</div>
-                  <div style={{fontSize:15,fontWeight:600,color:D.ink,marginBottom:8}}>Para el paciente</div>
-                  <div style={{fontSize:12,color:D.muted,lineHeight:1.6}}>Autorregistros, psicoeducación, hojas de trabajo y ejercicios para dar a tus pacientes.</div>
-                </Card>
-                <Card style={{padding:28,textAlign:"center"}}>
-                  <div style={{fontSize:36,marginBottom:12}}>🧠</div>
-                  <div style={{fontSize:15,fontWeight:600,color:D.ink,marginBottom:8}}>Para el profesional</div>
-                  <div style={{fontSize:12,color:D.muted,lineHeight:1.6}}>Protocolos de intervención, escalas estandarizadas y guías clínicas de referencia.</div>
-                </Card>
+              <div style={{fontFamily:"'Instrument Serif',serif",fontSize:26,color:D.ink,marginBottom:4}}>Recursos</div>
+              <div style={{fontSize:12,color:D.muted,marginBottom:18}}>Biblioteca de materiales clínicos · Acceso según tu plan</div>
+
+              <div style={{fontSize:10,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600,marginBottom:10}}>Para el paciente</div>
+              <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:16}}>
+                {[["📄","Registro de pensamientos automáticos","Hoja de autorregistro semanal para identificar distorsiones cognitivas","Todos los planes"],["📄","Psicoeducación sobre ansiedad","Guía explicativa para el paciente sobre qué es la ansiedad y cómo funciona","Todos los planes"],["📄","Ejercicios de respiración diafragmática","Instrucciones paso a paso para la técnica 4-7-8 y respiración abdominal","Todos los planes"],["📄","Registro de actividades placenteras","Hoja de seguimiento para activación conductual en depresión","Plan Pro"],["📄","Diario de sueño","Registro semanal de calidad y patrones del sueño","Plan Pro"]].map(([icon,title,desc,plan],i)=>(
+                  <div key={i} style={{background:D.bone,borderRadius:10,padding:"10px 14px",border:`1px solid ${D.border}`,display:"flex",gap:12,alignItems:"center"}}>
+                    <div style={{fontSize:20,flexShrink:0}}>{icon}</div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:12,fontWeight:600,color:D.ink}}>{title}</div>
+                      <div style={{fontSize:10,color:D.muted,marginTop:1}}>{desc}</div>
+                    </div>
+                    <span style={{background:plan==="Todos los planes"?D.gD:"rgba(166,107,63,0.1)",color:plan==="Todos los planes"?D.green:D.accent,fontSize:9,fontWeight:600,padding:"2px 8px",borderRadius:20,flexShrink:0}}>{plan}</span>
+                    <div style={{width:28,height:28,borderRadius:8,background:D.sand,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,cursor:"pointer",flexShrink:0}}>↓</div>
+                  </div>
+                ))}
               </div>
-              <div style={{background:D.sand,borderRadius:12,padding:"18px 24px",textAlign:"center",border:`1px solid ${D.border}`}}>
-                <div style={{fontSize:14,fontWeight:600,color:D.walnut,marginBottom:4}}>Próximamente</div>
-                <div style={{fontSize:12,color:D.muted}}>Estamos preparando la biblioteca de recursos. Disponible en el lanzamiento.</div>
+
+              <div style={{fontSize:10,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600,marginBottom:10}}>Para el profesional</div>
+              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                {[["📋","Protocolo TCC para trastorno de ansiedad generalizada","Guía estructurada de intervención cognitivo-conductual — 12 sesiones","Plan Pro"],["📋","Protocolo de activación conductual para depresión","Protocolo BA con registro de actividades y programación semanal","Plan Pro"],["📋","Escala BAI — Inventario de Ansiedad de Beck","Versión para uso clínico con instrucciones de corrección e interpretación","Todos los planes"],["📋","Escala PHQ-9 — Depresión","Cuestionario de salud del paciente para cribado de depresión","Todos los planes"],["📋","Plantilla de informe de derivación","Estructura profesional para informes de derivación a psiquiatría u otros especialistas","Plan Pro"]].map(([icon,title,desc,plan],i)=>(
+                  <div key={i} style={{background:D.bone,borderRadius:10,padding:"10px 14px",border:`1px solid ${D.border}`,display:"flex",gap:12,alignItems:"center"}}>
+                    <div style={{fontSize:20,flexShrink:0}}>{icon}</div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:12,fontWeight:600,color:D.ink}}>{title}</div>
+                      <div style={{fontSize:10,color:D.muted,marginTop:1}}>{desc}</div>
+                    </div>
+                    <span style={{background:plan==="Todos los planes"?D.gD:"rgba(166,107,63,0.1)",color:plan==="Todos los planes"?D.green:D.accent,fontSize:9,fontWeight:600,padding:"2px 8px",borderRadius:20,flexShrink:0}}>{plan}</span>
+                    <div style={{width:28,height:28,borderRadius:8,background:D.sand,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,cursor:"pointer",flexShrink:0,opacity:0.4}}>🔒</div>
+                  </div>
+                ))}
               </div>
             </div>}
 
