@@ -28,237 +28,6 @@ const PLANES = [
 ];
 
 
-const DEMO_HTML = `<!DOCTYPE html>
-<html><head>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@1&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Manrope',sans-serif}
-body{background:#F5EFE4;display:flex;height:560px;overflow:hidden}
-.nav-item{padding:7px 16px;font-size:11px;cursor:pointer;color:#9A7E68;font-weight:400;transition:all 0.15s}
-.nav-item:hover{background:rgba(166,107,63,0.05);color:#A66B3F}
-.nav-item.active{background:rgba(166,107,63,0.1);color:#A66B3F;font-weight:600}
-.nav-sub{padding:5px 16px 5px 28px;font-size:10px;cursor:pointer;color:#9A7E68}
-.nav-sub:hover{color:#A66B3F}
-.nav-sub.active{color:#A66B3F;font-weight:600}
-.section{display:none;padding:20px;overflow-y:auto;height:100%}
-.section.active{display:block}
-.card{background:#FBF8F1;border-radius:10px;border:1px solid #D9C9A8}
-.badge-green{background:#E8EFE2;color:#4A6438;font-size:9px;font-weight:600;padding:2px 8px;border-radius:20px;display:inline-block}
-.badge-amber{background:#FDF3DC;color:#C48C2A;font-size:9px;font-weight:600;padding:2px 8px;border-radius:20px;display:inline-block}
-.badge-terra{background:rgba(166,107,63,0.1);color:#A66B3F;font-size:9px;font-weight:600;padding:2px 8px;border-radius:20px;display:inline-block}
-.tab{padding:5px 11px;border-radius:8px;font-size:10px;border:1px solid #D9C9A8;cursor:pointer;background:#FBF8F1;color:#9A7E68;white-space:nowrap}
-.tab.active{background:#A66B3F;color:#FBF8F1;border-color:#A66B3F}
-.row-item{padding:9px 14px;border-bottom:1px solid #D9C9A8;display:flex;align-items:center;gap:10px;cursor:pointer}
-.row-item:hover{background:rgba(166,107,63,0.04)}
-.avatar{width:30px;height:30px;border-radius:50%;background:#A66B3F;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#FBF8F1;flex-shrink:0}
-.slabel{font-size:9px;color:#6B4A30;text-transform:uppercase;letter-spacing:0.07em;font-weight:600;margin-bottom:8px}
-</style></head><body>
-<div style="width:185px;background:#F5EFE4;border-right:1px solid #D9C9A8;flex-shrink:0;display:flex;flex-direction:column">
-  <div style="padding:14px 16px 10px;border-bottom:1px solid #D9C9A8;margin-bottom:6px">
-    <div style="display:flex;align-items:flex-end;line-height:1">
-      <span style="font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:#A66B3F">pra</span>
-      <span style="font-family:'Playfair Display',serif;font-style:italic;font-size:18px;color:#A66B3F;line-height:0.9;margin-left:1px">X</span>
-      <span style="font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:#A66B3F">i</span>
-      <span style="display:inline-block;width:4px;height:4px;border-radius:50%;background:#A66B3F;margin-left:6px;margin-bottom:2px"></span>
-    </div>
-    <div style="font-size:7px;color:#9A7E68;letter-spacing:0.15em;text-transform:uppercase;margin-top:2px">gestión clínica</div>
-  </div>
-  <div class="nav-item active" onclick="show('dashboard')">▪ Dashboard</div>
-  <div class="nav-item" onclick="show('calendario')">▪ Calendario</div>
-  <div class="nav-item" onclick="show('pacientes')">▪ Pacientes</div>
-  <div class="nav-sub" onclick="show('ficha')">↳ Ficha paciente</div>
-  <div class="nav-item" onclick="show('facturas')">▪ Facturas</div>
-  <div class="nav-item" onclick="show('recursos')">▪ Recursos</div>
-  <div style="margin-top:auto;padding:10px 16px;border-top:1px solid #D9C9A8;display:flex;align-items:center;gap:8px">
-    <div style="width:24px;height:24px;border-radius:50%;background:#A66B3F;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#FBF8F1">K</div>
-    <div><div style="font-size:10px;font-weight:600;color:#3B2A1E">Kevin Costa</div><div style="font-size:8px;color:#9A7E68">Neuropsicólogo</div></div>
-  </div>
-</div>
-<div style="flex:1;overflow:hidden">
-
-<div id="s-dashboard" class="section active">
-  <div style="font-family:'Instrument Serif',serif;font-size:19px;color:#221610;font-style:italic;margin-bottom:4px">Dashboard</div>
-  <div style="font-size:10px;color:#9A7E68;margin-bottom:14px">Lunes, 11 de agosto de 2026</div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px">
-    <div class="card" style="padding:10px"><div style="font-size:19px;font-weight:700;color:#A66B3F">15</div><div style="font-size:9px;color:#9A7E68;margin-top:1px">Pacientes activos</div></div>
-    <div class="card" style="padding:10px"><div style="font-size:19px;font-weight:700;color:#A66B3F">5</div><div style="font-size:9px;color:#9A7E68;margin-top:1px">Citas hoy</div></div>
-    <div class="card" style="padding:10px"><div style="font-size:19px;font-weight:700;color:#A66B3F">830€</div><div style="font-size:9px;color:#9A7E68;margin-top:1px">Cobrado mes</div></div>
-    <div class="card" style="padding:10px"><div style="font-size:19px;font-weight:700;color:#A66B3F">320€</div><div style="font-size:9px;color:#9A7E68;margin-top:1px">Pendiente</div></div>
-  </div>
-  <div class="card" style="padding:12px;margin-bottom:10px">
-    <div class="slabel">Citas de hoy</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
-      <div style="padding:7px;background:#F5EFE4;border-radius:8px;border:1px solid #D9C9A8"><div style="font-size:9px;color:#9A7E68">09:00</div><div style="font-size:10px;font-weight:600;color:#221610">María González</div><div style="font-size:9px;color:#9A7E68">60min</div></div>
-      <div style="padding:7px;background:#F5EFE4;border-radius:8px;border:1px solid #D9C9A8"><div style="font-size:9px;color:#4A7B6B">10:00 · Calendly</div><div style="font-size:10px;font-weight:600;color:#221610">Primera llamada</div><div style="font-size:9px;color:#9A7E68">30min</div></div>
-      <div style="padding:7px;background:#F5EFE4;border-radius:8px;border:1px solid #D9C9A8"><div style="font-size:9px;color:#9A7E68">11:00</div><div style="font-size:10px;font-weight:600;color:#221610">Carlos Ruiz</div><div style="font-size:9px;color:#9A7E68">60min</div></div>
-      <div style="padding:7px;background:#F5EFE4;border-radius:8px;border:1px solid #D9C9A8"><div style="font-size:9px;color:#9A7E68">12:00</div><div style="font-size:10px;font-weight:600;color:#221610">Laura Sánchez</div><div style="font-size:9px;color:#9A7E68">90min</div></div>
-      <div style="padding:7px;background:#F5EFE4;border-radius:8px;border:1px solid #D9C9A8"><div style="font-size:9px;color:#9A7E68">16:00</div><div style="font-size:10px;font-weight:600;color:#221610">Miguel García</div><div style="font-size:9px;color:#9A7E68">60min</div></div>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 200px;gap:10px">
-    <div class="card" style="padding:12px">
-      <div class="slabel">Agenda personal</div>
-      <div style="display:flex;flex-direction:column;gap:7px">
-        <div style="display:flex;gap:7px;align-items:center"><div style="width:7px;height:7px;border-radius:50%;background:#B85040;flex-shrink:0"></div><div style="font-size:10px;color:#3B2A1E;flex:1">Supervisión clínica</div><div style="font-size:9px;color:#9A7E68">15:00</div></div>
-        <div style="display:flex;gap:7px;align-items:center"><div style="width:7px;height:7px;border-radius:50%;background:#C48C2A;flex-shrink:0"></div><div style="font-size:10px;color:#3B2A1E;flex:1">Enviar informe derivación</div><div style="font-size:9px;color:#9A7E68">Mañana</div></div>
-        <div style="display:flex;gap:7px;align-items:center"><div style="width:7px;height:7px;border-radius:50%;background:#4A6438;flex-shrink:0"></div><div style="font-size:10px;color:#3B2A1E;flex:1">Formación EMDR</div><div style="font-size:9px;color:#9A7E68">Viernes</div></div>
-      </div>
-    </div>
-    <div class="card" style="padding:12px">
-      <div class="slabel">✦ Asistente IA</div>
-      <div style="font-size:10px;color:#9A7E68;line-height:1.5;font-style:italic">"Laura lleva 5 sesiones — considera revisar objetivos en la próxima."</div>
-    </div>
-  </div>
-</div>
-
-<div id="s-calendario" class="section">
-  <div style="font-family:'Instrument Serif',serif;font-size:19px;color:#221610;font-style:italic;margin-bottom:12px">Calendario semanal</div>
-  <div class="card" style="overflow:hidden">
-    <div style="display:grid;grid-template-columns:40px repeat(7,1fr);border-bottom:1px solid #D9C9A8">
-      <div style="background:#F5EFE4"></div>
-      <div style="padding:7px 3px;text-align:center;background:rgba(166,107,63,0.08);border-left:1px solid #D9C9A8"><div style="font-size:8px;color:#A66B3F;text-transform:uppercase;font-weight:600">Lun</div><div style="font-size:14px;font-weight:700;color:#A66B3F">11</div><div style="width:4px;height:4px;border-radius:50%;background:#A66B3F;margin:2px auto 0"></div></div>
-      <div style="padding:7px 3px;text-align:center;border-left:1px solid #D9C9A8"><div style="font-size:8px;color:#9A7E68;text-transform:uppercase">Mar</div><div style="font-size:14px;color:#221610">12</div><div style="width:4px;height:4px;border-radius:50%;background:#A66B3F;margin:2px auto 0"></div></div>
-      <div style="padding:7px 3px;text-align:center;border-left:1px solid #D9C9A8"><div style="font-size:8px;color:#9A7E68;text-transform:uppercase">Mié</div><div style="font-size:14px;color:#221610">13</div></div>
-      <div style="padding:7px 3px;text-align:center;border-left:1px solid #D9C9A8"><div style="font-size:8px;color:#9A7E68;text-transform:uppercase">Jue</div><div style="font-size:14px;color:#221610">14</div><div style="width:4px;height:4px;border-radius:50%;background:#A66B3F;margin:2px auto 0"></div></div>
-      <div style="padding:7px 3px;text-align:center;border-left:1px solid #D9C9A8"><div style="font-size:8px;color:#9A7E68;text-transform:uppercase">Vie</div><div style="font-size:14px;color:#221610">15</div><div style="width:4px;height:4px;border-radius:50%;background:#A66B3F;margin:2px auto 0"></div></div>
-      <div style="padding:7px 3px;text-align:center;border-left:1px solid #D9C9A8"><div style="font-size:8px;color:#9A7E68;text-transform:uppercase">Sáb</div><div style="font-size:14px;color:#221610">16</div></div>
-      <div style="padding:7px 3px;text-align:center;border-left:1px solid #D9C9A8"><div style="font-size:8px;color:#9A7E68;text-transform:uppercase">Dom</div><div style="font-size:14px;color:#221610">17</div></div>
-    </div>
-    <div style="display:grid;grid-template-columns:40px repeat(7,1fr);height:320px">
-      <div style="display:flex;flex-direction:column">
-        <div style="flex:1;padding:3px 5px;font-size:8px;color:#9A7E68;border-bottom:1px solid #E2D9C8;text-align:right">09:00</div>
-        <div style="flex:1;padding:3px 5px;font-size:8px;color:#9A7E68;border-bottom:1px solid #E2D9C8;text-align:right">10:00</div>
-        <div style="flex:1;padding:3px 5px;font-size:8px;color:#9A7E68;border-bottom:1px solid #E2D9C8;text-align:right">11:00</div>
-        <div style="flex:1;padding:3px 5px;font-size:8px;color:#9A7E68;border-bottom:1px solid #E2D9C8;text-align:right">12:00</div>
-        <div style="flex:1;padding:3px 5px;font-size:8px;color:#9A7E68;border-bottom:1px solid #E2D9C8;text-align:right">13:00</div>
-        <div style="flex:1;padding:3px 5px;font-size:8px;color:#9A7E68;border-bottom:1px solid #E2D9C8;text-align:right">14:00</div>
-        <div style="flex:1;padding:3px 5px;font-size:8px;color:#9A7E68;border-bottom:1px solid #E2D9C8;text-align:right">15:00</div>
-        <div style="flex:1;padding:3px 5px;font-size:8px;color:#9A7E68;text-align:right">16:00</div>
-      </div>
-      <div style="border-left:1px solid #D9C9A8;position:relative;background:rgba(166,107,63,0.02)">
-        <div style="position:absolute;top:2px;left:2px;right:2px;background:rgba(166,107,63,0.15);border:1px solid #A66B3F;border-radius:4px;padding:2px 4px"><div style="font-size:8px;font-weight:600;color:#A66B3F">09:00 María G.</div></div>
-        <div style="position:absolute;top:42px;left:2px;right:2px;background:rgba(74,123,107,0.12);border:1px solid #4A7B6B;border-radius:4px;padding:2px 4px"><div style="font-size:8px;font-weight:600;color:#4A7B6B">10:00 Calendly</div></div>
-        <div style="position:absolute;top:82px;left:2px;right:2px;background:rgba(166,107,63,0.15);border:1px solid #A66B3F;border-radius:4px;padding:2px 4px"><div style="font-size:8px;font-weight:600;color:#A66B3F">11:00 Carlos R.</div></div>
-        <div style="position:absolute;top:122px;left:2px;right:2px;height:58px;background:rgba(166,107,63,0.15);border:1px solid #A66B3F;border-radius:4px;padding:2px 4px"><div style="font-size:8px;font-weight:600;color:#A66B3F">12:00 Laura S. 90min</div></div>
-        <div style="position:absolute;top:282px;left:2px;right:2px;background:rgba(166,107,63,0.15);border:1px solid #A66B3F;border-radius:4px;padding:2px 4px"><div style="font-size:8px;font-weight:600;color:#A66B3F">16:00 Miguel G.</div></div>
-      </div>
-      <div style="border-left:1px solid #D9C9A8;position:relative">
-        <div style="position:absolute;top:22px;left:2px;right:2px;background:rgba(166,107,63,0.15);border:1px solid #A66B3F;border-radius:4px;padding:2px 4px"><div style="font-size:8px;font-weight:600;color:#A66B3F">09:30 Ana M.</div></div>
-        <div style="position:absolute;top:82px;left:2px;right:2px;background:rgba(166,107,63,0.15);border:1px solid #A66B3F;border-radius:4px;padding:2px 4px"><div style="font-size:8px;font-weight:600;color:#A66B3F">11:00 Pedro L.</div></div>
-      </div>
-      <div style="border-left:1px solid #D9C9A8"></div>
-      <div style="border-left:1px solid #D9C9A8;position:relative">
-        <div style="position:absolute;top:2px;left:2px;right:2px;background:rgba(166,107,63,0.15);border:1px solid #A66B3F;border-radius:4px;padding:2px 4px"><div style="font-size:8px;font-weight:600;color:#A66B3F">09:00 Elena V.</div></div>
-        <div style="position:absolute;top:90px;left:2px;right:2px;height:58px;background:rgba(166,107,63,0.15);border:1px solid #A66B3F;border-radius:4px;padding:2px 4px"><div style="font-size:8px;font-weight:600;color:#A66B3F">11:30 Isabel M. 90min</div></div>
-      </div>
-      <div style="border-left:1px solid #D9C9A8;position:relative">
-        <div style="position:absolute;top:42px;left:2px;right:2px;background:rgba(166,107,63,0.15);border:1px solid #A66B3F;border-radius:4px;padding:2px 4px"><div style="font-size:8px;font-weight:600;color:#A66B3F">10:00 Sofía R.</div></div>
-        <div style="position:absolute;top:82px;left:2px;right:2px;background:rgba(166,107,63,0.15);border:1px solid #A66B3F;border-radius:4px;padding:2px 4px"><div style="font-size:8px;font-weight:600;color:#A66B3F">11:00 Antonio P.</div></div>
-      </div>
-      <div style="border-left:1px solid #D9C9A8"></div>
-      <div style="border-left:1px solid #D9C9A8"></div>
-    </div>
-  </div>
-</div>
-
-<div id="s-pacientes" class="section">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <div style="font-family:'Instrument Serif',serif;font-size:19px;color:#221610;font-style:italic">Pacientes</div>
-    <input placeholder="Buscar..." style="border:1px solid #D9C9A8;border-radius:8px;padding:5px 10px;font-size:10px;background:#FBF8F1;color:#9A7E68;outline:none;width:140px"/>
-  </div>
-  <div class="card" style="overflow:hidden">
-    <div class="row-item" onclick="show('ficha')"><div class="avatar">M</div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#221610">María González López</div><div style="font-size:9px;color:#9A7E68">Ansiedad generalizada · 4 sesiones</div></div><span class="badge-terra">Activo</span></div>
-    <div class="row-item" onclick="show('ficha')"><div class="avatar">C</div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#221610">Carlos Ruiz Martínez</div><div style="font-size:9px;color:#9A7E68">Depresión mayor · 3 sesiones</div></div><span class="badge-terra">Activo</span></div>
-    <div class="row-item" onclick="show('ficha')"><div class="avatar">A</div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#221610">Ana Martínez Vega</div><div style="font-size:9px;color:#9A7E68">Fobia social · 3 sesiones</div></div><span class="badge-terra">Activo</span></div>
-    <div class="row-item" onclick="show('ficha')"><div class="avatar">J</div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#221610">Javier Fernández Mora</div><div style="font-size:9px;color:#9A7E68">Trastorno adaptativo · 3 sesiones</div></div><span class="badge-terra">Activo</span></div>
-    <div class="row-item" onclick="show('ficha')"><div class="avatar">L</div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#221610">Laura Sánchez Díaz</div><div style="font-size:9px;color:#9A7E68">TCA restricción · 5 sesiones</div></div><span class="badge-terra">Activo</span></div>
-    <div class="row-item" onclick="show('ficha')"><div class="avatar">P</div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#221610">Pedro López Castillo</div><div style="font-size:9px;color:#9A7E68">TOC · 3 sesiones</div></div><span class="badge-terra">Activo</span></div>
-    <div class="row-item" onclick="show('ficha')"><div class="avatar">S</div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#221610">Sofía Ramírez Torres</div><div style="font-size:9px;color:#9A7E68">Duelo complicado · 2 sesiones</div></div><span class="badge-terra">Activo</span></div>
-    <div class="row-item" onclick="show('ficha')"><div class="avatar" style="background:#4A6438">C</div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:#221610">Carmen Herrera Blanco</div><div style="font-size:9px;color:#9A7E68">Fobia a agujas · 4 sesiones</div></div><span class="badge-green">Alta</span></div>
-  </div>
-  <div style="padding:7px 0;font-size:9px;color:#9A7E68;text-align:center">Haz clic en un paciente para ver su ficha →</div>
-</div>
-
-<div id="s-ficha" class="section">
-  <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:12px">
-    <div class="avatar" style="width:38px;height:38px;font-size:14px">M</div>
-    <div style="flex:1">
-      <div style="font-size:17px;font-weight:700;color:#221610">María González López</div>
-      <div style="font-size:10px;color:#9A7E68;margin-top:2px">612 345 678 · maria@email.com</div>
-      <div style="display:flex;gap:8px;margin-top:4px;align-items:center">
-        <span style="font-size:10px;color:#6B4A30;font-weight:500">4 sesiones</span>
-        <span style="color:#D9C9A8">·</span>
-        <span style="font-size:10px;color:#9A7E68">1/2 objetivos</span>
-        <div style="height:4px;width:50px;background:#E2D9C8;border-radius:99px;overflow:hidden"><div style="height:100%;width:50%;background:#4A6438;border-radius:99px"></div></div>
-      </div>
-    </div>
-    <span class="badge-terra">Activo</span>
-  </div>
-  <div class="card" style="padding:10px 12px;border-left:3px solid #A66B3F;margin-bottom:10px">
-    <div style="font-size:9px;color:#9A7E68;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px">Motivo de consulta</div>
-    <div style="font-size:11px;color:#3B2A1E;line-height:1.5">Ansiedad generalizada con episodios frecuentes de preocupación excesiva, insomnio y tensión muscular.</div>
-  </div>
-  <div style="display:flex;gap:5px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px">
-    <div class="tab">Historia clínica</div>
-    <div class="tab">Formulación</div>
-    <div class="tab active">Evolución</div>
-    <div class="tab">Objetivos</div>
-    <div class="tab">Pruebas</div>
-    <div class="tab">Sesiones</div>
-  </div>
-  <div class="card" style="overflow:hidden">
-    <div style="padding:8px 12px;border-bottom:1px solid #D9C9A8;background:#F5EFE4"><div class="slabel" style="margin:0">Evolución clínica</div></div>
-    <div style="padding:9px 12px;border-bottom:1px solid #D9C9A8"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;font-weight:600;color:#A66B3F">Sesión 4</span><span style="font-size:9px;color:#9A7E68">2026-03-01</span></div><div style="font-size:10px;color:#3B2A1E;line-height:1.5">Reestructuración cognitiva. Distorsiones identificadas. Buena adherencia al autorregistro.</div></div>
-    <div style="padding:9px 12px;border-bottom:1px solid #D9C9A8"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;font-weight:600;color:#A66B3F">Sesión 3</span><span style="font-size:9px;color:#9A7E68">2026-02-15</span></div><div style="font-size:10px;color:#3B2A1E;line-height:1.5">Respiración diafragmática. Técnica 4-7-8. La paciente la practica diariamente.</div></div>
-    <div style="padding:9px 12px;border-bottom:1px solid #D9C9A8"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;font-weight:600;color:#A66B3F">Sesión 2</span><span style="font-size:9px;color:#9A7E68">2026-02-01</span></div><div style="font-size:10px;color:#3B2A1E;line-height:1.5">Psicoeducación sobre ansiedad. Registro de pensamientos automáticos iniciado.</div></div>
-    <div style="padding:9px 12px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;font-weight:600;color:#A66B3F">Sesión 1</span><span style="font-size:9px;color:#9A7E68">2026-01-15</span></div><div style="font-size:10px;color:#3B2A1E;line-height:1.5">Evaluación inicial. Historia clínica completa. Rapport establecido.</div></div>
-  </div>
-</div>
-
-<div id="s-facturas" class="section">
-  <div style="font-family:'Instrument Serif',serif;font-size:19px;color:#221610;font-style:italic;margin-bottom:12px">Facturas</div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px">
-    <div class="card" style="padding:10px"><div style="font-size:9px;color:#9A7E68;margin-bottom:3px">Total cobrado</div><div style="font-size:18px;font-weight:700;color:#4A6438">3.440€</div></div>
-    <div class="card" style="padding:10px"><div style="font-size:9px;color:#9A7E68;margin-bottom:3px">Pendiente</div><div style="font-size:18px;font-weight:700;color:#C48C2A">320€</div></div>
-    <div class="card" style="padding:10px"><div style="font-size:9px;color:#9A7E68;margin-bottom:3px">Este mes</div><div style="font-size:18px;font-weight:700;color:#A66B3F">830€</div></div>
-  </div>
-  <div class="card" style="overflow:hidden">
-    <div style="display:grid;grid-template-columns:1fr 90px 60px 75px;padding:7px 12px;border-bottom:1px solid #D9C9A8;font-size:8px;color:#9A7E68;text-transform:uppercase;letter-spacing:0.07em;font-weight:600">
-      <div>Paciente</div><div>Factura</div><div>Importe</div><div>Estado</div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 90px 60px 75px;padding:8px 12px;border-bottom:1px solid #D9C9A8;align-items:center"><div style="font-size:10px;font-weight:500;color:#221610">María González</div><div style="font-size:9px;color:#9A7E68">FAC-104</div><div style="font-size:10px;font-weight:600">80€</div><span class="badge-amber">Pendiente</span></div>
-    <div style="display:grid;grid-template-columns:1fr 90px 60px 75px;padding:8px 12px;border-bottom:1px solid #D9C9A8;align-items:center"><div style="font-size:10px;font-weight:500;color:#221610">Carlos Ruiz</div><div style="font-size:9px;color:#9A7E68">FAC-203</div><div style="font-size:10px;font-weight:600">80€</div><span class="badge-amber">Pendiente</span></div>
-    <div style="display:grid;grid-template-columns:1fr 90px 60px 75px;padding:8px 12px;border-bottom:1px solid #D9C9A8;align-items:center"><div style="font-size:10px;font-weight:500;color:#221610">Laura Sánchez</div><div style="font-size:9px;color:#9A7E68">FAC-505</div><div style="font-size:10px;font-weight:600">90€</div><span class="badge-amber">Pendiente</span></div>
-    <div style="display:grid;grid-template-columns:1fr 90px 60px 75px;padding:8px 12px;border-bottom:1px solid #D9C9A8;align-items:center"><div style="font-size:10px;font-weight:500;color:#221610">Ana Martínez</div><div style="font-size:9px;color:#9A7E68">FAC-303</div><div style="font-size:10px;font-weight:600">80€</div><span class="badge-green">Pagada</span></div>
-    <div style="display:grid;grid-template-columns:1fr 90px 60px 75px;padding:8px 12px;border-bottom:1px solid #D9C9A8;align-items:center"><div style="font-size:10px;font-weight:500;color:#221610">Miguel García</div><div style="font-size:9px;color:#9A7E68">FAC-804</div><div style="font-size:10px;font-weight:600">80€</div><span class="badge-green">Pagada</span></div>
-    <div style="display:grid;grid-template-columns:1fr 90px 60px 75px;padding:8px 12px;align-items:center"><div style="font-size:10px;font-weight:500;color:#221610">Javier Fernández</div><div style="font-size:9px;color:#9A7E68">FAC-403</div><div style="font-size:10px;font-weight:600">90€</div><span class="badge-green">Pagada</span></div>
-  </div>
-</div>
-
-<div id="s-recursos" class="section">
-  <div style="font-family:'Instrument Serif',serif;font-size:19px;color:#221610;font-style:italic;margin-bottom:6px">Recursos</div>
-  <div style="font-size:11px;color:#9A7E68;margin-bottom:16px">Biblioteca de materiales clínicos según tu plan</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;opacity:0.55">
-    <div class="card" style="padding:20px;text-align:center"><div style="font-size:28px;margin-bottom:8px">👤</div><div style="font-size:12px;font-weight:600;color:#221610;margin-bottom:4px">Para el paciente</div><div style="font-size:10px;color:#9A7E68;line-height:1.5">Autorregistros, psicoeducación y hojas de trabajo.</div></div>
-    <div class="card" style="padding:20px;text-align:center"><div style="font-size:28px;margin-bottom:8px">🧠</div><div style="font-size:12px;font-weight:600;color:#221610;margin-bottom:4px">Para el profesional</div><div style="font-size:10px;color:#9A7E68;line-height:1.5">Protocolos, escalas y guías clínicas.</div></div>
-  </div>
-  <div style="background:#E2D9C8;border-radius:10px;padding:14px 18px;text-align:center;border:1px solid #D9C9A8">
-    <div style="font-size:12px;font-weight:600;color:#6B4A30;margin-bottom:3px">Próximamente</div>
-    <div style="font-size:11px;color:#9A7E68">Disponible en el lanzamiento.</div>
-  </div>
-</div>
-
-</div>
-<script>
-function show(id){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-item,.nav-sub').forEach(n=>n.classList.remove('active'));
-  document.getElementById('s-'+id).classList.add('active');
-  var nav=document.querySelector('[onclick="show(\''+id+'\')"]');
-  if(nav)nav.classList.add('active');
-}
-</script>
-</body></html>`;
 
 const Logo = ({ size = 22, textColor = C.ink }) => (
   <div style={{ display: "flex", alignItems: "flex-end", lineHeight: 1, gap: 0 }}>
@@ -268,6 +37,238 @@ const Logo = ({ size = 22, textColor = C.ink }) => (
     <span style={{ display: "inline-block", width: size * 0.27, height: size * 0.27, borderRadius: "50%", background: C.accent, marginLeft: size * 0.45, marginBottom: size * 0.13, flexShrink: 0 }} />
   </div>
 );
+
+
+function Demo() {
+  const [active, setActive] = useState("dashboard");
+  const C2 = { bg:"#F5EFE4",bone:"#FBF8F1",border:"#D9C9A8",accent:"#A66B3F",walnut:"#6B4A30",ink:"#221610",muted:"#9A7E68",sand:"#E2D9C8",green:"#4A6438",teal:"#4A7B6B" };
+  const navItems = [["dashboard","Dashboard"],["calendario","Calendario"],["pacientes","Pacientes"],["ficha","↳ Ficha paciente"],["facturas","Facturas"],["recursos","Recursos"]];
+
+  return (
+    <section style={{maxWidth:1000,margin:"0 auto 90px",padding:"0 48px"}}>
+      <div style={{textAlign:"center",marginBottom:24}}>
+        <div style={{display:"flex",alignItems:"flex-end",justifyContent:"center",lineHeight:1,marginBottom:6}}>
+          <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontSize:18,color:C2.ink,letterSpacing:"-0.5px"}}>Explora las diferentes secciones de pra</span>
+          <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontSize:21,color:C2.accent,letterSpacing:"-0.5px",lineHeight:0.9,marginLeft:2}}>X</span>
+          <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontSize:18,color:C2.ink,letterSpacing:"-0.5px"}}>i</span>
+          <span style={{display:"inline-block",width:6,height:6,borderRadius:"50%",background:C2.accent,marginLeft:9,marginBottom:3}}/>
+        </div>
+      </div>
+      <div style={{background:C2.ink,borderRadius:20,overflow:"hidden",boxShadow:"0 40px 80px rgba(34,22,16,0.2)"}}>
+        <div style={{background:"#1A0E08",padding:"10px 16px",display:"flex",gap:6,alignItems:"center"}}>
+          {["#FF5F57","#FFBD2E","#28CA41"].map((c,i)=><div key={i} style={{width:11,height:11,borderRadius:"50%",background:c}}/>)}
+          <div style={{flex:1,background:"#2A1E18",borderRadius:6,height:22,margin:"0 12px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <span style={{fontSize:10,color:"#6B4A30"}}>praxi-kevin-8beb.vercel.app/app</span>
+          </div>
+        </div>
+        <div style={{display:"flex",height:540}}>
+          {/* Sidebar */}
+          <div style={{width:190,background:C2.bg,borderRight:`1px solid ${C2.border}`,flexShrink:0,display:"flex",flexDirection:"column"}}>
+            <div style={{padding:"14px 16px 10px",borderBottom:`1px solid ${C2.border}`,marginBottom:6}}>
+              <div style={{display:"flex",alignItems:"flex-end",lineHeight:1}}>
+                <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontSize:15,color:C2.accent}}>pra</span>
+                <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontSize:18,color:C2.accent,lineHeight:0.9,marginLeft:1}}>X</span>
+                <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontSize:15,color:C2.accent}}>i</span>
+                <span style={{display:"inline-block",width:4,height:4,borderRadius:"50%",background:C2.accent,marginLeft:6,marginBottom:2}}/>
+              </div>
+              <div style={{fontSize:7,color:C2.muted,letterSpacing:"0.15em",textTransform:"uppercase",marginTop:2}}>gestión clínica</div>
+            </div>
+            {navItems.map(([id,label])=>(
+              <div key={id} onClick={()=>setActive(id)} style={{padding:id==="ficha"?"5px 16px 5px 28px":"7px 16px",fontSize:id==="ficha"?10:11,cursor:"pointer",color:active===id?C2.accent:C2.muted,fontWeight:active===id?600:400,background:active===id?"rgba(166,107,63,0.1)":"transparent",transition:"all 0.15s"}}>
+                {label}
+              </div>
+            ))}
+            <div style={{marginTop:"auto",padding:"10px 16px",borderTop:`1px solid ${C2.border}`,display:"flex",alignItems:"center",gap:8}}>
+              <div style={{width:24,height:24,borderRadius:"50%",background:C2.accent,display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:700,color:C2.bone}}>K</div>
+              <div><div style={{fontSize:10,fontWeight:600,color:C2.ink}}>Kevin Costa</div><div style={{fontSize:8,color:C2.muted}}>Neuropsicólogo</div></div>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div style={{flex:1,background:C2.bg,overflowY:"auto",padding:20}}>
+
+            {active==="dashboard"&&<div>
+              <div style={{fontFamily:"'Instrument Serif',serif",fontSize:20,color:C2.ink,fontStyle:"italic",marginBottom:4}}>Dashboard</div>
+              <div style={{fontSize:10,color:C2.muted,marginBottom:14}}>Lunes, 11 de agosto de 2026</div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:12}}>
+                {[["15","Pacientes activos"],["5","Citas hoy"],["830€","Cobrado mes"],["320€","Pendiente"]].map(([v,l],i)=>(
+                  <div key={i} style={{background:C2.bone,borderRadius:10,padding:"10px 12px",border:`1px solid ${C2.border}`}}>
+                    <div style={{fontSize:19,fontWeight:700,color:C2.accent}}>{v}</div>
+                    <div style={{fontSize:9,color:C2.muted,marginTop:2}}>{l}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{background:C2.bone,borderRadius:10,padding:12,border:`1px solid ${C2.border}`,marginBottom:10}}>
+                <div style={{fontSize:9,color:C2.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600,marginBottom:10}}>Citas de hoy</div>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:7}}>
+                  {[["09:00","María González","60min",false],["10:00","Primera llamada","30min",true],["11:00","Carlos Ruiz","60min",false],["12:00","Laura Sánchez","90min",false],["16:00","Miguel García","60min",false]].map(([h,n,d,cal],i)=>(
+                    <div key={i} style={{padding:7,background:C2.bg,borderRadius:8,border:`1px solid ${C2.border}`}}>
+                      <div style={{fontSize:9,color:cal?C2.teal:C2.muted}}>{h}{cal?" · Calendly":""}</div>
+                      <div style={{fontSize:10,fontWeight:600,color:C2.ink}}>{n}</div>
+                      <div style={{fontSize:9,color:C2.muted}}>{d}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 200px",gap:10}}>
+                <div style={{background:C2.bone,borderRadius:10,padding:12,border:`1px solid ${C2.border}`}}>
+                  <div style={{fontSize:9,color:C2.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600,marginBottom:8}}>Agenda personal</div>
+                  {[["Supervisión clínica","15:00","#B85040"],["Enviar informe derivación","Mañana","#C48C2A"],["Formación EMDR","Viernes","#4A6438"]].map(([t,h,c],i)=>(
+                    <div key={i} style={{display:"flex",gap:7,alignItems:"center",marginBottom:6}}>
+                      <div style={{width:7,height:7,borderRadius:"50%",background:c,flexShrink:0}}/>
+                      <div style={{fontSize:10,color:C2.ink,flex:1}}>{t}</div>
+                      <div style={{fontSize:9,color:C2.muted}}>{h}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{background:C2.bone,borderRadius:10,padding:12,border:`1px solid ${C2.border}`}}>
+                  <div style={{fontSize:9,color:C2.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600,marginBottom:8}}>✦ Asistente IA</div>
+                  <div style={{fontSize:10,color:C2.muted,lineHeight:1.6,fontStyle:"italic"}}>"Laura lleva 5 sesiones — considera revisar objetivos en la próxima."</div>
+                </div>
+              </div>
+            </div>}
+
+            {active==="calendario"&&<div>
+              <div style={{fontFamily:"'Instrument Serif',serif",fontSize:20,color:C2.ink,fontStyle:"italic",marginBottom:12}}>Calendario semanal</div>
+              <div style={{background:C2.bone,borderRadius:10,border:`1px solid ${C2.border}`,overflow:"hidden"}}>
+                <div style={{display:"grid",gridTemplateColumns:"40px repeat(7,1fr)",borderBottom:`1px solid ${C2.border}`}}>
+                  <div style={{background:C2.bg}}/>
+                  {[["Lun","11",true],["Mar","12",true],["Mié","13",false],["Jue","14",true],["Vie","15",true],["Sáb","16",false],["Dom","17",false]].map(([d,n,has],i)=>(
+                    <div key={i} style={{padding:"7px 3px",textAlign:"center",background:i===0?"rgba(166,107,63,0.08)":"transparent",borderLeft:`1px solid ${C2.border}`}}>
+                      <div style={{fontSize:8,color:i===0?C2.accent:C2.muted,textTransform:"uppercase",fontWeight:i===0?600:400}}>{d}</div>
+                      <div style={{fontSize:14,fontWeight:i===0?700:400,color:i===0?C2.accent:C2.ink}}>{n}</div>
+                      {has&&<div style={{width:4,height:4,borderRadius:"50%",background:C2.accent,margin:"2px auto 0"}}/>}
+                    </div>
+                  ))}
+                </div>
+                <div style={{display:"grid",gridTemplateColumns:"40px repeat(7,1fr)",height:320}}>
+                  <div style={{display:"flex",flexDirection:"column"}}>
+                    {["09","10","11","12","13","14","15","16"].map(h=>(
+                      <div key={h} style={{flex:1,padding:"3px 5px",fontSize:8,color:C2.muted,borderBottom:`1px solid ${C2.sand}`,textAlign:"right"}}>{h}:00</div>
+                    ))}
+                  </div>
+                  <div style={{borderLeft:`1px solid ${C2.border}`,position:"relative",background:"rgba(166,107,63,0.02)"}}>
+                    <div style={{position:"absolute",top:2,left:2,right:2,background:"rgba(166,107,63,0.15)",border:`1px solid ${C2.accent}`,borderRadius:4,padding:"2px 4px"}}><div style={{fontSize:8,fontWeight:600,color:C2.accent}}>09:00 María G.</div></div>
+                    <div style={{position:"absolute",top:42,left:2,right:2,background:"rgba(74,123,107,0.12)",border:`1px solid ${C2.teal}`,borderRadius:4,padding:"2px 4px"}}><div style={{fontSize:8,fontWeight:600,color:C2.teal}}>10:00 Calendly</div></div>
+                    <div style={{position:"absolute",top:82,left:2,right:2,background:"rgba(166,107,63,0.15)",border:`1px solid ${C2.accent}`,borderRadius:4,padding:"2px 4px"}}><div style={{fontSize:8,fontWeight:600,color:C2.accent}}>11:00 Carlos R.</div></div>
+                    <div style={{position:"absolute",top:122,left:2,right:2,height:56,background:"rgba(166,107,63,0.15)",border:`1px solid ${C2.accent}`,borderRadius:4,padding:"2px 4px"}}><div style={{fontSize:8,fontWeight:600,color:C2.accent}}>12:00 Laura S. 90min</div></div>
+                    <div style={{position:"absolute",top:282,left:2,right:2,background:"rgba(166,107,63,0.15)",border:`1px solid ${C2.accent}`,borderRadius:4,padding:"2px 4px"}}><div style={{fontSize:8,fontWeight:600,color:C2.accent}}>16:00 Miguel G.</div></div>
+                  </div>
+                  {[1,2,3,4,5,6].map(i=><div key={i} style={{borderLeft:`1px solid ${C2.border}`,position:"relative"}}/>)}
+                </div>
+              </div>
+            </div>}
+
+            {active==="pacientes"&&<div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+                <div style={{fontFamily:"'Instrument Serif',serif",fontSize:20,color:C2.ink,fontStyle:"italic"}}>Pacientes</div>
+                <input placeholder="Buscar..." style={{border:`1px solid ${C2.border}`,borderRadius:8,padding:"5px 10px",fontSize:10,background:C2.bone,color:C2.muted,outline:"none",width:140}}/>
+              </div>
+              <div style={{background:C2.bone,borderRadius:10,border:`1px solid ${C2.border}`,overflow:"hidden"}}>
+                {[["M","María González López","Ansiedad generalizada","4 sesiones",false],["C","Carlos Ruiz Martínez","Depresión mayor","3 sesiones",false],["A","Ana Martínez Vega","Fobia social","3 sesiones",false],["J","Javier Fernández","Trastorno adaptativo","3 sesiones",false],["L","Laura Sánchez","TCA restricción","5 sesiones",false],["P","Pedro López","TOC","3 sesiones",false],["S","Sofía Ramírez","Duelo complicado","2 sesiones",false],["C","Carmen Herrera","Fobia a agujas","4 sesiones",true]].map(([ini,name,mot,ses,alta],i)=>(
+                  <div key={i} onClick={()=>setActive("ficha")} style={{padding:"9px 14px",borderBottom:`1px solid ${C2.border}`,display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}>
+                    <div style={{width:30,height:30,borderRadius:"50%",background:alta?C2.green:C2.accent,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:C2.bone,flexShrink:0}}>{ini}</div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:11,fontWeight:600,color:C2.ink}}>{name}</div>
+                      <div style={{fontSize:9,color:C2.muted}}>{mot} · {ses}</div>
+                    </div>
+                    <span style={{background:alta?"#E8EFE2":"rgba(166,107,63,0.1)",color:alta?C2.green:C2.accent,fontSize:9,fontWeight:600,padding:"2px 8px",borderRadius:20}}>{alta?"Alta":"Activo"}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{padding:"8px 0",fontSize:9,color:C2.muted,textAlign:"center"}}>Haz clic en un paciente para ver su ficha →</div>
+            </div>}
+
+            {active==="ficha"&&<div>
+              <div style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:12}}>
+                <div style={{width:38,height:38,borderRadius:"50%",background:C2.accent,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:700,color:C2.bone,flexShrink:0}}>M</div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:17,fontWeight:700,color:C2.ink}}>María González López</div>
+                  <div style={{fontSize:10,color:C2.muted,marginTop:2}}>612 345 678 · maria@email.com</div>
+                  <div style={{display:"flex",gap:8,marginTop:4,alignItems:"center"}}>
+                    <span style={{fontSize:10,color:C2.walnut,fontWeight:500}}>4 sesiones</span>
+                    <span style={{color:C2.border}}>·</span>
+                    <span style={{fontSize:10,color:C2.muted}}>1/2 objetivos</span>
+                    <div style={{height:4,width:50,background:C2.sand,borderRadius:99,overflow:"hidden"}}><div style={{height:"100%",width:"50%",background:C2.green,borderRadius:99}}/></div>
+                  </div>
+                </div>
+                <span style={{background:"rgba(166,107,63,0.1)",color:C2.accent,fontSize:9,fontWeight:600,padding:"2px 8px",borderRadius:20}}>Activo</span>
+              </div>
+              <div style={{background:C2.bone,borderRadius:10,padding:"10px 12px",borderLeft:`3px solid ${C2.accent}`,border:`1px solid ${C2.border}`,borderLeft:`3px solid ${C2.accent}`,marginBottom:10}}>
+                <div style={{fontSize:9,color:C2.muted,textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:3}}>Motivo de consulta</div>
+                <div style={{fontSize:11,color:C2.ink,lineHeight:1.5}}>Ansiedad generalizada con episodios frecuentes de preocupación excesiva, insomnio y tensión muscular.</div>
+              </div>
+              <div style={{display:"flex",gap:5,marginBottom:10,overflowX:"auto",paddingBottom:2}}>
+                {["Historia clínica","Formulación","Evolución","Objetivos","Pruebas","Sesiones"].map((t,i)=>(
+                  <div key={i} style={{padding:"5px 10px",borderRadius:8,fontSize:10,border:`1px solid ${C2.border}`,cursor:"pointer",background:i===2?C2.accent:"transparent",color:i===2?C2.bone:C2.muted,whiteSpace:"nowrap"}}>{t}</div>
+                ))}
+              </div>
+              <div style={{background:C2.bone,borderRadius:10,border:`1px solid ${C2.border}`,overflow:"hidden"}}>
+                <div style={{padding:"8px 12px",borderBottom:`1px solid ${C2.border}`,background:C2.bg,fontSize:9,color:C2.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600}}>Evolución clínica</div>
+                {[["4","2026-03-01","Reestructuración cognitiva. Distorsiones identificadas. Buena adherencia al autorregistro."],["3","2026-02-15","Respiración diafragmática. Técnica 4-7-8. La paciente la practica diariamente."],["2","2026-02-01","Psicoeducación sobre ansiedad. Registro de pensamientos automáticos iniciado."],["1","2026-01-15","Evaluación inicial. Historia clínica completa. Rapport establecido."]].map(([n,f,t],i)=>(
+                  <div key={i} style={{padding:"9px 12px",borderBottom:i<3?`1px solid ${C2.border}`:"none"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}>
+                      <span style={{fontSize:9,fontWeight:600,color:C2.accent}}>Sesión {n}</span>
+                      <span style={{fontSize:9,color:C2.muted}}>{f}</span>
+                    </div>
+                    <div style={{fontSize:10,color:C2.ink,lineHeight:1.5}}>{t}</div>
+                  </div>
+                ))}
+              </div>
+            </div>}
+
+            {active==="facturas"&&<div>
+              <div style={{fontFamily:"'Instrument Serif',serif",fontSize:20,color:C2.ink,fontStyle:"italic",marginBottom:12}}>Facturas</div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:12}}>
+                {[["Total cobrado","3.440€","#4A6438"],["Pendiente","320€","#C48C2A"],["Este mes","830€",C2.accent]].map(([l,v,c],i)=>(
+                  <div key={i} style={{background:C2.bone,borderRadius:10,padding:12,border:`1px solid ${C2.border}`}}>
+                    <div style={{fontSize:9,color:C2.muted,marginBottom:3}}>{l}</div>
+                    <div style={{fontSize:19,fontWeight:700,color:c}}>{v}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{background:C2.bone,borderRadius:10,border:`1px solid ${C2.border}`,overflow:"hidden"}}>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 90px 60px 75px",padding:"7px 12px",borderBottom:`1px solid ${C2.border}`,fontSize:8,color:C2.muted,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600}}>
+                  <div>Paciente</div><div>Factura</div><div>Importe</div><div>Estado</div>
+                </div>
+                {[["María González","FAC-104","80€",false],["Carlos Ruiz","FAC-203","80€",false],["Laura Sánchez","FAC-505","90€",false],["Ana Martínez","FAC-303","80€",true],["Miguel García","FAC-804","80€",true],["Javier Fernández","FAC-403","90€",true]].map(([n,f,imp,paid],i)=>(
+                  <div key={i} style={{display:"grid",gridTemplateColumns:"1fr 90px 60px 75px",padding:"8px 12px",borderBottom:i<5?`1px solid ${C2.border}`:"none",alignItems:"center"}}>
+                    <div style={{fontSize:10,fontWeight:500,color:C2.ink}}>{n}</div>
+                    <div style={{fontSize:9,color:C2.muted}}>{f}</div>
+                    <div style={{fontSize:10,fontWeight:600,color:C2.ink}}>{imp}</div>
+                    <span style={{background:paid?"#E8EFE2":"#FDF3DC",color:paid?C2.green:"#C48C2A",fontSize:9,fontWeight:600,padding:"2px 8px",borderRadius:20,display:"inline-block"}}>{paid?"Pagada":"Pendiente"}</span>
+                  </div>
+                ))}
+              </div>
+            </div>}
+
+            {active==="recursos"&&<div>
+              <div style={{fontFamily:"'Instrument Serif',serif",fontSize:20,color:C2.ink,fontStyle:"italic",marginBottom:6}}>Recursos</div>
+              <div style={{fontSize:11,color:C2.muted,marginBottom:16}}>Biblioteca de materiales clínicos según tu plan</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12,opacity:0.55}}>
+                <div style={{background:C2.bone,borderRadius:10,padding:20,border:`1px solid ${C2.border}`,textAlign:"center"}}>
+                  <div style={{fontSize:28,marginBottom:8}}>👤</div>
+                  <div style={{fontSize:12,fontWeight:600,color:C2.ink,marginBottom:4}}>Para el paciente</div>
+                  <div style={{fontSize:10,color:C2.muted,lineHeight:1.5}}>Autorregistros, psicoeducación y hojas de trabajo.</div>
+                </div>
+                <div style={{background:C2.bone,borderRadius:10,padding:20,border:`1px solid ${C2.border}`,textAlign:"center"}}>
+                  <div style={{fontSize:28,marginBottom:8}}>🧠</div>
+                  <div style={{fontSize:12,fontWeight:600,color:C2.ink,marginBottom:4}}>Para el profesional</div>
+                  <div style={{fontSize:10,color:C2.muted,lineHeight:1.5}}>Protocolos, escalas y guías clínicas.</div>
+                </div>
+              </div>
+              <div style={{background:C2.sand,borderRadius:10,padding:"14px 18px",textAlign:"center",border:`1px solid ${C2.border}`}}>
+                <div style={{fontSize:12,fontWeight:600,color:C2.walnut,marginBottom:3}}>Próximamente</div>
+                <div style={{fontSize:11,color:C2.muted}}>Disponible en el lanzamiento.</div>
+              </div>
+            </div>}
+
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -306,39 +307,18 @@ export default function Landing() {
       </section>
 
       {/* DEMO INTERACTIVO */}
-      <section style={{ maxWidth: 1000, margin: "0 auto 90px", padding: "0 48px" }}>
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", lineHeight: 1, marginBottom: 10 }}>
-            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 18, color: C.ink, letterSpacing: "-0.5px" }}>Explora las diferentes secciones de pra</span>
-            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 21, color: C.accent, letterSpacing: "-0.5px", lineHeight: 0.9, marginLeft: 2 }}>X</span>
-            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 18, color: C.ink, letterSpacing: "-0.5px" }}>i</span>
-            <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: C.accent, marginLeft: 9, marginBottom: 3 }} />
-          </div>
-        </div>
-        <div style={{ background: C.ink, borderRadius: 20, overflow: "hidden", boxShadow: "0 40px 80px rgba(34,22,16,0.2)" }}>
-          <div style={{ background: "#1A0E08", padding: "10px 16px", display: "flex", gap: 6, alignItems: "center" }}>
-            {["#FF5F57","#FFBD2E","#28CA41"].map((c,i)=><div key={i} style={{width:11,height:11,borderRadius:"50%",background:c}}/>)}
-            <div style={{flex:1,background:"#2A1E18",borderRadius:6,height:22,margin:"0 12px",display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <span style={{fontSize:10,color:"#6B4A30"}}>praxi-kevin-8beb.vercel.app/app</span>
-            </div>
-          </div>
-          <iframe
-            srcDoc={DEMO_HTML}
-            style={{width:"100%",height:560,border:"none",display:"block"}}
-            scrolling="no"
-          />
-        </div>
-      </section>
+      <Demo />
 
       {/* FEATURES */}
       <section id="features" style={{ maxWidth: 1000, margin: "0 auto 90px", padding: "0 48px" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
+          <div style={{ fontSize: 10, color: C.accent, textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 600, marginBottom: 12 }}>Funcionalidades</div>
           <h2 style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, fontSize: 22, color: C.ink, margin: 0, letterSpacing: "-0.3px" }}>Todo lo que necesitas en un solo sitio</h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "0 48px" }}>
           {FEATURES.map((f, i) => (
             <div key={i} style={{ padding: "28px 0", borderBottom: `1px solid ${C.border}`, display: "grid", gridTemplateColumns: "64px 1fr", gap: 24, alignItems: "start" }}>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, fontSize: 48, color: C.sand, lineHeight: 1, letterSpacing: "-2px", userSelect: "none" }}>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, fontSize: 48, color: C.accent, lineHeight: 1, letterSpacing: "-2px", userSelect: "none", opacity: 0.4 }}>
                 {String(i + 1).padStart(2, "0")}
               </div>
               <div>
@@ -366,12 +346,8 @@ export default function Landing() {
           <div style={{ fontSize: 10, color: C.accent, textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 600, marginBottom: 12 }}>Precios</div>
           <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 36, fontWeight: 400, color: C.ink, margin: "0 0 8px" }}>Simple y sin sorpresas</h2>
           <p style={{ fontSize: 13, color: C.muted, marginBottom: 20 }}>IVA incluido · Cancela cuando quieras</p>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: C.ink, borderRadius: 14, padding: "12px 24px" }}>
-            <span style={{ fontSize: 20 }}>🎁</span>
-            <div style={{ textAlign: "left" }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.bone, letterSpacing: "-0.2px" }}>Los primeros 3 meses son gratuitos</div>
-              <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>Para los primeros profesionales que soliciten acceso. Sin tarjeta de crédito.</div>
-            </div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: C.gD, border: `1px solid ${C.green}`, borderRadius: 20, padding: "8px 20px", marginTop: 4 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: C.green, letterSpacing: "0.02em" }}>3 meses gratis para los primeros · Sin tarjeta de crédito</span>
           </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
