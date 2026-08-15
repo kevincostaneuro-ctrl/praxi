@@ -470,7 +470,12 @@ function Login({onLogin}){
 
   const Logo=()=>(
     <div style={{textAlign:"center",marginBottom:32}}>
-      <div style={{fontSize:32,fontWeight:300,color:C.accent,letterSpacing:"-1px",fontFamily:"'Manrope',sans-serif"}}>praxi</div>
+      <div style={{display:"flex",alignItems:"flex-end",lineHeight:1,gap:0}}>
+              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:32,color:C.text,letterSpacing:"-1px"}}>pra</span>
+              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:38,color:C.accent,letterSpacing:"-1px",lineHeight:0.9,marginLeft:4}}>X</span>
+              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:32,color:C.text,letterSpacing:"-1px"}}>i</span>
+              <span style={{display:"inline-block",width:9,height:9,borderRadius:"50%",background:C.accent,marginLeft:14,marginBottom:5,flexShrink:0}}/>
+            </div>
       <div style={{fontSize:11,color:C.muted,letterSpacing:"0.18em",textTransform:"uppercase",marginTop:4}}>gestión clínica</div>
     </div>
   );
@@ -478,7 +483,7 @@ function Login({onLogin}){
   // ── PASO 1: Login clínica ──────────────────────────────────────────────────
   if(step==="clinica") return(
     <div style={wrapStyle}>
-      <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
       <div style={cardStyle}>
         <Logo/>
         <div style={{fontSize:13,color:C.muted,textAlign:"center",marginBottom:24}}>Accede con las credenciales de tu clínica</div>
@@ -2275,7 +2280,12 @@ function Facturas({patients,setPatients}){
           <div style={{border:`1px solid ${C.border}`,borderRadius:12,padding:24}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20}}>
               <div>
-                <div style={{fontSize:22,fontWeight:300,color:C.accent,letterSpacing:"-0.5px",fontFamily:"'Manrope',sans-serif"}}>praxi</div>
+                <div style={{display:"flex",alignItems:"flex-end",lineHeight:1,gap:0}}>
+              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:18,color:C.accent,letterSpacing:"-0.5px"}}>pra</span>
+              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:22,color:C.accent,letterSpacing:"-0.5px",lineHeight:0.9,marginLeft:2}}>X</span>
+              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:18,color:C.accent,letterSpacing:"-0.5px"}}>i</span>
+              <span style={{display:"inline-block",width:5,height:5,borderRadius:"50%",background:C.accent,marginLeft:9,marginBottom:3,flexShrink:0}}/>
+            </div>
                 <div style={{fontSize:9,color:C.muted,letterSpacing:"0.15em",textTransform:"uppercase"}}>gestión clínica</div>
               </div>
               <div style={{textAlign:"right"}}>
@@ -3100,7 +3110,7 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCit
 // ══════════════════════════════════════════════════════════════════════════════
 // APP ROOT
 // ══════════════════════════════════════════════════════════════════════════════
-export default function App(){
+export default function App({ isDemo = false }){
   const[currentUser,setCurrentUser]=useState(INITIAL_PROFESIONALES[0]);
   const[currentClinica,setCurrentClinica]=useState(CLINICA_STORE);
   const[profesionales,setProfesionales]=useState(INITIAL_PROFESIONALES);
@@ -3134,8 +3144,13 @@ export default function App(){
   ];
   if(!currentUser)return <Login onLogin={(prof,clinica)=>{setCurrentUser(prof);setCurrentClinica(clinica);}}/>;
   return(
-    <div style={st.app}>
-      <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+    <div style={{...st.app,flexDirection:"column"}}>
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+      {isDemo&&<div style={{background:"#221610",padding:"10px 24px",display:"flex",justifyContent:"space-between",alignItems:"center",flexShrink:0,zIndex:200}}>
+        <span style={{fontSize:12,color:"#9A7E68"}}>✦ Estás explorando praXi en modo demo · Los datos son de muestra y los cambios no se guardan</span>
+        <a href="/" style={{background:"#A66B3F",color:"#FBF8F1",borderRadius:8,padding:"6px 16px",fontSize:12,fontWeight:600,cursor:"pointer",textDecoration:"none"}}>← Volver a la web</a>
+      </div>}
+      <div style={{display:"flex",flex:1,overflow:"hidden"}}>
       {reminders.length>0&&<div style={{position:"fixed",top:16,right:16,zIndex:200,display:"flex",flexDirection:"column",gap:8}}>{reminders.map(r=><div key={r.id} style={{background:r.type==="soon"?C.rD:C.amD,border:`1px solid ${r.type==="soon"?C.red:C.amber}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:r.type==="soon"?C.red:C.amber,display:"flex",gap:10,alignItems:"center",maxWidth:340,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"}}><span style={{flex:1}}>{r.msg}</span><button onClick={()=>setReminders(rs=>rs.filter(x=>x.id!==r.id))} style={{background:"none",border:"none",color:"inherit",cursor:"pointer",fontSize:14}}>✕</button></div>)}</div>}
 
       {/* Panel de notificaciones — fixed dentro del área principal */}
@@ -3174,8 +3189,13 @@ export default function App(){
       <div style={st.sidebar}>
         <div style={{...st.sidebarBrand,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div>
-            <div style={{fontSize:20,fontWeight:300,color:C.accent,letterSpacing:"-0.5px",fontFamily:"'Manrope',sans-serif",lineHeight:1}}>praxi</div>
-            <div style={{fontSize:10,color:C.muted,letterSpacing:"0.15em",textTransform:"uppercase",marginTop:3}}>gestión clínica</div>
+            <div style={{display:"flex",alignItems:"flex-end",lineHeight:1,gap:0}}>
+              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:20,color:C.accent,letterSpacing:"-0.5px"}}>pra</span>
+              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:24,color:C.accent,letterSpacing:"-0.5px",lineHeight:0.9,marginLeft:2}}>X</span>
+              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:20,color:C.accent,letterSpacing:"-0.5px"}}>i</span>
+              <span style={{display:"inline-block",width:5,height:5,borderRadius:"50%",background:C.accent,marginLeft:9,marginBottom:3,flexShrink:0}}/>
+            </div>
+            <div style={{fontSize:9,color:C.muted,letterSpacing:"0.15em",textTransform:"uppercase",marginTop:3}}>gestión clínica</div>
           </div>
           <div style={{position:"relative"}}>
             <button onClick={()=>setShowNotifs(v=>!v)} style={{background:"none",border:"none",cursor:"pointer",fontSize:18,color:notifs.filter(n=>!dismissedNotifs.has(n.id)).length>0?C.amber:C.muted,position:"relative"}}>
