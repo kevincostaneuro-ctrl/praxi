@@ -492,9 +492,14 @@ export default function Landing() {
         <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.7, maxWidth: 520, margin: "0 auto 44px" }}>
           Para psicólogos, fisioterapeutas, nutricionistas, logopedas y cualquier profesional sanitario que trabaje con pacientes.
         </p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 40 }}>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 16 }}>
           <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
           <a href="#features" style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "14px 28px", fontSize: 14, fontWeight: 500, cursor: "pointer", textDecoration: "none", display: "inline-block" }}>Ver funcionalidades ↓</a>
+        </div>
+        <div style={{ marginBottom: 40 }}>
+          <button onClick={() => navigate("/demo")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: C.muted, fontFamily: "'Manrope',sans-serif", display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 0", borderBottom: `1px dashed ${C.dim}` }}>
+            ✦ Descubre cómo funciona →
+          </button>
         </div>
       </section>
 
@@ -510,8 +515,6 @@ export default function Landing() {
           <div style={{ fontSize: 13, color: C.ink }}><span style={{ fontWeight: 700 }}>47</span> profesionales ya en la lista</div>
         </div>
       </div>
-
-      <Demo />
 
       {/* FEATURES */}
       <section id="features" style={{ maxWidth: 1000, margin: "0 auto 90px", padding: "0 48px" }}>
