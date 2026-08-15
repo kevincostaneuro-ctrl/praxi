@@ -262,7 +262,6 @@ function TimePicker({value,onChange}){
         </div>
       )}
     </div>
-      </div>
   );
 }
 
@@ -471,12 +470,7 @@ function Login({onLogin}){
 
   const Logo=()=>(
     <div style={{textAlign:"center",marginBottom:32}}>
-      <div style={{display:"flex",alignItems:"flex-end",lineHeight:1,gap:0}}>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:32,color:C.text,letterSpacing:"-1px"}}>pra</span>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:38,color:C.accent,letterSpacing:"-1px",lineHeight:0.9,marginLeft:4}}>X</span>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:32,color:C.text,letterSpacing:"-1px"}}>i</span>
-              <span style={{display:"inline-block",width:9,height:9,borderRadius:"50%",background:C.accent,marginLeft:14,marginBottom:5,flexShrink:0}}/>
-            </div>
+      <div style={{fontSize:32,fontWeight:300,color:C.accent,letterSpacing:"-1px",fontFamily:"'Manrope',sans-serif"}}>praxi</div>
       <div style={{fontSize:11,color:C.muted,letterSpacing:"0.18em",textTransform:"uppercase",marginTop:4}}>gestión clínica</div>
     </div>
   );
@@ -484,7 +478,7 @@ function Login({onLogin}){
   // ── PASO 1: Login clínica ──────────────────────────────────────────────────
   if(step==="clinica") return(
     <div style={wrapStyle}>
-      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+      <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
       <div style={cardStyle}>
         <Logo/>
         <div style={{fontSize:13,color:C.muted,textAlign:"center",marginBottom:24}}>Accede con las credenciales de tu clínica</div>
@@ -564,7 +558,6 @@ function Login({onLogin}){
         {mode==="login"&&<div style={{fontSize:11,color:C.dim,textAlign:"center",marginTop:12}}>Demo: kevin@praxi.com / psico2026</div>}
       </div>
     </div>
-      </div>
   );
 }
 
@@ -965,7 +958,6 @@ function TabDocumentos({patient,update}){
         </div>
       )}
     </div>
-      </div>
   );
 }
 
@@ -1061,7 +1053,6 @@ function TabCitasClinica({patient,citas,profesionales}){
         </table>
       </div>
     </div>
-      </div>
   );
 }
 
@@ -1186,7 +1177,6 @@ function FichaPaciente({patient,setPatients,onBack,citas,setCitas,profesionales,
       {showIA&&<IAPanel patient={patient} onClose={()=>setShowIA(false)}/>}
       {showNuevaCita&&<CitaModal cita={null} patients={[patient]} tipos={tipos||[]} defaultFecha={toYMD(today())} defaultHora="09:00" makeUrl="" onClose={()=>setShowNuevaCita(false)} onSave={form=>{setCitas&&setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:patient.id,origen:"interno"}]);setShowNuevaCita(false);}} onDelete={()=>{}}/>}
     </div>
-      </div>
   );
 }
 
@@ -1216,7 +1206,6 @@ function TabPruebas({patient,update}){
       {patient.pruebasRealizadas.map(pr=>(<div key={pr.id} style={{...st.card,marginBottom:12,padding:"14px 18px"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><div><div style={{fontWeight:700,fontSize:15}}>{pr.prueba}</div><div style={{fontSize:12,color:C.muted}}>{pr.fecha}</div></div><div style={st.rowActions}><button style={st.btn("sm")} onClick={()=>{setForm({...pr});setShow(true);}}>Editar</button><button style={{...st.btn("sm"),color:C.red,background:C.rD}} onClick={()=>del(pr.id)}>Eliminar</button></div></div><div style={{background:C.bone,borderRadius:7,padding:"8px 12px"}}><div style={{fontSize:10,color:C.dim,textTransform:"uppercase",marginBottom:3}}>Resultado</div><div style={{fontSize:13,fontWeight:600,color:C.aL}}>{pr.resultado}</div></div>{pr.observaciones&&<div style={{fontSize:13,color:C.muted,marginTop:8}}>{pr.observaciones}</div>}</div>))}
       {show&&<Modal onClose={()=>setShow(false)} title={form.id?"Editar prueba":"Añadir prueba"}><div style={{display:"flex",flexDirection:"column",gap:14}}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><Field label="Prueba"><input style={st.input} value={form.prueba} onChange={f("prueba")} placeholder="BAI, PHQ-9..."/></Field><Field label="Fecha"><input type="date" style={st.input} value={form.fecha} onChange={f("fecha")}/></Field></div><Field label="Resultado"><input style={st.input} value={form.resultado} onChange={f("resultado")}/></Field><Field label="Observaciones"><textarea style={st.textarea} value={form.observaciones} onChange={f("observaciones")}/></Field></div><MFooter onCancel={()=>setShow(false)} onSave={save}/></Modal>}
     </div>
-      </div>
   );
 }
 
@@ -1270,7 +1259,6 @@ function TabSesiones({patient,update}){
       {show&&<Modal onClose={()=>setShow(false)} title={form.id?`Editar sesión ${form.numero}`:`Sesión ${nextNum}`} width={520}><div style={{display:"flex",flexDirection:"column",gap:14}}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><Field label="Fecha"><input type="date" style={st.input} value={form.fecha} onChange={f("fecha")}/></Field><Field label="Importe €"><input type="number" style={st.input} value={form.pago} onChange={f("pago")}/></Field></div><Field label="Estado"><select style={st.input} value={form.pagado} onChange={e=>setForm(p=>({...p,pagado:e.target.value==="true"}))}><option value="false">Pendiente</option><option value="true">Pagado</option></select></Field><Field label="Lo trabajado en esta sesión"><textarea style={{...st.textarea,minHeight:100}} value={form.trabajado} onChange={f("trabajado")}/></Field></div><MFooter onCancel={()=>setShow(false)} onSave={save}/></Modal>}
       {viewF&&<Modal onClose={()=>setViewF(null)} title="Factura" width={400}><div style={{border:`1px solid ${C.border}`,borderRadius:10,padding:20}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:16}}><div><div style={{fontSize:18,fontWeight:800,color:C.aL}}>FACTURA</div><div style={{fontSize:12,color:C.muted}}>{viewF.factura}</div></div><div style={{textAlign:"right"}}><div style={{fontSize:12,color:C.muted}}>Fecha</div><div style={{fontWeight:600}}>{viewF.fecha}</div></div></div><div style={{borderTop:`1px solid ${C.border}`,borderBottom:`1px solid ${C.border}`,padding:"12px 0",margin:"12px 0"}}><div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:6}}><span style={{color:C.muted}}>Paciente</span><span style={{fontWeight:600}}>{patient.nombre} {patient.apellidos}</span></div><div style={{display:"flex",justifyContent:"space-between",fontSize:13}}><span style={{color:C.muted}}>Sesión nº {viewF.numero} — Psicología</span><span style={{fontWeight:600}}>{viewF.pago}€</span></div></div><div style={{display:"flex",justifyContent:"space-between",fontSize:16,fontWeight:800}}><span>Total</span><span style={{color:C.aL}}>{viewF.pago}€</span></div><div style={{marginTop:14,padding:"8px 12px",background:viewF.pagado?C.gD:C.amD,borderRadius:7,textAlign:"center",fontSize:13,fontWeight:600,color:viewF.pagado?C.green:C.amber}}>{viewF.pagado?"✓ Pagado":"⏳ Pendiente de pago"}</div></div></Modal>}
     </div>
-      </div>
   );
 }
 
@@ -1396,7 +1384,6 @@ function TabDatos({patient,update}){
         </div>}
       </div>
     </div>
-      </div>
   );
 }
 
@@ -1431,7 +1418,6 @@ function TabHistoriaClinica({patient,update}){
           </div>
       }
     </div>
-      </div>
   );
 }
 
@@ -1500,7 +1486,6 @@ function TabFormulacionCaso({patient,update}){
         );
       })}
     </div>
-      </div>
   );
 }
 
@@ -1598,7 +1583,6 @@ function TabEvolucion({patient,update}){
         );
       })}
     </div>
-      </div>
   );
 }
 
@@ -2018,7 +2002,6 @@ function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tare
         <MFooter onCancel={()=>setShowCfg(false)} onSave={()=>{setConfig(c=>({...c,makeOut:makeUrl}));setShowCfg(false);}} saveLabel="Guardar URL"/>
       </Modal>}
     </div>
-      </div>
   );
 }
 
@@ -2126,7 +2109,6 @@ function Configuracion({horario,setHorario,tipos,setTipos}){
         )}
       </div>
     </div>
-      </div>
   );
 }
 
@@ -2293,12 +2275,7 @@ function Facturas({patients,setPatients}){
           <div style={{border:`1px solid ${C.border}`,borderRadius:12,padding:24}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20}}>
               <div>
-                <div style={{display:"flex",alignItems:"flex-end",lineHeight:1,gap:0}}>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:18,color:C.accent,letterSpacing:"-0.5px"}}>pra</span>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:22,color:C.accent,letterSpacing:"-0.5px",lineHeight:0.9,marginLeft:2}}>X</span>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:18,color:C.accent,letterSpacing:"-0.5px"}}>i</span>
-              <span style={{display:"inline-block",width:5,height:5,borderRadius:"50%",background:C.accent,marginLeft:9,marginBottom:3,flexShrink:0}}/>
-            </div>
+                <div style={{fontSize:22,fontWeight:300,color:C.accent,letterSpacing:"-0.5px",fontFamily:"'Manrope',sans-serif"}}>praxi</div>
                 <div style={{fontSize:9,color:C.muted,letterSpacing:"0.15em",textTransform:"uppercase"}}>gestión clínica</div>
               </div>
               <div style={{textAlign:"right"}}>
@@ -2330,7 +2307,6 @@ function Facturas({patients,setPatients}){
       )}
       {showIA&&<IAFacturasPanel patients={patients} onClose={()=>setShowIA(false)}/>}
     </div>
-      </div>
   );
 }
 
@@ -2380,7 +2356,6 @@ function Recursos({currentUser}){
         </div>
       </div>
     </div>
-      </div>
   );
 }
 
@@ -2544,7 +2519,6 @@ Usa toda esta información para dar respuestas precisas y contextualizadas. Si a
         >↑</button>
       </div>
     </div>
-      </div>
   );
 }
 
@@ -2671,7 +2645,6 @@ function AgendaGlobal({citas,patients,profesionales}){
         );
       })()}
     </div>
-      </div>
   );
 }
 
@@ -2733,7 +2706,6 @@ function AdminPanel({profesionales,setProfesionales,clinica}){
         </Modal>
       )}
     </div>
-      </div>
   );
 }
 
@@ -2872,7 +2844,6 @@ Usa estos datos para responder preguntas sobre ingresos, pendientes, seguimiento
         <button style={{...st.btn(),background:C.accent,color:C.bone,padding:"0 16px",flexShrink:0}} onClick={()=>send()} disabled={loading||!input.trim()}>↑</button>
       </div>
     </div>
-      </div>
   );
 }
 
@@ -3123,14 +3094,13 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCit
         </div>
       </div>
     </div>
-      </div>
   );
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // APP ROOT
 // ══════════════════════════════════════════════════════════════════════════════
-export default function App({ isDemo = false }){
+export default function App(){
   const[currentUser,setCurrentUser]=useState(INITIAL_PROFESIONALES[0]);
   const[currentClinica,setCurrentClinica]=useState(CLINICA_STORE);
   const[profesionales,setProfesionales]=useState(INITIAL_PROFESIONALES);
@@ -3164,13 +3134,8 @@ export default function App({ isDemo = false }){
   ];
   if(!currentUser)return <Login onLogin={(prof,clinica)=>{setCurrentUser(prof);setCurrentClinica(clinica);}}/>;
   return(
-    <div style={{...st.app,flexDirection:"column"}}>
-      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
-      {isDemo&&<div style={{background:"#221610",padding:"10px 24px",display:"flex",justifyContent:"space-between",alignItems:"center",flexShrink:0,zIndex:200}}>
-        <span style={{fontSize:12,color:"#9A7E68"}}>✦ Estás explorando praXi en modo demo · Los datos son de muestra y los cambios no se guardan</span>
-        <a href="/" style={{background:"#A66B3F",color:"#FBF8F1",borderRadius:8,padding:"6px 16px",fontSize:12,fontWeight:600,cursor:"pointer",textDecoration:"none"}}>← Volver a la web</a>
-      </div>}
-      <div style={{display:"flex",flex:1,overflow:"hidden"}}>
+    <div style={st.app}>
+      <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
       {reminders.length>0&&<div style={{position:"fixed",top:16,right:16,zIndex:200,display:"flex",flexDirection:"column",gap:8}}>{reminders.map(r=><div key={r.id} style={{background:r.type==="soon"?C.rD:C.amD,border:`1px solid ${r.type==="soon"?C.red:C.amber}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:r.type==="soon"?C.red:C.amber,display:"flex",gap:10,alignItems:"center",maxWidth:340,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"}}><span style={{flex:1}}>{r.msg}</span><button onClick={()=>setReminders(rs=>rs.filter(x=>x.id!==r.id))} style={{background:"none",border:"none",color:"inherit",cursor:"pointer",fontSize:14}}>✕</button></div>)}</div>}
 
       {/* Panel de notificaciones — fixed dentro del área principal */}
@@ -3209,13 +3174,8 @@ export default function App({ isDemo = false }){
       <div style={st.sidebar}>
         <div style={{...st.sidebarBrand,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div>
-            <div style={{display:"flex",alignItems:"flex-end",lineHeight:1,gap:0}}>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:20,color:C.accent,letterSpacing:"-0.5px"}}>pra</span>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:24,color:C.accent,letterSpacing:"-0.5px",lineHeight:0.9,marginLeft:2}}>X</span>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:20,color:C.accent,letterSpacing:"-0.5px"}}>i</span>
-              <span style={{display:"inline-block",width:5,height:5,borderRadius:"50%",background:C.accent,marginLeft:9,marginBottom:3,flexShrink:0}}/>
-            </div>
-            <div style={{fontSize:9,color:C.muted,letterSpacing:"0.15em",textTransform:"uppercase",marginTop:3}}>gestión clínica</div>
+            <div style={{fontSize:20,fontWeight:300,color:C.accent,letterSpacing:"-0.5px",fontFamily:"'Manrope',sans-serif",lineHeight:1}}>praxi</div>
+            <div style={{fontSize:10,color:C.muted,letterSpacing:"0.15em",textTransform:"uppercase",marginTop:3}}>gestión clínica</div>
           </div>
           <div style={{position:"relative"}}>
             <button onClick={()=>setShowNotifs(v=>!v)} style={{background:"none",border:"none",cursor:"pointer",fontSize:18,color:notifs.filter(n=>!dismissedNotifs.has(n.id)).length>0?C.amber:C.muted,position:"relative"}}>
@@ -3338,6 +3298,5 @@ export default function App({ isDemo = false }){
       {editCitaDash&&<CitaModal cita={editCitaDash} patients={patients} tipos={tipos} defaultFecha={editCitaDash.fecha} defaultHora={editCitaDash.hora} defaultTipoId={editCitaDash.tipoId} makeUrl={config.makeOut} onClose={()=>setEditCitaDash(null)} onSave={form=>{setCitas(cs=>cs.map(c=>c.id===form.id?{...c,...form}:c));setEditCitaDash(null);}} onDelete={id=>{if(confirm("¿Eliminar?"))setCitas(cs=>cs.filter(c=>c.id!==id));setEditCitaDash(null);}}/>}
       {editTareaDash&&<TareaModal tarea={editTareaDash} onClose={()=>setEditTareaDash(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTareaDash(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTareaDash(null);}}/>}
     </div>
-      </div>
   );
 }
