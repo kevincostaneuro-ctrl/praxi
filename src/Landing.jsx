@@ -23,8 +23,8 @@ const FEATURES = [
 
 const PLANES = [
   { nombre: "Básico", precio: "9,99€", desc: "Para empezar", destacado: false, features: ["Hasta 20 pacientes", "Agenda y calendario", "Historia clínica", "Facturación PDF", "IA para seguimientos"] },
-  { nombre: "Pro", precio: "29,99€", desc: "Para consultas activas", destacado: true, features: ["Pacientes ilimitados", "Asistente IA", "WhatsApp automático", "Videollamada integrada", "Informes con IA"] },
-  { nombre: "Clínica", precio: "60€", desc: "Para equipos", destacado: false, features: ["Hasta 6 profesionales", "Todo lo del plan Pro", "Agenda multi-profesional", "Panel de administración"] },
+  { nombre: "Pro", precio: "19,99€", desc: "Para consultas activas", destacado: true, features: ["Pacientes ilimitados", "Asistente IA", "WhatsApp automático", "Videollamada integrada", "Informes con IA"] },
+  { nombre: "Clínica", precio: "50€", desc: "Para equipos", destacado: false, features: ["Hasta 6 profesionales", "Todo lo del plan Pro", "Agenda multi-profesional", "Panel de administración"] },
 ];
 
 
@@ -37,6 +37,65 @@ const Logo = ({ size = 22, textColor = C.ink }) => (
     <span style={{ display: "inline-block", width: size * 0.27, height: size * 0.27, borderRadius: "50%", background: C.accent, marginLeft: size * 0.45, marginBottom: size * 0.13, flexShrink: 0 }} />
   </div>
 );
+
+
+function WaitlistModal({ open, onClose }) {
+  const [enviado, setEnviado] = useState(false);
+  const [form, setForm] = useState({ nombre: "", email: "", profesion: "" });
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const inputStyle = { width: "100%", border: `1px solid ${C.border}`, borderRadius: 10, padding: "10px 12px", fontSize: 13, background: C.bg, color: C.ink, outline: "none", fontFamily: "'Manrope',sans-serif", boxSizing: "border-box" };
+  const labelStyle = { fontSize: 10, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", display: "block", marginBottom: 5 };
+
+  if (!open) return null;
+  return (
+    <div onClick={e => e.target === e.currentTarget && onClose()} style={{ position: "fixed", inset: 0, background: "rgba(34,22,16,0.55)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div style={{ background: C.bone, borderRadius: 24, maxWidth: 480, width: "100%", padding: "40px 44px", border: `1px solid ${C.border}`, boxShadow: "0 24px 60px rgba(34,22,16,0.2)" }}>
+        {!enviado ? (
+          <>
+            <div style={{ textAlign: "center", marginBottom: 28 }}>
+              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", lineHeight: 1, marginBottom: 10 }}>
+                <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 32, color: C.ink, letterSpacing: "-1px" }}>pra</span>
+                <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 38, color: C.accent, letterSpacing: "-1px", lineHeight: 0.9, marginLeft: 2 }}>X</span>
+                <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 32, color: C.ink, letterSpacing: "-1px" }}>i</span>
+                <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: C.accent, marginLeft: 12, marginBottom: 4 }} />
+              </div>
+              <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 22, fontWeight: 400, color: C.ink, margin: "0 0 6px", fontStyle: "italic" }}>Únete a la lista de espera</h2>
+              <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>3 meses gratuitos · Sin tarjeta de crédito</p>
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Nombre</label>
+              <input style={inputStyle} placeholder="María González" value={form.nombre} onChange={e => set("nombre", e.target.value)} />
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <label style={labelStyle}>Email profesional</label>
+              <input style={inputStyle} type="email" placeholder="maria@clinica.com" value={form.email} onChange={e => set("email", e.target.value)} />
+            </div>
+            <div style={{ marginBottom: 24 }}>
+              <label style={labelStyle}>Profesión</label>
+              <select style={{ ...inputStyle, appearance: "none", cursor: "pointer" }} value={form.profesion} onChange={e => set("profesion", e.target.value)}>
+                <option value="" disabled>Selecciona tu profesión</option>
+                {["Psicólogo/a","Neuropsicólogo/a","Fisioterapeuta","Nutricionista","Logopeda","Terapeuta ocupacional","Médico/a","Otro profesional sanitario"].map(p => <option key={p}>{p}</option>)}
+              </select>
+            </div>
+            <button onClick={() => { if(form.nombre&&form.email&&form.profesion) setEnviado(true); }} style={{ width: "100%", background: C.accent, color: C.bone, border: "none", borderRadius: 12, padding: "14px 0", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Manrope',sans-serif", marginBottom: 14 }}>
+              Apuntarme a la lista
+            </button>
+            <div style={{ textAlign: "center", fontSize: 12, color: C.muted }}>
+              ¿Ya tienes cuenta? <span onClick={onClose} style={{ color: C.accent, fontWeight: 500, cursor: "pointer" }}>Iniciar sesión</span>
+            </div>
+          </>
+        ) : (
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
+            <h3 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 22, fontWeight: 400, color: C.ink, margin: "0 0 10px", fontStyle: "italic" }}>¡Ya estás en la lista!</h3>
+            <p style={{ fontSize: 13, color: C.muted, lineHeight: 1.7, margin: "0 0 24px" }}>Te avisaremos cuando tu acceso esté listo.<br/>Serás de los primeros en entrar.</p>
+            <button onClick={onClose} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 12, padding: "12px 28px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Cerrar</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 
 function Demo() {
@@ -403,9 +462,11 @@ function Demo() {
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [waitlist, setWaitlist] = useState(false);
 
   return (
     <div style={{ fontFamily: "'Manrope', sans-serif", background: C.bg, color: C.text, minHeight: "100vh" }}>
+      <WaitlistModal open={waitlist} onClose={() => setWaitlist(false)} />
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* NAV */}
@@ -414,7 +475,7 @@ export default function Landing() {
         <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
           <a href="#features" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Funcionalidades</a>
           <a href="#precios" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Precios</a>
-          <button onClick={() => navigate("/login")} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Iniciar sesión</button>
+          <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
         </div>
       </nav>
 
@@ -431,13 +492,25 @@ export default function Landing() {
         <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.7, maxWidth: 520, margin: "0 auto 44px" }}>
           Para psicólogos, fisioterapeutas, nutricionistas, logopedas y cualquier profesional sanitario que trabaje con pacientes.
         </p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 80 }}>
-          <button onClick={() => navigate("/login")} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 40 }}>
+          <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
           <a href="#features" style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "14px 28px", fontSize: 14, fontWeight: 500, cursor: "pointer", textDecoration: "none", display: "inline-block" }}>Ver funcionalidades ↓</a>
         </div>
       </section>
 
       {/* DEMO INTERACTIVO */}
+      {/* Contador lista de espera */}
+      <div style={{ textAlign: "center", marginBottom: 80 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 12, background: C.bone, border: `1px solid ${C.border}`, borderRadius: 20, padding: "10px 20px" }}>
+          <div style={{ display: "flex" }}>
+            {["K","M","A","L","P"].map((l,i) => (
+              <div key={i} style={{ width: 28, height: 28, borderRadius: "50%", background: [C.accent,"#6B4A30","#9A7E68","#4A6438","#B8A898"][i], border: `2px solid ${C.bone}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: C.bone, marginLeft: i > 0 ? -8 : 0 }}>{l}</div>
+            ))}
+          </div>
+          <div style={{ fontSize: 13, color: C.ink }}><span style={{ fontWeight: 700 }}>47</span> profesionales ya en la lista</div>
+        </div>
+      </div>
+
       <Demo />
 
       {/* FEATURES */}
@@ -491,7 +564,7 @@ export default function Landing() {
               <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 24 }}>
                 {p.features.map((f, j) => <div key={j} style={{ fontSize: 12, color: p.destacado ? "#C8A882" : C.muted }}>✓ {f}</div>)}
               </div>
-              <button onClick={() => navigate("/login")} style={{ width: "100%", padding: "11px 0", borderRadius: 10, border: p.destacado ? "none" : `1px solid ${C.border}`, background: p.destacado ? C.accent : "transparent", color: p.destacado ? C.bone : C.accent, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso →</button>
+              <button onClick={() => setWaitlist(true)} style={{ width: "100%", padding: "11px 0", borderRadius: 10, border: p.destacado ? "none" : `1px solid ${C.border}`, background: p.destacado ? C.accent : "transparent", color: p.destacado ? C.bone : C.accent, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
             </div>
           ))}
         </div>
