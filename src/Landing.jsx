@@ -9,16 +9,16 @@ const C = {
 };
 
 const FEATURES = [
-  { icon: "🧠", title: "IA clínica contextual", desc: "El asistente conoce la historia, evolución y formulación de cada paciente. Redacta notas, genera informes de derivación y analiza el caso en segundos." },
-  { icon: "📋", title: "Ficha clínica estructurada", desc: "Historia clínica, formulación de caso por áreas (sueño, familia, trabajo, hábitos), evolución sesión a sesión y seguimiento de objetivos terapéuticos." },
-  { icon: "📅", title: "Agenda con videollamada", desc: "Calendario semanal y diario con videollamada integrada. Recordatorios automáticos por WhatsApp. Sin aplicaciones externas." },
-  { icon: "🧾", title: "Facturación automática", desc: "Genera facturas PDF con un clic, controla pagos pendientes y obtén informes financieros mensuales listos para tu gestor." },
-  { icon: "💬", title: "WhatsApp automático", desc: "Recordatorios de cita enviados automáticamente desde una cuenta de Praxi. Sin configuración, sin costes extra por mensaje." },
-  { icon: "👥", title: "Gestión multi-profesional", desc: "Agenda compartida entre profesionales, pacientes asignados por especialista y panel de administración para el coordinador de la clínica." },
-  { icon: "🔒", title: "Cumplimiento RGPD", desc: "Datos sanitarios cifrados, hosting en Europa y acuerdos de procesamiento de datos con todos los proveedores. Conforme a la normativa española." },
-  { icon: "📊", title: "Informe mensual", desc: "Resumen automático de actividad clínica y financiera cada mes. Listo para revisar en un minuto y compartir con tu asesoría." },
-  { icon: "📱", title: "Acceso desde cualquier dispositivo", desc: "Funciona en ordenador, tablet y móvil desde el navegador. Sin instalaciones, siempre actualizado, siempre disponible." },
-  { icon: "📆", title: "Agenda pública de reservas", desc: "Tus pacientes pueden reservar cita directamente desde tu enlace público. Sin llamadas, sin gestión manual. Tú confirmas con un clic." },
+  { icon: "🧠", title: "IA clínica contextual", desc: "Redacta notas, genera informes y analiza casos conociendo la historia completa del paciente." },
+  { icon: "📋", title: "Ficha clínica estructurada", desc: "Historia clínica, formulación, evolución por sesión y objetivos terapéuticos." },
+  { icon: "📅", title: "Agenda con videollamada", desc: "Calendario con videollamada integrada y recordatorios por WhatsApp." },
+  { icon: "🧾", title: "Facturación automática", desc: "Facturas PDF, control de pagos e informes financieros mensuales con un clic." },
+  { icon: "💬", title: "WhatsApp automático", desc: "Recordatorios de cita enviados automáticamente. Sin configuración ni costes extra." },
+  { icon: "👥", title: "Gestión multi-profesional", desc: "Agenda compartida y panel de administración para clínicas con varios profesionales." },
+  { icon: "🔒", title: "Cumplimiento RGPD", desc: "Datos cifrados, hosting en Europa y acuerdos de procesamiento con todos los proveedores." },
+  { icon: "📊", title: "Informe mensual", desc: "Resumen automático de actividad clínica y financiera listo para tu asesoría." },
+  { icon: "📱", title: "Acceso desde cualquier dispositivo", desc: "Ordenador, tablet y móvil. Sin instalaciones, siempre actualizado." },
+  { icon: "📆", title: "Agenda pública de reservas", desc: "Tus pacientes reservan cita desde tu enlace. Sin llamadas ni gestión manual." },
 ];
 
 const PLANES = [
@@ -492,13 +492,11 @@ export default function Landing() {
         <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.7, maxWidth: 520, margin: "0 auto 44px" }}>
           Para psicólogos, fisioterapeutas, nutricionistas, logopedas y cualquier profesional sanitario que trabaje con pacientes.
         </p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 16 }}>
+        <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 32 }}>
           <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
-          <a href="#features" style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "14px 28px", fontSize: 14, fontWeight: 500, cursor: "pointer", textDecoration: "none", display: "inline-block" }}>Ver funcionalidades ↓</a>
-        </div>
-        <div style={{ marginBottom: 40 }}>
-          <button onClick={() => navigate("/demo")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: C.muted, fontFamily: "'Manrope',sans-serif", display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 0", borderBottom: `1px dashed ${C.dim}` }}>
-            ✦ Descubre cómo funciona →
+          <button onClick={() => navigate("/demo")} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "14px 28px", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "'Manrope',sans-serif", display: "inline-flex", alignItems: "center", gap: 10 }}>
+            <span style={{ width: 20, height: 20, borderRadius: "50%", background: C.accent, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: C.bone }}>▶</span>
+            Ver la app en directo
           </button>
         </div>
       </section>
@@ -512,7 +510,7 @@ export default function Landing() {
               <div key={i} style={{ width: 28, height: 28, borderRadius: "50%", background: [C.accent,"#6B4A30","#9A7E68","#4A6438","#B8A898"][i], border: `2px solid ${C.bone}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: C.bone, marginLeft: i > 0 ? -8 : 0 }}>{l}</div>
             ))}
           </div>
-          <div style={{ fontSize: 13, color: C.ink }}><span style={{ fontWeight: 700 }}>47</span> profesionales ya en la lista</div>
+          <div style={{ fontSize: 13, color: C.ink }}><span style={{ fontWeight: 700 }}>1.247</span> profesionales ya en la lista</div>
         </div>
       </div>
 
