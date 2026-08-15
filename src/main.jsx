@@ -14,7 +14,7 @@ const DEMO_USER = {
 };
 
 
-const C = {
+const DC = {
   bg: "#F5EFE4", bone: "#FBF8F1", sand: "#E2D9C8",
   border: "#D9C9A8", accent: "#A66B3F", walnut: "#6B4A30",
   ink: "#221610", text: "#3B2A1E", muted: "#9A7E68",
@@ -83,25 +83,25 @@ function ClientDashboard({ user, onLogout, onEnterApp }) {
   ];
 
   return (
-    <div style={{ fontFamily: "'Manrope',sans-serif", background: C.bg, minHeight: "100vh", color: C.text }}>
+    <div style={{ fontFamily: "'Manrope',sans-serif", background: DC.bg, minHeight: "100vh", color: DC.text }}>
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* NAV */}
-      <nav style={{ background: C.bone, borderBottom: `1px solid ${C.border}`, padding: "0 48px", display: "flex", justifyContent: "space-between", alignItems: "center", height: 64 }}>
+      <nav style={{ background: DC.bone, borderBottom: `1px solid ${DC.border}`, padding: "0 48px", display: "flex", justifyContent: "space-between", alignItems: "center", height: 64 }}>
         <div style={{ display: "flex", alignItems: "flex-end", lineHeight: 1 }}>
-          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 22, color: C.ink }}>pra</span>
-          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 26, color: C.accent, lineHeight: 0.9, marginLeft: 2 }}>X</span>
-          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 22, color: C.ink }}>i</span>
-          <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: C.accent, marginLeft: 10, marginBottom: 3 }} />
+          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 22, color: DC.ink }}>pra</span>
+          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 26, color: DC.accent, lineHeight: 0.9, marginLeft: 2 }}>X</span>
+          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 22, color: DC.ink }}>i</span>
+          <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: DC.accent, marginLeft: 10, marginBottom: 3 }} />
         </div>
         <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 32, height: 32, borderRadius: "50%", background: C.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: C.bone }}>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: DC.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: DC.bone }}>
               {nombre[0]}
             </div>
-            <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{nombre}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: DC.ink }}>{nombre}</span>
           </div>
-          <button onClick={onLogout} style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "6px 14px", fontSize: 12, color: C.muted, cursor: "pointer" }}>
+          <button onClick={onLogout} style={{ background: "none", border: `1px solid ${DC.border}`, borderRadius: 8, padding: "6px 14px", fontSize: 12, color: DC.muted, cursor: "pointer" }}>
             Cerrar sesión
           </button>
         </div>
@@ -110,13 +110,13 @@ function ClientDashboard({ user, onLogout, onEnterApp }) {
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "40px 48px" }}>
 
         {/* TABS */}
-        <div style={{ display: "flex", marginBottom: 32, borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ display: "flex", marginBottom: 32, borderBottom: `1px solid ${DC.border}` }}>
           {tabs.map(t => (
             <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
               padding: "10px 20px", background: "none", border: "none", cursor: "pointer",
               fontSize: 13, fontWeight: activeTab === t.id ? 600 : 400,
-              color: activeTab === t.id ? C.accent : C.muted,
-              borderBottom: activeTab === t.id ? `2px solid ${C.accent}` : "2px solid transparent",
+              color: activeTab === t.id ? DC.accent : DC.muted,
+              borderBottom: activeTab === t.id ? `2px solid ${DC.accent}` : "2px solid transparent",
               marginBottom: -1, fontFamily: "'Manrope',sans-serif",
             }}>{t.label}</button>
           ))}
@@ -126,37 +126,37 @@ function ClientDashboard({ user, onLogout, onEnterApp }) {
         {activeTab === "inicio" && (
           <div>
             <div style={{ marginBottom: 28 }}>
-              <h1 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 32, fontWeight: 400, color: C.ink, margin: "0 0 6px" }}>
+              <h1 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 32, fontWeight: 400, color: DC.ink, margin: "0 0 6px" }}>
                 {getSaludo(nombre)}
               </h1>
-              <p style={{ fontSize: 14, color: C.muted }}>{clinicaNombre} · Plan {planData.nombre}</p>
+              <p style={{ fontSize: 14, color: DC.muted }}>{clinicaNombre} · Plan {planData.nombre}</p>
             </div>
 
-            <div style={{ background: C.ink, borderRadius: 20, padding: "32px 40px", marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ background: DC.ink, borderRadius: 20, padding: "32px 40px", marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
-                <div style={{ fontSize: 20, fontWeight: 600, color: C.bone, marginBottom: 6 }}>Tu consulta te espera</div>
-                <div style={{ fontSize: 13, color: C.muted }}>Accede a tu gestión clínica, pacientes y agenda</div>
+                <div style={{ fontSize: 20, fontWeight: 600, color: DC.bone, marginBottom: 6 }}>Tu consulta te espera</div>
+                <div style={{ fontSize: 13, color: DC.muted }}>Accede a tu gestión clínica, pacientes y agenda</div>
               </div>
-              <button onClick={onEnterApp} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 12, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>
+              <button onClick={onEnterApp} style={{ background: DC.accent, color: DC.bone, border: "none", borderRadius: 12, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>
                 Entrar a la app →
               </button>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
               <Card style={{ padding: "20px 24px" }}>
-                <div style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Plan activo</div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 2 }}>{planData.nombre}</div>
-                <div style={{ fontSize: 12, color: C.muted }}>{planData.precio}/mes</div>
+                <div style={{ fontSize: 11, color: DC.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Plan activo</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: DC.ink, marginBottom: 2 }}>{planData.nombre}</div>
+                <div style={{ fontSize: 12, color: DC.muted }}>{planData.precio}/mes</div>
               </Card>
               <Card style={{ padding: "20px 24px" }}>
-                <div style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Período gratuito</div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: C.green, marginBottom: 2 }}>61 días</div>
-                <div style={{ fontSize: 12, color: C.muted }}>Hasta el 1 nov 2026</div>
+                <div style={{ fontSize: 11, color: DC.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Período gratuito</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: DC.green, marginBottom: 2 }}>61 días</div>
+                <div style={{ fontSize: 12, color: DC.muted }}>Hasta el 1 nov 2026</div>
               </Card>
               <Card style={{ padding: "20px 24px" }}>
-                <div style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Miembro desde</div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 2 }}>Ago 2026</div>
-                <div style={{ fontSize: 12, color: C.muted }}>Beta tester</div>
+                <div style={{ fontSize: 11, color: DC.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Miembro desde</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: DC.ink, marginBottom: 2 }}>Ago 2026</div>
+                <div style={{ fontSize: 12, color: DC.muted }}>Beta tester</div>
               </Card>
             </div>
 
@@ -164,11 +164,11 @@ function ClientDashboard({ user, onLogout, onEnterApp }) {
               <SLabel>Última factura de Praxi</SLabel>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: C.ink }}>{FACTURAS[0].concepto}</div>
-                  <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{FACTURAS[0].id} · {FACTURAS[0].fecha}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: DC.ink }}>{FACTURAS[0].concepto}</div>
+                  <div style={{ fontSize: 12, color: DC.muted, marginTop: 2 }}>{FACTURAS[0].id} · {FACTURAS[0].fecha}</div>
                 </div>
                 <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>{FACTURAS[0].importe}</span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: DC.ink }}>{FACTURAS[0].importe}</span>
                   <Badge>Pagada</Badge>
                 </div>
               </div>
@@ -179,24 +179,24 @@ function ClientDashboard({ user, onLogout, onEnterApp }) {
         {/* ── MI CLÍNICA ── */}
         {activeTab === "clinica" && (
           <div>
-            <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 28, fontWeight: 400, color: C.ink, margin: "0 0 24px" }}>Mi clínica</h2>
+            <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 28, fontWeight: 400, color: DC.ink, margin: "0 0 24px" }}>Mi clínica</h2>
 
             <Card style={{ padding: "28px 32px", marginBottom: 14 }}>
               <SLabel>Nombre de la clínica</SLabel>
               {editingClinica ? (
                 <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                   <input value={tempNombre} onChange={e => setTempNombre(e.target.value)}
-                    style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 14px", fontSize: 16, background: C.bg, color: C.text, outline: "none", flex: 1 }} autoFocus />
+                    style={{ border: `1px solid ${DC.border}`, borderRadius: 8, padding: "10px 14px", fontSize: 16, background: DC.bg, color: DC.text, outline: "none", flex: 1 }} autoFocus />
                   <button onClick={() => { setClinicaNombre(tempNombre); setEditingClinica(false); }}
-                    style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Guardar</button>
+                    style={{ background: DC.accent, color: DC.bone, border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Guardar</button>
                   <button onClick={() => setEditingClinica(false)}
-                    style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 16px", fontSize: 13, color: C.muted, cursor: "pointer" }}>Cancelar</button>
+                    style={{ background: "none", border: `1px solid ${DC.border}`, borderRadius: 8, padding: "10px 16px", fontSize: 13, color: DC.muted, cursor: "pointer" }}>Cancelar</button>
                 </div>
               ) : (
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 22, fontWeight: 600, color: C.ink }}>{clinicaNombre}</span>
+                  <span style={{ fontSize: 22, fontWeight: 600, color: DC.ink }}>{clinicaNombre}</span>
                   <button onClick={() => { setTempNombre(clinicaNombre); setEditingClinica(true); }}
-                    style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "7px 16px", fontSize: 12, color: C.muted, cursor: "pointer" }}>Editar</button>
+                    style={{ background: "none", border: `1px solid ${DC.border}`, borderRadius: 8, padding: "7px 16px", fontSize: 12, color: DC.muted, cursor: "pointer" }}>Editar</button>
                 </div>
               )}
             </Card>
@@ -206,29 +206,29 @@ function ClientDashboard({ user, onLogout, onEnterApp }) {
               {plan === "clinica" ? (
                 <>
                   {PROFESIONALES_CLINICA.map((p, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
-                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: p.yo ? C.accent : C.muted, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: C.bone }}>{p.ini}</div>
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: `1px solid ${DC.border}` }}>
+                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: p.yo ? DC.accent : DC.muted, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: DC.bone }}>{p.ini}</div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{p.nombre}</div>
-                        <div style={{ fontSize: 11, color: C.muted }}>{p.esp}</div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: DC.ink }}>{p.nombre}</div>
+                        <div style={{ fontSize: 11, color: DC.muted }}>{p.esp}</div>
                       </div>
-                      {p.yo ? <Badge>Tú</Badge> : <button style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 6, padding: "4px 10px", fontSize: 11, color: C.muted, cursor: "pointer" }}>Eliminar</button>}
+                      {p.yo ? <Badge>Tú</Badge> : <button style={{ background: "none", border: `1px solid ${DC.border}`, borderRadius: 6, padding: "4px 10px", fontSize: 11, color: DC.muted, cursor: "pointer" }}>Eliminar</button>}
                     </div>
                   ))}
                   {PROFESIONALES_CLINICA.length < 6 && (
                     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", marginTop: 4 }}>
-                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.sand, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: C.muted }}>+</div>
-                      <div style={{ fontSize: 13, color: C.muted, flex: 1 }}>Invitar profesional <span style={{ color: C.muted, fontSize: 11 }}>({PROFESIONALES_CLINICA.length}/6)</span></div>
-                      <button style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Invitar</button>
+                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: DC.sand, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: DC.muted }}>+</div>
+                      <div style={{ fontSize: 13, color: DC.muted, flex: 1 }}>Invitar profesional <span style={{ color: DC.muted, fontSize: 11 }}>({PROFESIONALES_CLINICA.length}/6)</span></div>
+                      <button style={{ background: DC.accent, color: DC.bone, border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Invitar</button>
                     </div>
                   )}
                 </>
               ) : (
                 <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: C.bone }}>{nombre[0]}</div>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: DC.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: DC.bone }}>{nombre[0]}</div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{nombre}</div>
-                    <div style={{ fontSize: 11, color: C.muted }}>{user?.especialidad || "Neuropsicólogo"} · Admin</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: DC.ink }}>{nombre}</div>
+                    <div style={{ fontSize: 11, color: DC.muted }}>{user?.especialidad || "Neuropsicólogo"} · Admin</div>
                   </div>
                   <Badge>Tú</Badge>
                 </div>
@@ -239,12 +239,12 @@ function ClientDashboard({ user, onLogout, onEnterApp }) {
               <SLabel>Plan actual</SLabel>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 4 }}>Plan {planData.nombre}</div>
-                  <div style={{ fontSize: 13, color: C.muted }}>{planData.desc}</div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: DC.ink, marginBottom: 4 }}>Plan {planData.nombre}</div>
+                  <div style={{ fontSize: 13, color: DC.muted }}>{planData.desc}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: 22, fontWeight: 700, color: C.accent }}>{planData.precio}<span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>/mes</span></div>
-                  <button style={{ marginTop: 8, background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "6px 14px", fontSize: 12, color: C.muted, cursor: "pointer" }}>Cambiar plan</button>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: DC.accent }}>{planData.precio}<span style={{ fontSize: 13, fontWeight: 400, color: DC.muted }}>/mes</span></div>
+                  <button style={{ marginTop: 8, background: "none", border: `1px solid ${DC.border}`, borderRadius: 8, padding: "6px 14px", fontSize: 12, color: DC.muted, cursor: "pointer" }}>Cambiar plan</button>
                 </div>
               </div>
             </Card>
@@ -254,37 +254,37 @@ function ClientDashboard({ user, onLogout, onEnterApp }) {
         {/* ── FACTURACIÓN ── */}
         {activeTab === "facturacion" && (
           <div>
-            <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 28, fontWeight: 400, color: C.ink, margin: "0 0 6px" }}>Facturación</h2>
-            <p style={{ fontSize: 13, color: C.muted, marginBottom: 28 }}>Historial de pagos de tu suscripción a Praxi</p>
+            <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 28, fontWeight: 400, color: DC.ink, margin: "0 0 6px" }}>Facturación</h2>
+            <p style={{ fontSize: 13, color: DC.muted, marginBottom: 28 }}>Historial de pagos de tu suscripción a Praxi</p>
 
             <Card style={{ padding: "18px 24px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
-                <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>Período gratuito activo hasta</div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: C.green }}>1 noviembre 2026 <span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>· sin cargo</span></div>
+                <div style={{ fontSize: 12, color: DC.muted, marginBottom: 4 }}>Período gratuito activo hasta</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: DC.green }}>1 noviembre 2026 <span style={{ fontSize: 13, fontWeight: 400, color: DC.muted }}>· sin cargo</span></div>
               </div>
               <Badge>3 meses gratuitos</Badge>
             </Card>
 
             <Card style={{ padding: "18px 24px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
-                <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>Próximo cargo</div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: C.ink }}>{planData.precio} <span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>el 1 nov 2026</span></div>
+                <div style={{ fontSize: 12, color: DC.muted, marginBottom: 4 }}>Próximo cargo</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: DC.ink }}>{planData.precio} <span style={{ fontSize: 13, fontWeight: 400, color: DC.muted }}>el 1 nov 2026</span></div>
               </div>
-              <div style={{ fontSize: 12, color: C.muted }}>•••• •••• •••• 4242</div>
+              <div style={{ fontSize: 12, color: DC.muted }}>•••• •••• •••• 4242</div>
             </Card>
 
             <Card style={{ overflow: "hidden" }}>
-              <div style={{ padding: "12px 20px", borderBottom: `1px solid ${C.border}`, fontSize: 11, color: C.walnut, textTransform: "uppercase", letterSpacing: "0.07em", fontWeight: 600 }}>Historial de facturas</div>
+              <div style={{ padding: "12px 20px", borderBottom: `1px solid ${DC.border}`, fontSize: 11, color: DC.walnut, textTransform: "uppercase", letterSpacing: "0.07em", fontWeight: 600 }}>Historial de facturas</div>
               {FACTURAS.map((f, i) => (
-                <div key={i} style={{ padding: "16px 20px", borderBottom: i < FACTURAS.length - 1 ? `1px solid ${C.border}` : "none", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div key={i} style={{ padding: "16px 20px", borderBottom: i < FACTURAS.length - 1 ? `1px solid ${DC.border}` : "none", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{f.concepto}</div>
-                    <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{f.id} · {f.fecha}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: DC.ink }}>{f.concepto}</div>
+                    <div style={{ fontSize: 11, color: DC.muted, marginTop: 2 }}>{f.id} · {f.fecha}</div>
                   </div>
                   <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>{f.importe}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: DC.ink }}>{f.importe}</span>
                     <Badge>Pagada</Badge>
-                    <button style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 6, padding: "5px 12px", fontSize: 11, color: C.muted, cursor: "pointer" }}>PDF</button>
+                    <button style={{ background: "none", border: `1px solid ${DC.border}`, borderRadius: 6, padding: "5px 12px", fontSize: 11, color: DC.muted, cursor: "pointer" }}>PDF</button>
                   </div>
                 </div>
               ))}
@@ -295,16 +295,16 @@ function ClientDashboard({ user, onLogout, onEnterApp }) {
         {/* ── MI CUENTA ── */}
         {activeTab === "cuenta" && (
           <div>
-            <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 28, fontWeight: 400, color: C.ink, margin: "0 0 24px" }}>Mi cuenta</h2>
+            <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 28, fontWeight: 400, color: DC.ink, margin: "0 0 24px" }}>Mi cuenta</h2>
 
             <Card style={{ padding: "28px 32px", marginBottom: 14 }}>
               <div style={{ display: "flex", gap: 20, alignItems: "center", marginBottom: 24 }}>
-                <div style={{ width: 64, height: 64, borderRadius: "50%", background: C.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 700, color: C.bone }}>{nombre[0]}</div>
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: DC.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 700, color: DC.bone }}>{nombre[0]}</div>
                 <div>
-                  <div style={{ fontSize: 20, fontWeight: 700, color: C.ink }}>{nombre}</div>
-                  <div style={{ fontSize: 13, color: C.muted }}>{user?.especialidad || "Neuropsicólogo"}</div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: DC.ink }}>{nombre}</div>
+                  <div style={{ fontSize: 13, color: DC.muted }}>{user?.especialidad || "Neuropsicólogo"}</div>
                 </div>
-                <button style={{ marginLeft: "auto", background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 16px", fontSize: 12, color: C.muted, cursor: "pointer" }}>Editar perfil</button>
+                <button style={{ marginLeft: "auto", background: "none", border: `1px solid ${DC.border}`, borderRadius: 8, padding: "8px 16px", fontSize: 12, color: DC.muted, cursor: "pointer" }}>Editar perfil</button>
               </div>
               <Row label="Nombre" value={nombre} />
               <Row label="Email" value={user?.email || "kevincostaneuro@gmail.com"} />
@@ -316,13 +316,13 @@ function ClientDashboard({ user, onLogout, onEnterApp }) {
 
             <Card style={{ padding: "28px 32px", marginBottom: 14 }}>
               <SLabel>Seguridad</SLabel>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderTop: `1px solid ${C.border}` }}>
-                <span style={{ fontSize: 13, color: C.muted }}>Contraseña</span>
-                <button style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "6px 14px", fontSize: 12, color: C.muted, cursor: "pointer" }}>Cambiar contraseña</button>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderTop: `1px solid ${DC.border}` }}>
+                <span style={{ fontSize: 13, color: DC.muted }}>Contraseña</span>
+                <button style={{ background: "none", border: `1px solid ${DC.border}`, borderRadius: 8, padding: "6px 14px", fontSize: 12, color: DC.muted, cursor: "pointer" }}>Cambiar contraseña</button>
               </div>
             </Card>
 
-            <button style={{ background: C.rD, color: C.red, border: `1px solid ${C.red}`, borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+            <button style={{ background: DC.rD, color: DC.red, border: `1px solid ${DC.red}`, borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
               Cancelar suscripción
             </button>
           </div>
@@ -334,7 +334,7 @@ function ClientDashboard({ user, onLogout, onEnterApp }) {
 }
 
 
-const C = {
+const RC = {
   bg: "#F5EFE4", bone: "#FBF8F1", border: "#D9C9A8",
   accent: "#A66B3F", ink: "#221610", muted: "#9A7E68",
   green: "#4A6438", gD: "#E8EFE2", walnut: "#6B4A30",
@@ -376,17 +376,17 @@ function Modal({ open, onClose, title, sections }) {
   if (!open) return null;
   return (
     <div onClick={e => e.target === e.currentTarget && onClose()} style={{ position: "fixed", inset: 0, background: "rgba(34,22,16,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ background: C.bone, borderRadius: 20, maxWidth: 560, width: "100%", maxHeight: "80vh", overflowY: "auto", border: `1px solid ${C.border}` }}>
-        <div style={{ padding: "20px 28px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: C.bone, borderRadius: "20px 20px 0 0" }}>
-          <div style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 18, color: C.ink }}>{title}</div>
-          <button onClick={onClose} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8, padding: "5px 12px", fontSize: 12, color: C.muted, cursor: "pointer" }}>Cerrar ✕</button>
+      <div style={{ background: DC.bone, borderRadius: 20, maxWidth: 560, width: "100%", maxHeight: "80vh", overflowY: "auto", border: `1px solid ${DC.border}` }}>
+        <div style={{ padding: "20px 28px 16px", borderBottom: `1px solid ${DC.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: DC.bone, borderRadius: "20px 20px 0 0" }}>
+          <div style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 18, color: DC.ink }}>{title}</div>
+          <button onClick={onClose} style={{ background: DC.bg, border: `1px solid ${DC.border}`, borderRadius: 8, padding: "5px 12px", fontSize: 12, color: DC.muted, cursor: "pointer" }}>Cerrar ✕</button>
         </div>
         <div style={{ padding: "24px 28px" }}>
-          <p style={{ fontSize: 12, color: C.muted, marginBottom: 16 }}>Última actualización: agosto de 2026</p>
+          <p style={{ fontSize: 12, color: DC.muted, marginBottom: 16 }}>Última actualización: agosto de 2026</p>
           {sections.map(([titulo, texto], i) => (
             <div key={i} style={{ marginBottom: 16 }}>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 15, color: C.ink, marginBottom: 6 }}>{titulo}</div>
-              <p style={{ fontSize: 13, color: C.walnut, lineHeight: 1.7 }}>{texto}</p>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 15, color: DC.ink, marginBottom: 6 }}>{titulo}</div>
+              <p style={{ fontSize: 13, color: DC.walnut, lineHeight: 1.7 }}>{texto}</p>
             </div>
           ))}
         </div>
@@ -395,8 +395,8 @@ function Modal({ open, onClose, title, sections }) {
   );
 }
 
-const inputStyle = { width: "100%", border: `1px solid ${C.border}`, borderRadius: 10, padding: "10px 12px", fontSize: 13, background: C.bg, color: C.ink, outline: "none", fontFamily: "'Manrope',sans-serif", boxSizing: "border-box" };
-const labelStyle = { fontSize: 10, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", display: "block", marginBottom: 5 };
+const inputStyle = { width: "100%", border: `1px solid ${DC.border}`, borderRadius: 10, padding: "10px 12px", fontSize: 13, background: DC.bg, color: DC.ink, outline: "none", fontFamily: "'Manrope',sans-serif", boxSizing: "border-box" };
+const labelStyle = { fontSize: 10, color: DC.muted, textTransform: "uppercase", letterSpacing: "0.07em", display: "block", marginBottom: 5 };
 
 function Registro() {
   const navigate = useNavigate();
@@ -406,7 +406,7 @@ function Registro() {
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   return (
-    <div style={{ fontFamily: "'Manrope',sans-serif", background: C.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
+    <div style={{ fontFamily: "'Manrope',sans-serif", background: RC.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@1&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
       <Modal open={modal === "terminos"} onClose={() => setModal(null)} title="Términos de uso" sections={TERMINOS} />
@@ -417,20 +417,20 @@ function Registro() {
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", lineHeight: 1, marginBottom: 6 }}>
-            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 36, color: C.ink, letterSpacing: "-1px" }}>pra</span>
-            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 43, color: C.accent, letterSpacing: "-1px", lineHeight: 0.9, marginLeft: 2 }}>X</span>
-            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 36, color: C.ink, letterSpacing: "-1px" }}>i</span>
-            <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: "50%", background: C.accent, marginLeft: 14, marginBottom: 5 }} />
+            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 36, color: RC.ink, letterSpacing: "-1px" }}>pra</span>
+            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 43, color: RC.accent, letterSpacing: "-1px", lineHeight: 0.9, marginLeft: 2 }}>X</span>
+            <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 36, color: RC.ink, letterSpacing: "-1px" }}>i</span>
+            <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: "50%", background: RC.accent, marginLeft: 14, marginBottom: 5 }} />
           </div>
-          <div style={{ fontSize: 9, color: C.muted, letterSpacing: "4px", textTransform: "uppercase" }}>gestión clínica</div>
+          <div style={{ fontSize: 9, color: RC.muted, letterSpacing: "4px", textTransform: "uppercase" }}>gestión clínica</div>
         </div>
 
         {/* Card */}
-        <div style={{ background: C.bone, border: `1px solid ${C.border}`, borderRadius: 24, padding: "40px 44px", boxShadow: "0 8px 40px rgba(59,42,30,0.07)" }}>
+        <div style={{ background: RC.bone, border: `1px solid ${RC.border}`, borderRadius: 24, padding: "40px 44px", boxShadow: "0 8px 40px rgba(59,42,30,0.07)" }}>
 
           <div style={{ marginBottom: 28 }}>
-            <h1 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 24, fontWeight: 400, color: C.ink, margin: "0 0 6px", fontStyle: "italic" }}>Crea tu cuenta</h1>
-            <p style={{ fontSize: 13, color: C.muted }}>3 meses gratuitos · Sin tarjeta de crédito</p>
+            <h1 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 24, fontWeight: 400, color: RC.ink, margin: "0 0 6px", fontStyle: "italic" }}>Crea tu cuenta</h1>
+            <p style={{ fontSize: 13, color: RC.muted }}>3 meses gratuitos · Sin tarjeta de crédito</p>
           </div>
 
           {/* Nombre y apellidos */}
@@ -481,23 +481,23 @@ function Registro() {
 
           {/* Términos */}
           <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 20 }}>
-            <input type="checkbox" checked={form.terms} onChange={e => set("terms", e.target.checked)} style={{ marginTop: 2, accentColor: C.accent, cursor: "pointer", flexShrink: 0, width: "auto" }} />
-            <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.6 }}>
+            <input type="checkbox" checked={form.terms} onChange={e => set("terms", e.target.checked)} style={{ marginTop: 2, accentColor: RC.accent, cursor: "pointer", flexShrink: 0, width: "auto" }} />
+            <div style={{ fontSize: 11, color: RC.muted, lineHeight: 1.6 }}>
               Acepto los{" "}
-              <span onClick={() => setModal("terminos")} style={{ color: C.accent, fontWeight: 500, cursor: "pointer" }}>términos de uso</span>
+              <span onClick={() => setModal("terminos")} style={{ color: RC.accent, fontWeight: 500, cursor: "pointer" }}>términos de uso</span>
               {" "}y la{" "}
-              <span onClick={() => setModal("privacidad")} style={{ color: C.accent, fontWeight: 500, cursor: "pointer" }}>política de privacidad</span>
+              <span onClick={() => setModal("privacidad")} style={{ color: RC.accent, fontWeight: 500, cursor: "pointer" }}>política de privacidad</span>
               , incluyendo el tratamiento de datos sanitarios conforme al RGPD.
             </div>
           </div>
 
-          <button onClick={() => navigate("/login")} style={{ width: "100%", background: C.accent, color: C.bone, border: "none", borderRadius: 12, padding: "14px 0", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Manrope',sans-serif", marginBottom: 16 }}>
+          <button onClick={() => navigate("/login")} style={{ width: "100%", background: RC.accent, color: RC.bone, border: "none", borderRadius: 12, padding: "14px 0", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Manrope',sans-serif", marginBottom: 16 }}>
             Crear cuenta
           </button>
 
-          <div style={{ textAlign: "center", fontSize: 12, color: C.muted }}>
+          <div style={{ textAlign: "center", fontSize: 12, color: RC.muted }}>
             ¿Ya tienes cuenta?{" "}
-            <span onClick={() => navigate("/login")} style={{ color: C.accent, fontWeight: 500, cursor: "pointer" }}>Iniciar sesión</span>
+            <span onClick={() => navigate("/login")} style={{ color: RC.accent, fontWeight: 500, cursor: "pointer" }}>Iniciar sesión</span>
           </div>
 
         </div>
@@ -505,7 +505,7 @@ function Registro() {
         {/* Trust */}
         <div style={{ display: "flex", justifyContent: "center", gap: 24, marginTop: 20 }}>
           {["🔒 RGPD compliant", "🇪🇺 Datos en Europa", "✦ 3 meses gratuitos"].map(t => (
-            <div key={t} style={{ fontSize: 11, color: C.muted }}>{t}</div>
+            <div key={t} style={{ fontSize: 11, color: RC.muted }}>{t}</div>
           ))}
         </div>
 
