@@ -64,7 +64,7 @@ const Row = ({ label, value }) => (
   </div>
 );
 
-export default function ClientDashboard({ user, onLogout, onEnterApp }) {
+function ClientDashboard({ user, onLogout, onEnterApp }) {
   const [activeTab, setActiveTab] = useState("inicio");
   const [clinicaNombre, setClinicaNombre] = useState(user?.clinica || "Consulta Neuro Kevin");
   const [editingClinica, setEditingClinica] = useState(false);
@@ -398,7 +398,7 @@ function Modal({ open, onClose, title, sections }) {
 const inputStyle = { width: "100%", border: `1px solid ${C.border}`, borderRadius: 10, padding: "10px 12px", fontSize: 13, background: C.bg, color: C.ink, outline: "none", fontFamily: "'Manrope',sans-serif", boxSizing: "border-box" };
 const labelStyle = { fontSize: 10, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", display: "block", marginBottom: 5 };
 
-export default function Registro() {
+function Registro() {
   const navigate = useNavigate();
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({ nombre: "", apellidos: "", email: "", prefijo: "+34", telefono: "", profesion: "", consulta: "", password: "", confirm: "", terms: false });
