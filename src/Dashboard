@@ -1,0 +1,321 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+const C = {
+  bg: "#F5EFE4", bone: "#FBF8F1", sand: "#E2D9C8",
+  border: "#D9C9A8", accent: "#A66B3F", walnut: "#6B4A30",
+  ink: "#221610", text: "#3B2A1E", muted: "#9A7E68",
+  green: "#4A6438", gD: "#E8EFE2", amber: "#C48C2A",
+  red: "#B85040", rD: "#FAEAE8",
+};
+
+const PLANES = {
+  basico:  { nombre: "Básico",  precio: "9,99€",  desc: "Hasta 20 pacientes · IA seguimientos · Agenda · Facturación" },
+  pro:     { nombre: "Pro",     precio: "29,99€", desc: "Pacientes ilimitados · IA · WhatsApp · Videollamada" },
+  clinica: { nombre: "Clínica", precio: "60€",    desc: "Hasta 6 profesionales · Todo lo del plan Pro · Admin" },
+};
+
+const PROFESIONALES_CLINICA = [
+  { ini: "K", nombre: "Kevin Costa", esp: "Neuropsicólogo · Admin", yo: true },
+  { ini: "M", nombre: "María López", esp: "Psicóloga", yo: false },
+  { ini: "A", nombre: "Ana García",  esp: "Fisioterapeuta", yo: false },
+];
+
+const FACTURAS = [
+  { id: "PRX-002", fecha: "2026-08-01", concepto: "Plan Pro — Agosto 2026", importe: "29,99€" },
+  { id: "PRX-001", fecha: "2026-07-01", concepto: "Plan Pro — Julio 2026",  importe: "29,99€" },
+];
+
+function getSaludo(nombre) {
+  const h = new Date().getHours();
+  const saludo = h >= 6 && h <= 12 ? "Buenos días" : h >= 13 && h <= 21 ? "Buenas tardes" : "Buenas noches";
+  return `${saludo}, ${nombre.split(" ")[0]}`;
+}
+
+const Badge = ({ children, color = C.green, bg = C.gD }) => (
+  <span style={{ background: bg, color, fontSize: 10, fontWeight: 600, padding: "3px 10px", borderRadius: 20 }}>{children}</span>
+);
+
+const Card = ({ children, style = {} }) => (
+  <div style={{ background: C.bone, borderRadius: 14, border: `1px solid ${C.border}`, ...style }}>{children}</div>
+);
+
+const SLabel = ({ children }) => (
+  <div style={{ fontSize: 11, color: C.walnut, textTransform: "uppercase", letterSpacing: "0.07em", fontWeight: 600, marginBottom: 12 }}>{children}</div>
+);
+
+const Row = ({ label, value }) => (
+  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderTop: `1px solid ${C.border}` }}>
+    <span style={{ fontSize: 13, color: C.muted }}>{label}</span>
+    <span style={{ fontSize: 13, fontWeight: 500, color: C.text }}>{value}</span>
+  </div>
+);
+
+export default function ClientDashboard({ user, onLogout, onEnterApp }) {
+  const [activeTab, setActiveTab] = useState("inicio");
+  const [clinicaNombre, setClinicaNombre] = useState(user?.clinica || "Consulta Neuro Kevin");
+  const [editingClinica, setEditingClinica] = useState(false);
+  const [tempNombre, setTempNombre] = useState(clinicaNombre);
+  const navigate = useNavigate();
+
+  const plan = "pro"; // TODO: conectar a Supabase
+  const planData = PLANES[plan];
+  const nombre = user?.nombre || "Kevin Costa";
+
+  const tabs = [
+    { id: "inicio", label: "Inicio" },
+    { id: "clinica", label: "Mi clínica" },
+    { id: "facturacion", label: "Facturación" },
+    { id: "cuenta", label: "Mi cuenta" },
+  ];
+
+  return (
+    <div style={{ fontFamily: "'Manrope',sans-serif", background: C.bg, minHeight: "100vh", color: C.text }}>
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+      {/* NAV */}
+      <nav style={{ background: C.bone, borderBottom: `1px solid ${C.border}`, padding: "0 48px", display: "flex", justifyContent: "space-between", alignItems: "center", height: 64 }}>
+        <div style={{ display: "flex", alignItems: "flex-end", lineHeight: 1 }}>
+          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 22, color: C.ink }}>pra</span>
+          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 26, color: C.accent, lineHeight: 0.9, marginLeft: 2 }}>X</span>
+          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 22, color: C.ink }}>i</span>
+          <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: C.accent, marginLeft: 10, marginBottom: 3 }} />
+        </div>
+        <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: C.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: C.bone }}>
+              {nombre[0]}
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{nombre}</span>
+          </div>
+          <button onClick={onLogout} style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "6px 14px", fontSize: 12, color: C.muted, cursor: "pointer" }}>
+            Cerrar sesión
+          </button>
+        </div>
+      </nav>
+
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: "40px 48px" }}>
+
+        {/* TABS */}
+        <div style={{ display: "flex", marginBottom: 32, borderBottom: `1px solid ${C.border}` }}>
+          {tabs.map(t => (
+            <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
+              padding: "10px 20px", background: "none", border: "none", cursor: "pointer",
+              fontSize: 13, fontWeight: activeTab === t.id ? 600 : 400,
+              color: activeTab === t.id ? C.accent : C.muted,
+              borderBottom: activeTab === t.id ? `2px solid ${C.accent}` : "2px solid transparent",
+              marginBottom: -1, fontFamily: "'Manrope',sans-serif",
+            }}>{t.label}</button>
+          ))}
+        </div>
+
+        {/* ── INICIO ── */}
+        {activeTab === "inicio" && (
+          <div>
+            <div style={{ marginBottom: 28 }}>
+              <h1 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 32, fontWeight: 400, color: C.ink, margin: "0 0 6px" }}>
+                {getSaludo(nombre)}
+              </h1>
+              <p style={{ fontSize: 14, color: C.muted }}>{clinicaNombre} · Plan {planData.nombre}</p>
+            </div>
+
+            <div style={{ background: C.ink, borderRadius: 20, padding: "32px 40px", marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontSize: 20, fontWeight: 600, color: C.bone, marginBottom: 6 }}>Tu consulta te espera</div>
+                <div style={{ fontSize: 13, color: C.muted }}>Accede a tu gestión clínica, pacientes y agenda</div>
+              </div>
+              <button onClick={onEnterApp} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 12, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer" }}>
+                Entrar a la app →
+              </button>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 20 }}>
+              <Card style={{ padding: "20px 24px" }}>
+                <div style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Plan activo</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 2 }}>{planData.nombre}</div>
+                <div style={{ fontSize: 12, color: C.muted }}>{planData.precio}/mes</div>
+              </Card>
+              <Card style={{ padding: "20px 24px" }}>
+                <div style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Período gratuito</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: C.green, marginBottom: 2 }}>61 días</div>
+                <div style={{ fontSize: 12, color: C.muted }}>Hasta el 1 nov 2026</div>
+              </Card>
+              <Card style={{ padding: "20px 24px" }}>
+                <div style={{ fontSize: 11, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 6 }}>Miembro desde</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 2 }}>Ago 2026</div>
+                <div style={{ fontSize: 12, color: C.muted }}>Beta tester</div>
+              </Card>
+            </div>
+
+            <Card style={{ padding: "20px 24px" }}>
+              <SLabel>Última factura de Praxi</SLabel>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: C.ink }}>{FACTURAS[0].concepto}</div>
+                  <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{FACTURAS[0].id} · {FACTURAS[0].fecha}</div>
+                </div>
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: C.ink }}>{FACTURAS[0].importe}</span>
+                  <Badge>Pagada</Badge>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* ── MI CLÍNICA ── */}
+        {activeTab === "clinica" && (
+          <div>
+            <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 28, fontWeight: 400, color: C.ink, margin: "0 0 24px" }}>Mi clínica</h2>
+
+            <Card style={{ padding: "28px 32px", marginBottom: 14 }}>
+              <SLabel>Nombre de la clínica</SLabel>
+              {editingClinica ? (
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <input value={tempNombre} onChange={e => setTempNombre(e.target.value)}
+                    style={{ border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 14px", fontSize: 16, background: C.bg, color: C.text, outline: "none", flex: 1 }} autoFocus />
+                  <button onClick={() => { setClinicaNombre(tempNombre); setEditingClinica(false); }}
+                    style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Guardar</button>
+                  <button onClick={() => setEditingClinica(false)}
+                    style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "10px 16px", fontSize: 13, color: C.muted, cursor: "pointer" }}>Cancelar</button>
+                </div>
+              ) : (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 22, fontWeight: 600, color: C.ink }}>{clinicaNombre}</span>
+                  <button onClick={() => { setTempNombre(clinicaNombre); setEditingClinica(true); }}
+                    style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "7px 16px", fontSize: 12, color: C.muted, cursor: "pointer" }}>Editar</button>
+                </div>
+              )}
+            </Card>
+
+            <Card style={{ padding: "28px 32px", marginBottom: 14 }}>
+              <SLabel>Profesionales</SLabel>
+              {plan === "clinica" ? (
+                <>
+                  {PROFESIONALES_CLINICA.map((p, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
+                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: p.yo ? C.accent : C.muted, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: C.bone }}>{p.ini}</div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{p.nombre}</div>
+                        <div style={{ fontSize: 11, color: C.muted }}>{p.esp}</div>
+                      </div>
+                      {p.yo ? <Badge>Tú</Badge> : <button style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 6, padding: "4px 10px", fontSize: 11, color: C.muted, cursor: "pointer" }}>Eliminar</button>}
+                    </div>
+                  ))}
+                  {PROFESIONALES_CLINICA.length < 6 && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", marginTop: 4 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.sand, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: C.muted }}>+</div>
+                      <div style={{ fontSize: 13, color: C.muted, flex: 1 }}>Invitar profesional <span style={{ color: C.muted, fontSize: 11 }}>({PROFESIONALES_CLINICA.length}/6)</span></div>
+                      <button style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 8, padding: "7px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Invitar</button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: "50%", background: C.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: C.bone }}>{nombre[0]}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{nombre}</div>
+                    <div style={{ fontSize: 11, color: C.muted }}>{user?.especialidad || "Neuropsicólogo"} · Admin</div>
+                  </div>
+                  <Badge>Tú</Badge>
+                </div>
+              )}
+            </Card>
+
+            <Card style={{ padding: "28px 32px" }}>
+              <SLabel>Plan actual</SLabel>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: C.ink, marginBottom: 4 }}>Plan {planData.nombre}</div>
+                  <div style={{ fontSize: 13, color: C.muted }}>{planData.desc}</div>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: C.accent }}>{planData.precio}<span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>/mes</span></div>
+                  <button style={{ marginTop: 8, background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "6px 14px", fontSize: 12, color: C.muted, cursor: "pointer" }}>Cambiar plan</button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* ── FACTURACIÓN ── */}
+        {activeTab === "facturacion" && (
+          <div>
+            <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 28, fontWeight: 400, color: C.ink, margin: "0 0 6px" }}>Facturación</h2>
+            <p style={{ fontSize: 13, color: C.muted, marginBottom: 28 }}>Historial de pagos de tu suscripción a Praxi</p>
+
+            <Card style={{ padding: "18px 24px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>Período gratuito activo hasta</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: C.green }}>1 noviembre 2026 <span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>· sin cargo</span></div>
+              </div>
+              <Badge>3 meses gratuitos</Badge>
+            </Card>
+
+            <Card style={{ padding: "18px 24px", marginBottom: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontSize: 12, color: C.muted, marginBottom: 4 }}>Próximo cargo</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: C.ink }}>{planData.precio} <span style={{ fontSize: 13, fontWeight: 400, color: C.muted }}>el 1 nov 2026</span></div>
+              </div>
+              <div style={{ fontSize: 12, color: C.muted }}>•••• •••• •••• 4242</div>
+            </Card>
+
+            <Card style={{ overflow: "hidden" }}>
+              <div style={{ padding: "12px 20px", borderBottom: `1px solid ${C.border}`, fontSize: 11, color: C.walnut, textTransform: "uppercase", letterSpacing: "0.07em", fontWeight: 600 }}>Historial de facturas</div>
+              {FACTURAS.map((f, i) => (
+                <div key={i} style={{ padding: "16px 20px", borderBottom: i < FACTURAS.length - 1 ? `1px solid ${C.border}` : "none", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: C.ink }}>{f.concepto}</div>
+                    <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{f.id} · {f.fecha}</div>
+                  </div>
+                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: C.ink }}>{f.importe}</span>
+                    <Badge>Pagada</Badge>
+                    <button style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 6, padding: "5px 12px", fontSize: 11, color: C.muted, cursor: "pointer" }}>PDF</button>
+                  </div>
+                </div>
+              ))}
+            </Card>
+          </div>
+        )}
+
+        {/* ── MI CUENTA ── */}
+        {activeTab === "cuenta" && (
+          <div>
+            <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 28, fontWeight: 400, color: C.ink, margin: "0 0 24px" }}>Mi cuenta</h2>
+
+            <Card style={{ padding: "28px 32px", marginBottom: 14 }}>
+              <div style={{ display: "flex", gap: 20, alignItems: "center", marginBottom: 24 }}>
+                <div style={{ width: 64, height: 64, borderRadius: "50%", background: C.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 700, color: C.bone }}>{nombre[0]}</div>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 700, color: C.ink }}>{nombre}</div>
+                  <div style={{ fontSize: 13, color: C.muted }}>{user?.especialidad || "Neuropsicólogo"}</div>
+                </div>
+                <button style={{ marginLeft: "auto", background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 16px", fontSize: 12, color: C.muted, cursor: "pointer" }}>Editar perfil</button>
+              </div>
+              <Row label="Nombre" value={nombre} />
+              <Row label="Email" value={user?.email || "kevincostaneuro@gmail.com"} />
+              <Row label="Teléfono" value="+34 612 345 678" />
+              <Row label="Profesión" value={user?.especialidad || "Neuropsicólogo/a"} />
+              <Row label="Consulta" value={clinicaNombre} />
+              <Row label="Miembro desde" value="Agosto 2026" />
+            </Card>
+
+            <Card style={{ padding: "28px 32px", marginBottom: 14 }}>
+              <SLabel>Seguridad</SLabel>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderTop: `1px solid ${C.border}` }}>
+                <span style={{ fontSize: 13, color: C.muted }}>Contraseña</span>
+                <button style={{ background: "none", border: `1px solid ${C.border}`, borderRadius: 8, padding: "6px 14px", fontSize: 12, color: C.muted, cursor: "pointer" }}>Cambiar contraseña</button>
+              </div>
+            </Card>
+
+            <button style={{ background: C.rD, color: C.red, border: `1px solid ${C.red}`, borderRadius: 10, padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+              Cancelar suscripción
+            </button>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
