@@ -470,12 +470,7 @@ function Login({onLogin}){
 
   const Logo=()=>(
     <div style={{textAlign:"center",marginBottom:32}}>
-      <div style={{display:"flex",alignItems:"flex-end",lineHeight:1,gap:0}}>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:32,color:C.text,letterSpacing:"-1px"}}>pra</span>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:38,color:C.accent,letterSpacing:"-1px",lineHeight:0.9,marginLeft:4}}>X</span>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:32,color:C.text,letterSpacing:"-1px"}}>i</span>
-              <span style={{display:"inline-block",width:9,height:9,borderRadius:"50%",background:C.accent,marginLeft:14,marginBottom:5,flexShrink:0}}/>
-            </div>
+      <div style={{fontSize:32,fontWeight:300,color:C.accent,letterSpacing:"-1px",fontFamily:"'Manrope',sans-serif"}}>praxi</div>
       <div style={{fontSize:11,color:C.muted,letterSpacing:"0.18em",textTransform:"uppercase",marginTop:4}}>gestión clínica</div>
     </div>
   );
@@ -483,7 +478,7 @@ function Login({onLogin}){
   // ── PASO 1: Login clínica ──────────────────────────────────────────────────
   if(step==="clinica") return(
     <div style={wrapStyle}>
-      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+      <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
       <div style={cardStyle}>
         <Logo/>
         <div style={{fontSize:13,color:C.muted,textAlign:"center",marginBottom:24}}>Accede con las credenciales de tu clínica</div>
@@ -1695,11 +1690,10 @@ function CitaModal({cita,patients,tipos,onClose,onSave,onDelete,defaultFecha,def
           </select>
         </Field>
         {esPL?(<div style={{padding:"12px 14px",background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.teal}`}}><div style={{fontSize:11,color:C.teal,fontWeight:700,marginBottom:10,textTransform:"uppercase"}}>Datos del contacto</div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}><Field label="Nombre"><input style={st.input} value={form.nombreExterno||""} onChange={f("nombreExterno")}/></Field><Field label="Teléfono"><input style={st.input} value={form.telefonoExterno||""} onChange={f("telefonoExterno")}/></Field><div style={{gridColumn:"1/-1"}}><Field label="Email"><input style={st.input} value={form.emailExterno||""} onChange={f("emailExterno")}/></Field></div></div></div>):(<Field label="Paciente"><select style={st.input} value={form.pacienteId} onChange={f("pacienteId")}><option value="">Seleccionar...</option>{patients.map(p=><option key={p.id} value={p.id}>{p.nombre} {p.apellidos}</option>)}</select></Field>)}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:10}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
           <Field label="Fecha"><input type="date" style={st.input} value={form.fecha} onChange={f("fecha")}/></Field>
           <Field label="Hora"><select style={st.input} value={form.hora} onChange={f("hora")}>{HALF_HOURS.map(t=><option key={t}>{t}</option>)}</select></Field>
           <Field label="Duración"><select style={st.input} value={form.duracion} onChange={e=>setForm(p=>({...p,duracion:Number(e.target.value)}))}>{[15,30,45,60,75,90,120].map(d=><option key={d} value={d}>{d} min</option>)}</select></Field>
-          <Field label="Precio (€)"><input type="number" min={0} style={st.input} value={form.precio||0} onChange={e=>setForm(p=>({...p,precio:Number(e.target.value)}))}/></Field>
         </div>
         <Field label="Notas"><textarea style={st.textarea} value={form.notas} onChange={f("notas")}/></Field>
         {form.zoomLink&&<div style={{background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,padding:"10px 14px",borderLeft:`3px solid ${C.accent}`}}><div style={{fontSize:10,color:C.dim,textTransform:"uppercase",marginBottom:4}}>Enlace Zoom</div><a href={form.zoomLink} target="_blank" rel="noreferrer" style={{fontSize:12,color:C.aL,wordBreak:"break-all",textDecoration:"none"}}>{form.zoomLink}</a></div>}
@@ -1770,8 +1764,78 @@ function TareaModal({tarea,onClose,onSave,onDelete}){
   );
 }
 
+// ── HUECOS LIBRES — modal para compartir con pacientes ────────────────────────
+function HuecosModal({fecha,citas,horario,onClose}){
+  const[dias,setDias]=useState(5);
+  const[copiado,setCopiado]=useState(false);
+
+  const days=Array.from({length:dias},(_,i)=>addDays(fecha,i));
+
+  const getHuecos=d=>{
+    const ds=toYMD(d);
+    const occ=citas.filter(c=>c.fecha===ds).map(c=>({s:timeToMins(c.hora),e:timeToMins(c.hora)+c.duracion}));
+    const free=[];
+    for(let t=horario.start*60;t+60<=horario.end*60;t+=30){
+      if(!occ.some(o=>t<o.e&&t+30>o.s))free.push(minsToTime(t));
+    }
+    return free;
+  };
+
+  const DIAS_ES_LARGO=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+
+  const texto=days.map(d=>{
+    const huecos=getHuecos(d);
+    if(huecos.length===0)return null;
+    const dn=DIAS_ES_LARGO[(d.getDay()+6)%7];
+    const fecha_str=`${d.getDate()} de ${MONTHS_ES[d.getMonth()]}`;
+    return `${dn} ${fecha_str}: ${huecos.join(", ")}`;
+  }).filter(Boolean).join("
+");
+
+  const textoCompleto=`Hola, estos son mis próximos huecos disponibles:
+
+${texto}
+
+¿Cuál te viene mejor?`;
+
+  const copiar=()=>{
+    navigator.clipboard.writeText(textoCompleto);
+    setCopiado(true);
+    setTimeout(()=>setCopiado(false),2000);
+  };
+
+  return(
+    <Modal onClose={onClose} title="Huecos libres para compartir" width={480}>
+      <div style={{fontSize:12,color:C.muted,marginBottom:14}}>Genera un mensaje listo para enviar a tus pacientes por WhatsApp o email.</div>
+
+      <div style={{display:"flex",gap:6,marginBottom:16}}>
+        <label style={{...st.label,marginBottom:0,lineHeight:"28px"}}>Mostrar</label>
+        {[[3,"3 días"],[5,"5 días"],[7,"1 semana"]].map(([n,l])=>(
+          <button key={n} onClick={()=>setDias(n)} style={{...st.btn("sm"),background:dias===n?C.accent:C.bone,color:dias===n?C.bone:C.muted,border:`1px solid ${dias===n?C.accent:C.border}`}}>{l}</button>
+        ))}
+      </div>
+
+      {texto?(<>
+        <div style={{background:C.bone,border:`1px solid ${C.border}`,borderRadius:10,padding:"14px 16px",marginBottom:16,whiteSpace:"pre-wrap",fontSize:13,lineHeight:1.7,color:C.text}}>
+          {textoCompleto}
+        </div>
+        <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
+          <button style={st.btn("ghost")} onClick={onClose}>Cerrar</button>
+          <button style={{...st.btn(),background:copiado?C.green:C.accent,color:C.bone}} onClick={copiar}>
+            {copiado?"✓ Copiado":"📋 Copiar mensaje"}
+          </button>
+        </div>
+      </>):(
+        <div style={{textAlign:"center",padding:"24px 0",color:C.muted,fontSize:13}}>No hay huecos disponibles en este período.</div>
+      )}
+    </Modal>
+  );
+}
+
+
 function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tareas,setTareas}){
-  const[view,setView]=useState("day");
+  const[view,setView]=useState("5d");
+  const[showHuecos,setShowHuecos]=useState(false);
   const[date,setDate]=useState(today());
   const[citaM,setCitaM]=useState(null);
   const[showCfg,setShowCfg]=useState(false);
@@ -1841,6 +1905,72 @@ function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tare
                         <div style={{fontSize:10,fontWeight:700,color:"#fff",lineHeight:1.3}}>{name}</div>
                         <div style={{fontSize:9,color:"rgba(255,255,255,0.8)"}}>{cita.hora}</div>
                       </div>
+                    </div>
+                  );
+                }
+                return(
+                  <div key={i} onClick={()=>openNew(d,time)} style={{borderLeft:`1px solid ${C.border}`,background:isT?"rgba(166,107,63,0.03)":"transparent",cursor:"pointer"}}
+                    onMouseEnter={e=>e.currentTarget.style.background="rgba(166,107,63,0.06)"}
+                    onMouseLeave={e=>e.currentTarget.style.background=isT?"rgba(166,107,63,0.03)":"transparent"}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+
+  // Vista 5 días
+  const FiveDayV=()=>{
+    const days=Array.from({length:5},(_,i)=>addDays(date,i));
+    return(
+      <div>
+        <div style={{display:"grid",gridTemplateColumns:`54px repeat(5,1fr)`,borderBottom:`1px solid ${C.border}`}}>
+          <div/>
+          {days.map((d,i)=>{
+            const isT=toYMD(d)===todayStr;
+            const hasCitas=citas.some(c=>c.fecha===toYMD(d));
+            return(
+              <div key={i} onClick={()=>{setDate(d);setView("day");}} style={{padding:"10px 6px",textAlign:"center",cursor:"pointer",background:isT?"rgba(166,107,63,0.09)":"transparent",borderLeft:`1px solid ${C.border}`}}>
+                <div style={{fontSize:11,color:isT?C.accent:C.walnut,textTransform:"uppercase",letterSpacing:"0.05em",fontWeight:600}}>{DAYS_ES[i]}</div>
+                <div style={{fontSize:16,fontWeight:isT?700:400,color:isT?C.accent:C.text,width:28,height:28,borderRadius:"50%",background:isT?C.sand:"transparent",display:"flex",alignItems:"center",justifyContent:"center",margin:"4px auto 0"}}>{d.getDate()}</div>
+                {hasCitas&&!isT&&<div style={{width:4,height:4,borderRadius:"50%",background:C.accent,margin:"2px auto 0"}}/>}
+              </div>
+            );
+          })}
+        </div>
+        <div style={{overflowY:"auto",maxHeight:"60vh"}}>
+          {HOURS.map(h=>[`${pad(h)}:00`,`${pad(h)}:30`]).flat().map(time=>(
+            <div key={time} style={{display:"grid",gridTemplateColumns:`54px repeat(5,1fr)`,borderBottom:`1px solid ${C.border}`,minHeight:44}}>
+              <div style={{fontSize:10,color:time.endsWith(":00")?C.walnut:C.dim,padding:"6px 8px",textAlign:"center",paddingTop:8,fontWeight:time.endsWith(":00")?600:400}}>{time.endsWith(":00")?time:"·"}</div>
+              {days.map((d,i)=>{
+                const ds=toYMD(d);
+                const cita=citas.find(c=>c.fecha===ds&&c.hora===time);
+                const isT=ds===todayStr;
+                const covered=citas.some(c=>c.fecha===ds&&timeToMins(c.hora)<timeToMins(time)&&timeToMins(time)<timeToMins(c.hora)+c.duracion);
+                if(covered)return <div key={i} style={{borderLeft:`1px solid ${C.border}`,background:isT?"rgba(166,107,63,0.03)":"transparent"}}/>;
+                if(cita){
+                  const p=patients.find(p=>p.id==cita.pacienteId);
+                  const isC=cita.origen==="calendly";
+                  const name=isC?(cita.nombreExterno||"Cal"):(p?p.nombre:"?");
+                  const isCompact=cita.duracion<=30;
+                  const rowH=44*(cita.duracion/30);
+                  return(
+                    <div key={i} onClick={()=>openEdit(cita)} style={{borderLeft:`1px solid ${C.border}`,padding:2,cursor:"pointer",minHeight:rowH}}>
+                      {isCompact?(
+                        <div style={{background:isC?C.tD:C.sand,borderLeft:`3px solid ${isC?C.teal:C.accent}`,borderRadius:4,padding:"2px 5px",height:"calc(100% - 2px)",display:"flex",alignItems:"center",gap:4,overflow:"hidden"}}>
+                          <span style={{fontSize:9,fontWeight:700,color:isC?C.teal:C.accent,flexShrink:0}}>{cita.hora}</span>
+                          <span style={{fontSize:9,fontWeight:600,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{name}</span>
+                        </div>
+                      ):(
+                        <div style={{background:isC?C.teal:C.accent,borderRadius:5,padding:"3px 6px",height:"calc(100% - 2px)",overflow:"hidden"}}>
+                          <div style={{fontSize:10,fontWeight:700,color:"#fff",lineHeight:1.3}}>{name}</div>
+                          <div style={{fontSize:9,color:"rgba(255,255,255,0.8)"}}>{cita.hora}</div>
+                        </div>
+                      )}
                     </div>
                   );
                 }
@@ -1951,6 +2081,7 @@ function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tare
         </div>
         <div style={{display:"flex",gap:8}}>
           <button style={{...st.btn("sm"),background:config.makeOut?C.gD:C.rD,color:config.makeOut?C.green:C.red}} onClick={()=>setShowCfg(true)}>{config.makeOut?"● Integraciones":"○ Configurar Make"}</button>
+          <button style={{...st.btn("sm"),background:C.tD,color:C.teal}} onClick={()=>setShowHuecos(true)}>📋 Huecos libres</button>
           <button style={st.btn()} onClick={()=>openNew(date,"09:00",tipos[0]?.id)}>+ Añadir</button>
         </div>
       </div>
@@ -1960,10 +2091,11 @@ function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tare
         <button style={st.btn("sm")} onClick={()=>nav(1)}>›</button>
         <div style={{fontSize:15,fontWeight:700,flex:1,textAlign:"center"}}>{navLabel()}</div>
         <div style={{display:"flex",gap:3,background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,padding:3}}>
-          {[["week","Semanal"],["day","Diario"]].map(([v,l])=><button key={v} style={{...st.btn("sm"),background:view===v?C.aD:"transparent",color:view===v?C.bone:C.muted,border:"none"}} onClick={()=>setView(v)}>{l}</button>)}
+          {[["day","Día"],["5d","5 días"],["week","Semana"]].map(([v,l])=><button key={v} style={{...st.btn("sm"),background:view===v?C.aD:"transparent",color:view===v?C.bone:C.muted,border:"none"}} onClick={()=>setView(v)}>{l}</button>)}
         </div>
       </div>
-      <div style={st.card}>{view==="week"?<WeekV/>:<DayV/>}</div>
+      <div style={st.card}>{view==="week"?<WeekV/>:view==="5d"?<FiveDayV/>:<DayV/>}</div>
+      {showHuecos&&<HuecosModal fecha={date} citas={citas} horario={horario} onClose={()=>setShowHuecos(false)}/>}
       {citaM&&<CitaModal cita={citaM.cita} patients={patients} tipos={tipos} defaultFecha={citaM.defaultFecha} defaultHora={citaM.defaultHora} defaultTipoId={citaM.defaultTipoId} makeUrl={config.makeOut} onClose={()=>setCitaM(null)} onSave={saveCita} onDelete={delCita}/>}
       {editTarea&&<TareaModal tarea={editTarea} onClose={()=>setEditTarea(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTarea(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTarea(null);}}/>}
       {showCfg&&<Modal onClose={()=>setShowCfg(false)} title="⚙ Configurar integraciones Make" width={540}>
@@ -2280,12 +2412,7 @@ function Facturas({patients,setPatients}){
           <div style={{border:`1px solid ${C.border}`,borderRadius:12,padding:24}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20}}>
               <div>
-                <div style={{display:"flex",alignItems:"flex-end",lineHeight:1,gap:0}}>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:18,color:C.accent,letterSpacing:"-0.5px"}}>pra</span>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:22,color:C.accent,letterSpacing:"-0.5px",lineHeight:0.9,marginLeft:2}}>X</span>
-              <span style={{fontFamily:"'Playfair Display',serif",fontStyle:"italic",fontWeight:400,fontSize:18,color:C.accent,letterSpacing:"-0.5px"}}>i</span>
-              <span style={{display:"inline-block",width:5,height:5,borderRadius:"50%",background:C.accent,marginLeft:9,marginBottom:3,flexShrink:0}}/>
-            </div>
+                <div style={{fontSize:22,fontWeight:300,color:C.accent,letterSpacing:"-0.5px",fontFamily:"'Manrope',sans-serif"}}>praxi</div>
                 <div style={{fontSize:9,color:C.muted,letterSpacing:"0.15em",textTransform:"uppercase"}}>gestión clínica</div>
               </div>
               <div style={{textAlign:"right"}}>
@@ -2862,7 +2989,7 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCit
   const mes=toYMD(today()).slice(0,7);
   const mesCob=patients.flatMap(p=>p.sesiones.filter(s=>s.fecha.startsWith(mes)&&s.pagado)).reduce((a,s)=>a+s.pago,0);
   const sinConsent=patients.filter(p=>p.estado==="activo"&&!p.consentimiento);
-  const[dias,setDias]=useState(1);
+  const[dias,setDias]=useState(5);
   const[startDate,setStartDate]=useState(today());
   const[expanded,setExpanded]=useState(null);
   const[prepNotes,setPrepNotes]=useState({});
@@ -2947,46 +3074,24 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCit
   };
 
   return(
-    <div>
+    <div style={{maxWidth:1200,margin:"0 auto"}}>
       {/* Header */}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
         <div style={{fontSize:26,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Dashboard</div>
-        <button style={{...st.btn("sm"),background:C.gD,color:C.green}} onClick={onInforme}>📊 Informe mensual</button>
+        <div style={{display:"flex",gap:8}}>
+          <button style={{...st.btn("sm"),background:C.accent,color:C.bone}} onClick={()=>{}}>+ Nueva cita</button>
+          <button style={{...st.btn("sm"),background:C.gD,color:C.green}} onClick={onInforme}>📊 Informe mensual</button>
+        </div>
       </div>
 
       {/* Stats */}
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:14,marginBottom:20}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:20,maxWidth:700}}>
         <StatCard val={patients.filter(p=>p.estado==="activo").length} label="Pacientes activos" color={C.aL}/>
         <StatCard val={todayCitas.length} label="Citas hoy" color={C.text}/>
-        <StatCard val={`${mesCob}€`} label="Cobrado este mes" color={C.green}/>
-        <StatCard val={`${pend}€`} label="Total pendiente" color={C.amber}/>
+        <StatCard val={getFreeSlots(toYMD(today()),citas).length} label="Huecos libres hoy" color={C.green}/>
       </div>
 
-      {/* Resumen financiero del mes */}
-      {(()=>{
-        const objetivo=mesCob+pend||1;
-        const pct=Math.min(100,Math.round((mesCob/objetivo)*100));
-        const semana=toYMD(today());
-        const finSemana=toYMD(addDays(today(),7));
-        const pendSemana=patients.flatMap(p=>p.sesiones.filter(s=>!s.pagado&&s.fecha>=semana&&s.fecha<=finSemana)).reduce((a,s)=>a+s.pago,0);
-        return(
-          <div style={{...st.card,padding:"16px 20px",marginBottom:16}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-              <div style={{fontSize:13,fontWeight:600,color:C.text}}>Ingresos — {MONTHS_ES[today().getMonth()]}</div>
-              <div style={{fontSize:12,color:C.muted}}>{mesCob}€ cobrado · {pend}€ pendiente total</div>
-            </div>
-            {/* Barra de progreso cobrado vs total */}
-            <div style={{height:10,background:C.sand,borderRadius:999,overflow:"hidden",marginBottom:8}}>
-              <div style={{height:"100%",width:`${pct}%`,background:C.green,borderRadius:999,transition:"width 0.5s cubic-bezier(0.2,0.7,0.2,1)"}}/>
-            </div>
-            <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:C.muted}}>
-              <span style={{color:C.green,fontWeight:600}}>{pct}% cobrado</span>
-              {pendSemana>0&&<span style={{color:C.amber}}>⏳ {pendSemana}€ pendiente esta semana</span>}
-              <span>{mesCob+pend}€ total generado</span>
-            </div>
-          </div>
-        );
-      })()}
+
 
       {/* Próximas citas — solo hoy */}
       {(()=>{
@@ -3040,11 +3145,7 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCit
               {dias===1?startDate.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}):
                `${startDate.toLocaleDateString("es-ES",{day:"numeric",month:"short"})} – ${addDays(startDate,dias-1).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}`}
             </span>
-            <div style={{display:"flex",gap:3,background:C.bone,borderRadius:8,border:`1px solid ${C.border}`,padding:3}}>
-              {[[1,"1 día"],[5,"5 días"],[7,"7 días"]].map(([n,l])=>(
-                <button key={n} style={{...st.btn("sm"),background:dias===n?C.accent:"transparent",color:dias===n?C.bone:C.muted,border:"none",padding:"4px 10px",fontSize:11}} onClick={()=>{setDias(n);setStartDate(today());}}>{l}</button>
-              ))}
-            </div>
+            <button style={{...st.btn("sm"),background:C.bone,color:C.muted,fontSize:11}} onClick={()=>setPage&&setPage("calendario")}>Ver calendario →</button>
           </div>
           <div style={{display:"flex",borderBottom:`1px solid ${C.border}`,minHeight:200}}>
             {dayRange.map((d,i)=>(
@@ -3145,268 +3246,168 @@ export default function App(){
   if(!currentUser)return <Login onLogin={(prof,clinica)=>{setCurrentUser(prof);setCurrentClinica(clinica);}}/>;
   return(
     <div style={st.app}>
-      <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>CONSTANTS ──────────────────────────────────────────────────────────────────
-// ── CLINICA + PROFESIONALES STORE ─────────────────────────────────────────────
-// En producción esto va en Supabase. Por ahora en memoria.
-const INITIAL_CLINICA={
-  id:"c1",
-  nombre:"Clínica Praxi",
-  email:"admin@praxi.com",
-  password:"praxi2026",
-  creadoEn:new Date().toISOString(),
-};
+      <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+      {reminders.length>0&&<div style={{position:"fixed",top:16,right:16,zIndex:200,display:"flex",flexDirection:"column",gap:8}}>{reminders.map(r=><div key={r.id} style={{background:r.type==="soon"?C.rD:C.amD,border:`1px solid ${r.type==="soon"?C.red:C.amber}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:r.type==="soon"?C.red:C.amber,display:"flex",gap:10,alignItems:"center",maxWidth:340,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"}}><span style={{flex:1}}>{r.msg}</span><button onClick={()=>setReminders(rs=>rs.filter(x=>x.id!==r.id))} style={{background:"none",border:"none",color:"inherit",cursor:"pointer",fontSize:14}}>✕</button></div>)}</div>}
 
-const INITIAL_PROFESIONALES=[
-  {id:"u1",nombre:"Kevin Costa",email:"kevin@praxi.com",password:"psico2026",
-   especialidad:"Neuropsicología",color:"#A66B3F",rol:"admin",
-   clinicaId:"c1",activo:true,creadoEn:new Date().toISOString()},
-  {id:"u2",nombre:"María López",email:"maria@praxi.com",password:"psico2026",
-   especialidad:"Psicología Clínica",color:"#6B8C5A",rol:"profesional",
-   clinicaId:"c1",activo:true,creadoEn:new Date().toISOString()},
-];
-
-let CLINICA_STORE={...INITIAL_CLINICA};
-let PROF_STORE=[...INITIAL_PROFESIONALES];
-const WORK_START = 8, WORK_END = 20;
-const HOURS = Array.from({ length: WORK_END - WORK_START }, (_, i) => WORK_START + i);
-const HALF_HOURS = HOURS.flatMap(h => [`${pad(h)}:00`, `${pad(h)}:30`]);
-const DAYS_ES = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
-const MONTHS_ES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-const NOTE_TEMPLATES = [
-  { label: "SOAP", text: "S (Subjetivo): \nO (Objetivo): \nA (Análisis): \nP (Plan): " },
-  { label: "TCC", text: "Situación activadora: \nPensamientos automáticos: \nEmociones: \nConductas: \nReestructuración: " },
-  { label: "Seguimiento", text: "Estado general: \nTemas trabajados: \nTécnicas utilizadas: \nTareas para casa: \nPróximos objetivos: " },
-  { label: "Libre", text: "" },
-];
-const DEFAULT_CONSENT = `CONSENTIMIENTO INFORMADO PARA TRATAMIENTO PSICOLÓGICO
-
-Yo, [NOMBRE DEL PACIENTE], con DNI _________________, declaro haber sido informado/a de:
-
-1. LA NATURALEZA DEL TRATAMIENTO
-   El tratamiento psicológico consiste en intervenciones basadas en evidencia científica orientadas a mejorar el bienestar emocional y psicológico del paciente.
-
-2. VOLUNTARIEDAD
-   La participación en el tratamiento es completamente voluntaria. El paciente puede interrumpirlo en cualquier momento sin que ello suponga perjuicio alguno.
-
-3. CONFIDENCIALIDAD
-   Toda la información compartida durante las sesiones es estrictamente confidencial y está protegida por el secreto profesional, salvo en los casos en que la ley obligue a su revelación (riesgo grave para el paciente u otras personas).
-
-4. PROTECCIÓN DE DATOS
-   Los datos personales serán tratados conforme al Reglamento General de Protección de Datos (RGPD) y la Ley Orgánica 3/2018. Serán utilizados exclusivamente para la gestión del tratamiento.
-
-5. FORMATO DE LAS SESIONES
-   Las sesiones se realizarán en formato online a través de plataformas seguras (Zoom). Cada sesión tendrá una duración de 60 minutos con frecuencia semanal o según acuerdo.
-
-6. HONORARIOS
-   El coste por sesión es de ___ €. El pago se realizará según las condiciones acordadas. La cancelación deberá comunicarse con al menos 24 horas de antelación.
-
-7. DERECHOS DEL PACIENTE
-   El paciente tiene derecho a acceder, rectificar o suprimir sus datos, así como a solicitar un informe de alta en cualquier momento.
-
-Habiendo leído y comprendido la información anterior, PRESTO MI CONSENTIMIENTO para el inicio del proceso terapéutico.
-
-Fecha: _________________ Firma: _________________`;
-
-const C = {
-  // Canvas & surfaces
-  bg:"#F5EFE4",       // --canvas
-  card:"#EBE3D2",     // --canvas-2
-  bone:"#FBF8F1",     // --bone (modals)
-  sand:"#D9C9A8",     // --sand (borders, decorative)
-  // Brand
-  accent:"#A66B3F",   // --terracotta (CTA, focal)
-  aL:"#C4895A",       // terracotta light
-  aD:"#7A4E2D",       // terracotta dark (hover)
-  clay:"#B89271",     // --clay (secondary buttons, dividers)
-  clayD:"#9A7558",    // clay dark
-  // Text
-  text:"#3B2A1E",     // --espresso (body)
-  ink:"#221610",      // --ink (display, max contrast)
-  walnut:"#6B4A30",   // --walnut (captions, alt body)
-  muted:"#9A7E68",    // muted text on cream
-  dim:"#B89271",      // very muted / disabled
-  border:"#D9C9A8",   // --sand hairline
-  // Status (warm, no pure greens/blues)
-  green:"#6B8C5A",    // olive green — paid
-  gD:"#E8EFE2",       // green bg tint
-  amber:"#C48C2A",    // warm amber — pending
-  amD:"#FDF3DC",      // amber bg tint
-  red:"#B85040",      // warm red — error/danger
-  rD:"#FAEAE8",       // red bg tint
-  // Calendly accent (terracotta variant)
-  teal:"#8B6B52",     // warm brown as calendly color
-  tD:"#EDE6DE",       // calendly bg tint
-};
-
-function pad(n){return String(n).padStart(2,"0");}
-const hourLabel = h=>`${pad(h)}:00`;
-const toYMD = d=>d.toISOString().split("T")[0];
-const today = ()=>new Date();
-const addDays = (d,n)=>{const r=new Date(d);r.setDate(r.getDate()+n);return r;};
-const startOfWeek = d=>{const r=new Date(d);const day=r.getDay();r.setDate(r.getDate()+(day===0?-6:1-day));return r;};
-const timeToMins = t=>{const[h,m]=t.split(":").map(Number);return h*60+m;};
-const minsToTime = m=>`${pad(Math.floor(m/60))}:${pad(m%60)}`;
-const generateZoom = ()=>`https://zoom.us/j/${Math.floor(Math.random()*9e9+1e9)}?pwd=${Math.random().toString(36).slice(2,10)}`;
-async function postMake(url,data){if(!url)return{ok:false};try{await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});return{ok:true};}catch{return{ok:false};}}
-function getFreeSlots(dateStr,citas){
-  const occ=citas.filter(c=>c.fecha===dateStr).map(c=>({s:timeToMins(c.hora),e:timeToMins(c.hora)+c.duracion}));
-  const free=[];
-  for(let t=WORK_START*60;t+30<=WORK_END*60;t+=30){if(!occ.some(o=>t<o.e&&t+30>o.s))free.push(minsToTime(t));}
-  return free;
-}
-
-// ── STYLES ─────────────────────────────────────────────────────────────────────
-const st={
-  app:{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"'Manrope',sans-serif",display:"flex"},
-  sidebar:{width:240,background:C.bone,borderRight:`1px solid ${C.border}`,padding:"24px 0",display:"flex",flexDirection:"column",gap:2,flexShrink:0},
-  sidebarBrand:{padding:"0 24px 20px",borderBottom:`1px solid ${C.border}`,marginBottom:8},
-  main:{flex:1,padding:32,overflowY:"auto"},
-  card:{background:C.card,border:`1px solid ${C.border}`,borderRadius:18},
-  input:{background:C.bone,border:`1px solid ${C.border}`,borderRadius:4,padding:"9px 12px",color:C.text,fontSize:14,width:"100%",outline:"none",boxSizing:"border-box",fontFamily:"'Manrope',sans-serif"},
-  textarea:{background:C.bone,border:`1px solid ${C.border}`,borderRadius:4,padding:"9px 12px",color:C.text,fontSize:14,width:"100%",outline:"none",boxSizing:"border-box",fontFamily:"'Manrope',sans-serif",resize:"vertical",minHeight:80},
-  label:{fontSize:11,color:C.walnut,marginBottom:6,display:"block",textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:500},
-  modal:{position:"fixed",inset:0,background:"rgba(34,22,16,0.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,backdropFilter:"blur(6px)"},
-  modalBox:(w=500)=>({background:C.bone,border:`1px solid ${C.border}`,borderRadius:18,padding:32,width:w,maxHeight:"88vh",overflowY:"auto",boxShadow:"0 1px 2px rgba(59,42,30,0.06),0 8px 24px -12px rgba(59,42,30,0.18)"}),
-  btn:(v="primary")=>({padding:v==="sm"?"5px 14px":"10px 22px",borderRadius:10,border:"none",cursor:"pointer",fontSize:v==="sm"?12:13,fontWeight:500,fontFamily:"'Manrope',sans-serif",letterSpacing:"0.01em",transition:"background 200ms cubic-bezier(0.4,0,0.2,1),transform 120ms",
-    background:v==="ghost"?"transparent":v==="danger"?C.rD:v==="teal"?C.tD:v==="success"?C.gD:C.accent,
-    color:v==="ghost"?C.muted:v==="danger"?C.red:v==="teal"?C.walnut:v==="success"?C.green:C.bone}),
-  badge:(col,bg)=>({display:"inline-block",padding:"3px 10px",borderRadius:999,fontSize:11,fontWeight:500,letterSpacing:"0.03em",color:col,background:bg}),
-  statCard:{background:C.card,border:`1px solid ${C.border}`,borderRadius:18,padding:"20px 24px"},
-  th:{padding:"10px 16px",textAlign:"left",fontSize:11,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",borderBottom:`1px solid ${C.border}`,fontWeight:500},
-  td:{padding:"12px 16px",fontSize:13,borderBottom:`1px solid ${C.border}`,verticalAlign:"middle",color:C.text},
-  navItem:(a)=>({display:"flex",alignItems:"center",gap:10,padding:"10px 24px",cursor:"pointer",
-    color:a?C.accent:C.walnut,background:a?"rgba(166,107,63,0.08)":"transparent",
-    borderLeft:a?`3px solid ${C.accent}`:"3px solid transparent",
-    fontSize:13,fontWeight:a?500:400,transition:"all 150ms"}),
-  tab:(a)=>({padding:"9px 16px",cursor:"pointer",fontSize:13,fontWeight:a?500:400,
-    color:a?C.accent:C.walnut,borderBottom:a?`2px solid ${C.accent}`:"2px solid transparent",
-    marginBottom:-1,background:"transparent",border:"none",fontFamily:"'Manrope',sans-serif",letterSpacing:"0.01em"}),
-  tabs:{display:"flex",gap:2,marginBottom:24,borderBottom:`1px solid ${C.border}`},
-  rowActions:{display:"flex",gap:6,alignItems:"center"},
-};
-
-// ── TIME PICKER ────────────────────────────────────────────────────────────────
-function TimePicker({value,onChange}){
-  const[open,setOpen]=useState(false);
-  const[step,setStep]=useState("hour");
-  const[selH,setSelH]=useState(()=>value?Number(value.split(":")[0]):9);
-  const[pos,setPos]=useState({top:0,left:0});
-  const triggerRef=useRef();
-  const dropRef=useRef();
-  const skipClose=useRef(false);
-
-  // Calcular posición fixed al abrir
-  const calcPos=()=>{
-    if(!triggerRef.current)return;
-    const r=triggerRef.current.getBoundingClientRect();
-    const dropH=300;
-    const top=window.innerHeight-r.bottom>dropH?r.bottom+4:r.top-dropH-4;
-    const left=Math.min(r.left,window.innerWidth-240);
-    setPos({top:Math.max(8,top),left:Math.max(8,left)});
-  };
-
-  // Cerrar al hacer click fuera
-  useEffect(()=>{
-    if(!open)return;
-    const handler=()=>{
-      if(skipClose.current){skipClose.current=false;return;}
-      setOpen(false);setStep("hour");
-    };
-    document.addEventListener("click",handler);
-    return()=>document.removeEventListener("click",handler);
-  },[open]);
-
-  const HOURS=Array.from({length:24},(_,i)=>i);
-  const MINS=[0,5,10,15,20,25,30,35,40,45,50,55];
-
-  const toggle=()=>{
-    if(!open)calcPos();
-    skipClose.current=true;
-    setOpen(v=>!v);
-    setStep("hour");
-  };
-
-  const pickHour=h=>{
-    skipClose.current=true;
-    setSelH(h);
-    setStep("min");
-  };
-
-  const pickMin=m=>{
-    const result=`${String(selH).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
-    onChange(result);
-    setOpen(false);
-    setStep("hour");
-  };
-
-  const goBack=()=>{skipClose.current=true;setStep("hour");};
-
-  return(
-    <div style={{position:"relative"}}>
-      <div
-        ref={triggerRef}
-        onClick={toggle}
-        style={{...st.input,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between",userSelect:"none"}}
-      >
-        <span style={{fontSize:13,fontWeight:value?600:400,color:value?C.text:C.dim,fontFamily:"'Manrope',sans-serif"}}>{value||"--:--"}</span>
-        <span style={{fontSize:13,color:C.muted}}>🕐</span>
-      </div>
-
-      {open&&(
-        <div
-          ref={dropRef}
-          onClick={e=>{e.stopPropagation();skipClose.current=true;}}
-          style={{position:"fixed",top:pos.top,left:pos.left,zIndex:9999,background:C.bone,border:`1px solid ${C.border}`,borderRadius:14,boxShadow:"0 8px 32px rgba(59,42,30,0.22)",padding:16,width:232}}
-        >
-          {/* Cabecera */}
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-            <span style={{fontSize:11,color:C.walnut,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.07em"}}>
-              {step==="hour"?"Selecciona hora":"Selecciona minutos"}
-            </span>
-            {step==="min"&&(
-              <button onClick={goBack} style={{background:"none",border:"none",color:C.accent,fontSize:12,cursor:"pointer",fontWeight:600,padding:"2px 8px",borderRadius:6}}>
-                ← {String(selH).padStart(2,"0")}h
-              </button>
+      {/* Panel de notificaciones — fixed dentro del área principal */}
+      {showNotifs&&(
+        <div style={{position:"fixed",top:0,left:220,right:0,bottom:0,zIndex:250}} onClick={()=>setShowNotifs(false)}>
+          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:16,left:16,width:360,background:C.bone,border:`1px solid ${C.border}`,borderRadius:14,boxShadow:"0 8px 32px rgba(59,42,30,0.16)",overflow:"hidden"}}>
+            <div style={{padding:"12px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:C.sand}}>
+              <div style={{fontSize:13,fontWeight:600,color:C.text}}>
+                Notificaciones {notifs.filter(n=>!dismissedNotifs.has(n.id)).length>0&&`(${notifs.filter(n=>!dismissedNotifs.has(n.id)).length})`}
+              </div>
+              <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                {notifs.some(n=>!dismissedNotifs.has(n.id))&&(
+                  <button onClick={dismissAll} style={{fontSize:11,color:C.muted,background:"none",border:"none",cursor:"pointer",textDecoration:"underline"}}>Borrar todas</button>
+                )}
+                <button onClick={()=>setShowNotifs(false)} style={{background:"none",border:"none",cursor:"pointer",fontSize:16,color:C.muted}}>✕</button>
+              </div>
+            </div>
+            {notifs.filter(n=>!dismissedNotifs.has(n.id)).length===0&&(
+              <div style={{padding:"24px 16px",fontSize:13,color:C.muted,textAlign:"center"}}>
+                <div style={{fontSize:24,marginBottom:8}}>✓</div>
+                Sin notificaciones pendientes
+              </div>
             )}
+            {notifs.filter(n=>!dismissedNotifs.has(n.id)).map(n=>(
+              <div key={n.id} style={{padding:"12px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",gap:10,alignItems:"flex-start"}}>
+                <span style={{fontSize:16,flexShrink:0,marginTop:1}}>{n.tipo==="tarea"?"⏰":"⚠"}</span>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontSize:12,color:n.color,lineHeight:1.5}}>{n.msg}</div>
+                </div>
+                <button onClick={()=>dismissNotif(n.id)} style={{background:"none",border:"none",cursor:"pointer",fontSize:14,color:C.dim,flexShrink:0,marginTop:1}}>✕</button>
+              </div>
+            ))}
           </div>
-
-          {/* Display hora actual */}
-          <div style={{textAlign:"center",fontSize:28,fontWeight:300,letterSpacing:"0.1em",marginBottom:14,fontFamily:"'Manrope',sans-serif"}}>
-            <span style={{color:step==="hour"?C.accent:C.text,borderBottom:step==="hour"?`2px solid ${C.accent}`:"2px solid transparent",paddingBottom:2,transition:"color 150ms"}}>{String(selH).padStart(2,"0")}</span>
-            <span style={{color:C.dim,margin:"0 3px"}}>:</span>
-            <span style={{color:step==="min"?C.accent:C.dim,borderBottom:step==="min"?`2px solid ${C.accent}`:"2px solid transparent",paddingBottom:2,transition:"color 150ms"}}>
-              {value&&Number(value.split(":")[0])===selH?value.split(":")[1]:"--"}
-            </span>
-          </div>
-
-          {/* Grid horas */}
-          {step==="hour"&&(
-            <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:3}}>
-              {HOURS.map(h=>(
-                <button key={h} onClick={()=>pickHour(h)} style={{padding:"6px 2px",borderRadius:8,border:"none",cursor:"pointer",fontSize:12,fontWeight:h===selH?700:400,background:h===selH?C.accent:"transparent",color:h===selH?C.bone:C.text,transition:"background 100ms"}}>
-                  {String(h).padStart(2,"0")}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Grid minutos */}
-          {step==="min"&&(
-            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:5}}>
-              {MINS.map(m=>{
-                const cur=value?Number(value.split(":")[1]):null;
-                const isSel=cur===m&&value&&Number(value.split(":")[0])===selH;
-                return(
-                  <button key={m} onClick={()=>pickMin(m)} style={{padding:"9px 4px",borderRadius:8,border:"none",cursor:"pointer",fontSize:13,fontWeight:isSel?700:400,background:isSel?C.accent:"transparent",color:isSel?C.bone:C.text,transition:"background 100ms"}}>
-                    {String(m).padStart(2,"0")}
-                  </button>
-                );
-              })}
-            </div>
-          )}
         </div>
       )}
+      <div style={st.sidebar}>
+        <div style={{...st.sidebarBrand,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div>
+            <div style={{fontSize:20,fontWeight:300,color:C.accent,letterSpacing:"-0.5px",fontFamily:"'Manrope',sans-serif",lineHeight:1}}>praxi</div>
+            <div style={{fontSize:10,color:C.muted,letterSpacing:"0.15em",textTransform:"uppercase",marginTop:3}}>gestión clínica</div>
+          </div>
+          <div style={{position:"relative"}}>
+            <button onClick={()=>setShowNotifs(v=>!v)} style={{background:"none",border:"none",cursor:"pointer",fontSize:18,color:notifs.filter(n=>!dismissedNotifs.has(n.id)).length>0?C.amber:C.muted,position:"relative"}}>
+              🔔
+              {notifs.filter(n=>!dismissedNotifs.has(n.id)).length>0&&<span style={{position:"absolute",top:-4,right:-4,width:16,height:16,borderRadius:"50%",background:C.red,color:"#fff",fontSize:9,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center"}}>{notifs.filter(n=>!dismissedNotifs.has(n.id)).length}</span>}
+            </button>
+          </div>
+        </div>
+
+        {/* Búsqueda global spotlight */}
+        <div style={{padding:"0 14px 12px",position:"relative"}}>
+          <input
+            style={{...st.input,fontSize:12,background:C.card}}
+            placeholder="Buscar..."
+            value={globalSearch}
+            onChange={e=>setGlobalSearch(e.target.value)}
+            onKeyDown={e=>{
+              if(e.key==="Escape"){setGlobalSearch("");}
+            }}
+          />
+          {globalSearch&&(()=>{
+            const q=globalSearch.toLowerCase();
+            const results=[];
+
+            // Pacientes
+            patients.filter(p=>`${p.nombre} ${p.apellidos}`.toLowerCase().includes(q)||p.telefono?.includes(q)||p.email?.toLowerCase().includes(q)).slice(0,5).forEach(p=>
+              results.push({id:`p-${p.id}`,tipo:"Paciente",icon:"👤",label:`${p.nombre} ${p.apellidos}`,sub:`${p.sesiones.length} sesiones · ${p.estado}`,action:()=>{selectPatient(p.id);setGlobalSearch("");}})
+            );
+
+            // Páginas
+            [["dashboard","Dashboard","📊"],["calendario","Calendario","📅"],["pacientes","Pacientes","👥"],["facturas","Facturas","🧾"],["recursos","Recursos","📚"],["admin","Administración","⚙"]].filter(([,label])=>label.toLowerCase().includes(q)).forEach(([id,label,icon])=>
+              results.push({id:`nav-${id}`,tipo:"Sección",icon,label,sub:"Ir a "+label,action:()=>{setPage(id);setSelectedId(null);setGlobalSearch("");}})
+            );
+
+            // Facturas
+            patients.flatMap(p=>p.sesiones.map(s=>({...s,paciente:`${p.nombre} ${p.apellidos}`,pid:p.id}))).filter(s=>s.factura?.toLowerCase().includes(q)||s.paciente.toLowerCase().includes(q)).slice(0,3).forEach(s=>
+              results.push({id:`f-${s.id}`,tipo:"Factura",icon:"🧾",label:s.factura,sub:`${s.paciente} · ${s.pago}€ · ${s.pagado?"Pagada":"Pendiente"}`,action:()=>{setPage("facturas");setGlobalSearch("");}})
+            );
+
+            // Citas
+            citas.filter(c=>{const p=patients.find(p=>p.id==c.pacienteId);const name=c.origen==="calendly"?(c.nombreExterno||""):(p?`${p.nombre} ${p.apellidos}`:"");return name.toLowerCase().includes(q)||c.fecha?.includes(q)||c.tipo?.toLowerCase().includes(q);}).slice(0,3).forEach(c=>{
+              const p=patients.find(p=>p.id==c.pacienteId);
+              const name=c.origen==="calendly"?(c.nombreExterno||"Calendly"):(p?`${p.nombre} ${p.apellidos}`:"?");
+              results.push({id:`c-${c.id}`,tipo:"Cita",icon:"📅",label:name,sub:`${c.fecha} · ${c.hora} · ${c.tipo||"Cita"}`,action:()=>{setPage("calendario");setGlobalSearch("");}});
+            });
+
+            if(results.length===0) return(
+              <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:C.bone,border:`1px solid ${C.border}`,borderRadius:10,boxShadow:"0 8px 24px rgba(59,42,30,0.12)",zIndex:200,padding:"14px",fontSize:12,color:C.muted,textAlign:"center"}}>Sin resultados</div>
+            );
+
+            // Group by tipo
+            const grupos={};
+            results.forEach(r=>{if(!grupos[r.tipo])grupos[r.tipo]=[];grupos[r.tipo].push(r);});
+
+            return(
+              <div style={{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,background:C.bone,border:`1px solid ${C.border}`,borderRadius:10,boxShadow:"0 8px 24px rgba(59,42,30,0.12)",zIndex:200,maxHeight:340,overflowY:"auto"}}>
+                {Object.entries(grupos).map(([tipo,items])=>(
+                  <div key={tipo}>
+                    <div style={{padding:"6px 12px 2px",fontSize:9,color:C.dim,textTransform:"uppercase",letterSpacing:"0.08em",fontWeight:600}}>{tipo}</div>
+                    {items.map(r=>(
+                      <div key={r.id} onClick={r.action} style={{padding:"8px 12px",cursor:"pointer",display:"flex",gap:10,alignItems:"center",borderRadius:6,margin:"1px 4px"}}
+                        onMouseEnter={e=>e.currentTarget.style.background=C.sand}
+                        onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+                      >
+                        <span style={{fontSize:14,flexShrink:0}}>{r.icon}</span>
+                        <div style={{minWidth:0}}>
+                          <div style={{fontSize:12,fontWeight:600,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.label}</div>
+                          <div style={{fontSize:11,color:C.muted}}>{r.sub}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </div>
+
+        {[["dashboard","Dashboard"],["calendario","Calendario"],["pacientes","Pacientes"],["facturas","Facturas"],["recursos","Recursos"]].map(([id,label])=>{
+          const badge=id==="pacientes"?patients.filter(p=>!p.consentimiento&&p.estado==="activo").length:0;
+          return(
+            <div key={id} style={{...st.navItem(page===id||(id==="pacientes"&&page==="ficha")),justifyContent:"space-between"}} onClick={()=>{setPage(id);setSelectedId(null);}}>
+              <span>▪ {label}</span>
+              {badge>0&&<span style={{...st.badge(C.amber,C.amD),fontSize:9}}>{badge}</span>}
+            </div>
+          );
+        })}
+        {currentUser.rol==="admin"&&(
+          <div style={st.navItem(page==="admin")} onClick={()=>setPage("admin")}>▪ Administración</div>
+        )}
+        
+        <div style={{marginTop:16,borderTop:`1px solid ${C.border}`,paddingTop:8}}>
+          <div style={st.navItem(page==="configuracion")} onClick={()=>setPage("configuracion")}>▪ Configuración</div>
+        </div>
+        <div style={{flex:1}}/>
+        <div style={{padding:"12px 20px",borderTop:`1px solid ${C.border}`,display:"flex",flexDirection:"column",gap:5}}>
+          <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:8}}>
+            <div style={{width:32,height:32,borderRadius:"50%",background:currentUser.color||C.sand,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:"#fff",flexShrink:0}}>{currentUser.nombre[0]}</div>
+            <div style={{minWidth:0}}>
+              <div style={{fontSize:12,fontWeight:600,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{currentUser.nombre}</div>
+              <div style={{fontSize:10,color:C.muted}}>{currentUser.especialidad||currentUser.rol}</div>
+            </div>
+          </div>
+          <div style={{fontSize:11,color:C.dim,marginBottom:6,padding:"4px 8px",background:C.sand,borderRadius:6}}>{currentClinica?.nombre}</div>
+          <div style={{display:"flex",gap:6,alignItems:"center",fontSize:11,color:config.makeOut?C.green:C.dim}}><div style={{width:6,height:6,borderRadius:"50%",background:config.makeOut?C.green:C.dim}}/> Make {config.makeOut?"conectado":"sin configurar"}</div>
+          <button style={{...st.btn("ghost"),marginTop:4,fontSize:11,color:C.muted,textAlign:"left",padding:"4px 0"}} onClick={()=>{setCurrentUser(null);setCurrentClinica(null);}}>🔒 Cerrar sesión</button>
+        </div>
+      </div>
+      <div style={st.main}>
+        {page==="dashboard"&&<Dashboard patients={patients} citas={citas} setCitas={setCitas} tareas={tareas} setTareas={setTareas} onInforme={()=>setShowInforme(true)} onEditCita={c=>setEditCitaDash(c)} onEditTarea={t=>setEditTareaDash(t)}/>}
+        {page==="calendario"&&<Calendario patients={patients} citas={citas} setCitas={setCitas} config={config} setConfig={setConfig} tipos={tipos} horario={horario} tareas={tareas} setTareas={setTareas}/>}
+        {page==="pacientes"&&<Pacientes patients={patients} setPatients={setPatients} onSelect={selectPatient}/>}
+        {page==="ficha"&&selectedPatient&&<FichaPaciente patient={selectedPatient} setPatients={setPatients} onBack={goBack} citas={citas} setCitas={setCitas} profesionales={profesionales} tipos={tipos}/>}
+        {page==="facturas"&&<Facturas patients={patients} setPatients={setPatients}/>}
+        {page==="recursos"&&<Recursos currentUser={currentUser}/>}
+        {page==="admin"&&currentUser.rol==="admin"&&<AdminPanel profesionales={profesionales} setProfesionales={setProfesionales} clinica={currentClinica}/>}
+        {page==="configuracion"&&<Configuracion horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos}/>}
+      </div>
+      {showInforme&&<InformeMensual patients={patients} citas={citas} onClose={()=>setShowInforme(false)}/>}
+      {editCitaDash&&<CitaModal cita={editCitaDash} patients={patients} tipos={tipos} defaultFecha={editCitaDash.fecha} defaultHora={editCitaDash.hora} defaultTipoId={editCitaDash.tipoId} makeUrl={config.makeOut} onClose={()=>setEditCitaDash(null)} onSave={form=>{setCitas(cs=>cs.map(c=>c.id===form.id?{...c,...form}:c));setEditCitaDash(null);}} onDelete={id=>{if(confirm("¿Eliminar?"))setCitas(cs=>cs.filter(c=>c.id!==id));setEditCitaDash(null);}}/>}
+      {editTareaDash&&<TareaModal tarea={editTareaDash} onClose={()=>setEditTareaDash(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTareaDash(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTareaDash(null);}}/>}
     </div>
   );
 }
-
