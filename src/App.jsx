@@ -1789,14 +1789,9 @@ function HuecosModal({fecha,citas,horario,onClose}){
     const dn=DIAS_ES_LARGO[(d.getDay()+6)%7];
     const fecha_str=`${d.getDate()} de ${MONTHS_ES[d.getMonth()]}`;
     return `${dn} ${fecha_str}: ${huecos.join(", ")}`;
-  }).filter(Boolean).join("
-");
+  }).filter(Boolean).join("\n");
 
-  const textoCompleto=`Hola, estos son mis próximos huecos disponibles:
-
-${texto}
-
-¿Cuál te viene mejor?`;
+  const textoCompleto=`Hola, estos son mis próximos huecos disponibles:\n\n${texto}\n\n¿Cuál te viene mejor?`;
 
   const copiar=()=>{
     navigator.clipboard.writeText(textoCompleto);
