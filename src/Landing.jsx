@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabase.js";
-import { VERSION_PRIVACIDAD, EMAIL_CONTACTO } from "./Privacidad.jsx";
+import { VERSION_PRIVACIDAD, EMAIL_CONTACTO, DATOS_LEGALES_COMPLETOS } from "./legal.js";
 
 const C = {
   bg: "#F5EFE4", bone: "#FBF8F1", sand: "#E2D9C8",
@@ -15,7 +15,7 @@ const FEATURES = [
   { icon: "📋", title: "Ficha clínica estructurada", desc: "Historia clínica, formulación, evolución por sesión y objetivos terapéuticos." },
   { icon: "🧾", title: "Facturación automática", desc: "Facturas PDF, control de pagos e informes financieros mensuales con un clic." },
   { icon: "👥", title: "Gestión multi-profesional", desc: "Agenda compartida y panel de administración para clínicas con varios profesionales." },
-  { icon: "🔒", title: "Cumplimiento RGPD", desc: "Datos cifrados, hosting en Europa y acuerdos de procesamiento con todos los proveedores." },
+  { icon: "🔒", title: "Pensado para el RGPD", desc: "Datos cifrados y alojados en Europa, acceso por roles, registro de accesos y contrato de encargo incluido." },
   { icon: "📊", title: "Informe mensual", desc: "Resumen automático de actividad clínica y financiera listo para tu asesoría." },
   { icon: "📱", title: "Acceso desde cualquier dispositivo", desc: "Ordenador, tablet y móvil. Sin instalaciones, siempre actualizado." },
   { icon: "📆", title: "Agenda pública de reservas", desc: "Tus pacientes reservan cita desde tu enlace. Sin llamadas ni gestión manual." },
@@ -507,7 +507,6 @@ export default function Landing() {
   return (
     <div style={{ fontFamily: "'Manrope', sans-serif", background: C.bg, color: C.text, minHeight: "100vh" }}>
       <WaitlistModal open={waitlist} onClose={() => setWaitlist(false)} />
-      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* NAV */}
       <nav style={{ position: "sticky", top: 0, zIndex: 50, background: `${C.bone}ee`, backdropFilter: "blur(12px)", borderBottom: `1px solid ${C.border}`, padding: m ? "0 16px" : "0 48px", display: "flex", justifyContent: "space-between", alignItems: "center", height: m ? 56 : 64, gap: 8 }}>
@@ -619,8 +618,8 @@ export default function Landing() {
           <div style={{ fontSize: 7, color: C.walnut, letterSpacing: "3px", textTransform: "uppercase", marginTop: 2 }}>gestión clínica</div>
         </div>
         <div style={{ fontSize: 11, color: C.walnut }}>© 2026 Praxi · Hecho en España</div>
-        <div style={{ display: "flex", gap: 20 }}>
-          {[["Privacidad", "/privacidad"], ["Contacto", `mailto:${EMAIL_CONTACTO}`]].map(([l, h]) => <a key={l} href={h} style={{ fontSize: 11, color: C.walnut, textDecoration: "none" }}>{l}</a>)}
+        <div style={{ display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "center" }}>
+          {[["Privacidad", "/privacidad"], ["Términos", "/terminos"], ...(DATOS_LEGALES_COMPLETOS ? [["Aviso legal", "/aviso-legal"]] : []), ["Contacto", `mailto:${EMAIL_CONTACTO}`]].map(([l, h]) => <a key={l} href={h} style={{ fontSize: 11, color: C.walnut, textDecoration: "none" }}>{l}</a>)}
         </div>
       </footer>
     </div>
