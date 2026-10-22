@@ -52,10 +52,10 @@ const PRAXI_LOGO="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATwAAAB2CAYAAABV
 const INITIAL_CLINICA={id:"c1",nombre:"Clínica Praxi (demo)"};
 
 const INITIAL_PROFESIONALES=[
-  {id:"u1",nombre:"Kevin Costa",email:"kevin@praxi.com",
-   especialidad:"Neuropsicología",color:"#A66B3F",rol:"admin",activo:true},
-  {id:"u2",nombre:"María López",email:"maria@praxi.com",
-   especialidad:"Psicología Clínica",color:"#6B8C5A",rol:"profesional",activo:true},
+  {id:"u1",nombre:"Profesional demo",email:"demo@praxiclinic.com",
+   especialidad:"Psicología clínica",color:"#A66B3F",rol:"admin",activo:true,enlace_videollamada:"https://meet.google.com/abc-defg-hij"},
+  {id:"u2",nombre:"María López",email:"maria@ejemplo.com",
+   especialidad:"Psicología Clínica",color:"#6B8C5A",rol:"profesional",activo:true,enlace_videollamada:"https://zoom.us/j/1234567890"},
 ];
 
 const CLINICA_STORE=INITIAL_CLINICA;
@@ -145,7 +145,6 @@ const etiquetaMes=d=>{const t=today();const n=(d.getFullYear()-t.getFullYear())*
 const fechaDe=s=>{const[y,m,dd]=s.split("-").map(Number);return new Date(y,m-1,dd);};
 const timeToMins = t=>{const[h,m]=t.split(":").map(Number);return h*60+m;};
 const minsToTime = m=>`${pad(Math.floor(m/60))}:${pad(m%60)}`;
-const generateZoom = ()=>`https://zoom.us/j/${Math.floor(Math.random()*9e9+1e9)}?pwd=${Math.random().toString(36).slice(2,10)}`;
 async function postMake(url,data){if(!url)return{ok:false};try{await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});return{ok:true};}catch{return{ok:false};}}
 function getFreeSlots(dateStr,citas){
   const occ=citas.filter(c=>c.fecha===dateStr).map(c=>({s:timeToMins(c.hora),e:timeToMins(c.hora)+c.duracion}));
@@ -431,22 +430,22 @@ const SAMPLE_PATIENTS=[
 ];
 
 const SAMPLE_CITAS=[
-  {id:1,pacienteId:1,fecha:toYMD(today()),hora:"09:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:80},
-  {id:2,pacienteId:2,fecha:toYMD(today()),hora:"11:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:80},
-  {id:3,pacienteId:null,fecha:toYMD(today()),hora:"10:00",duracion:30,tipoId:"t1",tipo:"Primera llamada",notas:"",zoomLink:generateZoom(),origen:"calendly",nombreExterno:"Ana Martín",telefonoExterno:"666 111 222",emailExterno:"ana@email.com",precio:0},
-  {id:4,pacienteId:5,fecha:toYMD(today()),hora:"12:00",duracion:90,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:90},
-  {id:5,pacienteId:8,fecha:toYMD(today()),hora:"16:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:80},
-  {id:6,pacienteId:3,fecha:toYMD(addDays(today(),1)),hora:"09:30",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:80},
-  {id:7,pacienteId:6,fecha:toYMD(addDays(today(),1)),hora:"11:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:80},
-  {id:8,pacienteId:9,fecha:toYMD(addDays(today(),2)),hora:"10:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:80},
-  {id:9,pacienteId:4,fecha:toYMD(addDays(today(),2)),hora:"12:00",duracion:90,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:90},
-  {id:10,pacienteId:10,fecha:toYMD(addDays(today(),3)),hora:"09:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:80},
-  {id:11,pacienteId:11,fecha:toYMD(addDays(today(),3)),hora:"11:30",duracion:90,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:90},
-  {id:12,pacienteId:7,fecha:toYMD(addDays(today(),4)),hora:"10:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:80},
-  {id:13,pacienteId:12,fecha:toYMD(addDays(today(),4)),hora:"12:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:80},
-  {id:14,pacienteId:14,fecha:toYMD(addDays(today(),5)),hora:"09:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:70},
-  {id:15,pacienteId:15,fecha:toYMD(addDays(today(),5)),hora:"11:00",duracion:90,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:90},
-  {id:16,pacienteId:null,fecha:toYMD(addDays(today(),6)),hora:"09:30",duracion:30,tipoId:"t1",tipo:"Primera llamada",notas:"",zoomLink:generateZoom(),origen:"calendly",nombreExterno:"Pablo Suárez",telefonoExterno:"688 001 234",emailExterno:"pablo@email.com",precio:0},
+  {id:1,pacienteId:1,fecha:toYMD(today()),hora:"09:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:80},
+  {id:2,pacienteId:2,fecha:toYMD(today()),hora:"11:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:80},
+  {id:3,pacienteId:null,fecha:toYMD(today()),hora:"10:00",duracion:30,tipoId:"t1",tipo:"Primera llamada",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"calendly",nombreExterno:"Ana Martín",telefonoExterno:"666 111 222",emailExterno:"ana@email.com",precio:0},
+  {id:4,pacienteId:5,fecha:toYMD(today()),hora:"12:00",duracion:90,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:90},
+  {id:5,pacienteId:8,fecha:toYMD(today()),hora:"16:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:80},
+  {id:6,pacienteId:3,fecha:toYMD(addDays(today(),1)),hora:"09:30",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:80},
+  {id:7,pacienteId:6,fecha:toYMD(addDays(today(),1)),hora:"11:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:80},
+  {id:8,pacienteId:9,fecha:toYMD(addDays(today(),2)),hora:"10:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:80},
+  {id:9,pacienteId:4,fecha:toYMD(addDays(today(),2)),hora:"12:00",duracion:90,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:90},
+  {id:10,pacienteId:10,fecha:toYMD(addDays(today(),3)),hora:"09:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:80},
+  {id:11,pacienteId:11,fecha:toYMD(addDays(today(),3)),hora:"11:30",duracion:90,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:90},
+  {id:12,pacienteId:7,fecha:toYMD(addDays(today(),4)),hora:"10:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:80},
+  {id:13,pacienteId:12,fecha:toYMD(addDays(today(),4)),hora:"12:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:80},
+  {id:14,pacienteId:14,fecha:toYMD(addDays(today(),5)),hora:"09:00",duracion:60,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:70},
+  {id:15,pacienteId:15,fecha:toYMD(addDays(today(),5)),hora:"11:00",duracion:90,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"interno",precio:90},
+  {id:16,pacienteId:null,fecha:toYMD(addDays(today(),6)),hora:"09:30",duracion:30,tipoId:"t1",tipo:"Primera llamada",notas:"",zoomLink:"https://meet.google.com/abc-defg-hij",origen:"calendly",nombreExterno:"Pablo Suárez",telefonoExterno:"688 001 234",emailExterno:"pablo@email.com",precio:0},
 ];
 // En la demo, las fechas de ejemplo se desplazan para que la última sesión sea reciente
 function demoPacientes(){
@@ -481,6 +480,8 @@ const traducirError=e=>{
   if(m.includes("ya pertenece"))return "Tu cuenta ya pertenece a una clínica.";
   if(m.includes("aceptar los términos"))return "Para crear la clínica tienes que aceptar los Términos y el Contrato de encargo.";
   if(m.includes("código de acceso"))return "El código de acceso no es válido o ya se ha usado todas las veces permitidas.";
+  if(m.includes("guardar_mi_enlace")||m.includes("enlace_videollamada"))return "Falta preparar la base de datos: ejecuta supabase/06_videollamada.sql en Supabase.";
+  if(m.includes("debe empezar por https"))return "El enlace debe empezar por https://";
   if(m.includes("failed to fetch")||m.includes("network"))return "No hay conexión con el servidor. Revisa tu internet.";
   return e?.message||"Ha ocurrido un error.";
 };
@@ -1889,15 +1890,19 @@ function TiposCitaModal({tipos,setTipos,onClose}){
 // CALENDAR
 // ══════════════════════════════════════════════════════════════════════════════
 function CitaModal({cita,patients,tipos,onClose,onSave,onDelete,defaultFecha,defaultHora,defaultTipoId,defaultPacienteId,makeUrl}){
+  const{miembros,miId}=useContext(EquipoCtx);
+  // Enlace por defecto: el del profesional que lleva al paciente (o el tuyo)
+  const enlaceDe=pid=>{const pa=patients.find(x=>x.id==pid);const prof=miembros.find(m=>m.id===(pa?.profesionalId||miId))||miembros.find(m=>m.id===miId);return prof?.enlace_videollamada||miembros.find(m=>m.id===miId)?.enlace_videollamada||"";};
+  const[enlaceTocado,setEnlaceTocado]=useState(!!cita);
   const tipoInicial=tipos.find(t=>t.id===defaultTipoId)||tipos[0];
-  const init=cita?{...cita,tipoId:cita.tipoId||tipos.find(t=>t.nombre===cita.tipo)?.id||tipos[0]?.id}:{pacienteId:defaultPacienteId||"",nombreExterno:"",telefonoExterno:"",emailExterno:"",fecha:defaultFecha||toYMD(today()),hora:defaultHora||"09:00",duracion:tipoInicial?.duracion||60,precio:tipoInicial?.precio||0,tipoId:tipoInicial?.id||tipos[0]?.id,notas:"",zoomLink:"",origen:"interno"};
+  const init=cita?{...cita,tipoId:cita.tipoId||tipos.find(t=>t.nombre===cita.tipo)?.id||tipos[0]?.id}:{pacienteId:defaultPacienteId||"",nombreExterno:"",telefonoExterno:"",emailExterno:"",fecha:defaultFecha||toYMD(today()),hora:defaultHora||"09:00",duracion:tipoInicial?.duracion||60,precio:tipoInicial?.precio||0,tipoId:tipoInicial?.id||tipos[0]?.id,notas:"",zoomLink:enlaceDe(defaultPacienteId),origen:"interno"};
   const[form,setForm]=useState(init);const[saving,setSaving]=useState(false);const[sendStatus,setSendStatus]=useState(null);
   const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
   const tipoActual=tipos.find(t=>t.id===form.tipoId)||tipos[0];
   const esPL=tipoActual?.nombre==="Primera llamada";
   const save=async()=>{
     if(!form.fecha||!form.hora)return;if(!esPL&&!form.pacienteId)return;
-    const zoomLink=form.zoomLink||generateZoom();const ff={...form,zoomLink,tipo:tipoActual?.nombre||""};
+    const zoomLink=(form.zoomLink||"").trim();const ff={...form,zoomLink,tipo:tipoActual?.nombre||""};
     if(makeUrl){
       setSaving(true);
       const p=patients.find(p=>p.id==form.pacienteId);
@@ -1914,8 +1919,8 @@ function CitaModal({cita,patients,tipos,onClose,onSave,onDelete,defaultFecha,def
       };
       // Dos webhooks paralelos: recordatorio 24h (WhatsApp) y 1h (email + WhatsApp)
       const[res24,res1h]=await Promise.all([
-        postMake(makeUrl,{...payload,recordatorio:"24h",minutos_aviso:1440,canal:"whatsapp",mensaje:`Hola ${payload.paciente.split(" ")[0]}, te recordamos tu sesión de mañana a las ${form.hora}. Tu enlace: ${zoomLink}`}),
-        postMake(makeUrl,{...payload,recordatorio:"1h",minutos_aviso:60,canal:"email_whatsapp",mensaje:`Hola ${payload.paciente.split(" ")[0]}, tu sesión empieza en 1 hora (${form.hora}). Únete aquí: ${zoomLink}`}),
+        postMake(makeUrl,{...payload,recordatorio:"24h",minutos_aviso:1440,canal:"whatsapp",mensaje:`Hola ${payload.paciente.split(" ")[0]}, te recordamos tu sesión de mañana a las ${form.hora}.${zoomLink?` Tu enlace: ${zoomLink}`:""}`}),
+        postMake(makeUrl,{...payload,recordatorio:"1h",minutos_aviso:60,canal:"email_whatsapp",mensaje:`Hola ${payload.paciente.split(" ")[0]}, tu sesión empieza en 1 hora (${form.hora}).${zoomLink?` Únete aquí: ${zoomLink}`:""}`}),
       ]);
       setSaving(false);
       setSendStatus(res24.ok&&res1h.ok?"ok":"error");
@@ -1931,16 +1936,22 @@ function CitaModal({cita,patients,tipos,onClose,onSave,onDelete,defaultFecha,def
             {tipos.map(t=><option key={t.id} value={t.id}>{t.nombre} — {t.duracion} min</option>)}
           </select>
         </Field>
-        {esPL?(<div style={{padding:"12px 14px",background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.teal}`}}><div style={{fontSize:11,color:C.teal,fontWeight:700,marginBottom:10,textTransform:"uppercase"}}>Datos del contacto</div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}><Field label="Nombre"><input style={st.input} value={form.nombreExterno||""} onChange={f("nombreExterno")}/></Field><Field label="Teléfono"><input style={st.input} value={form.telefonoExterno||""} onChange={f("telefonoExterno")}/></Field><div style={{gridColumn:"1/-1"}}><Field label="Email"><input style={st.input} value={form.emailExterno||""} onChange={f("emailExterno")}/></Field></div></div></div>):(<Field label="Paciente"><select style={st.input} value={form.pacienteId} onChange={f("pacienteId")}><option value="">Seleccionar...</option>{patients.map(p=><option key={p.id} value={p.id}>{p.nombre} {p.apellidos}</option>)}</select></Field>)}
+        {esPL?(<div style={{padding:"12px 14px",background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.teal}`}}><div style={{fontSize:11,color:C.teal,fontWeight:700,marginBottom:10,textTransform:"uppercase"}}>Datos del contacto</div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}><Field label="Nombre"><input style={st.input} value={form.nombreExterno||""} onChange={f("nombreExterno")}/></Field><Field label="Teléfono"><input style={st.input} value={form.telefonoExterno||""} onChange={f("telefonoExterno")}/></Field><div style={{gridColumn:"1/-1"}}><Field label="Email"><input style={st.input} value={form.emailExterno||""} onChange={f("emailExterno")}/></Field></div></div></div>):(<Field label="Paciente"><select style={st.input} value={form.pacienteId} onChange={e=>{const v=e.target.value;setForm(p=>({...p,pacienteId:v,zoomLink:enlaceTocado?p.zoomLink:enlaceDe(v)}));}}><option value="">Seleccionar...</option>{patients.map(p=><option key={p.id} value={p.id}>{p.nombre} {p.apellidos}</option>)}</select></Field>)}
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
           <Field label="Fecha"><input type="date" style={st.input} value={form.fecha} onChange={f("fecha")}/></Field>
           <Field label="Hora"><select style={st.input} value={form.hora} onChange={f("hora")}>{HALF_HOURS.map(t=><option key={t}>{t}</option>)}</select></Field>
           <Field label="Duración"><select style={st.input} value={form.duracion} onChange={e=>setForm(p=>({...p,duracion:Number(e.target.value)}))}>{[15,30,45,60,75,90,120].map(d=><option key={d} value={d}>{d} min</option>)}</select></Field>
         </div>
         <Field label="Notas"><textarea style={st.textarea} value={form.notas} onChange={f("notas")}/></Field>
-        {form.zoomLink&&<div style={{background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,padding:"10px 14px",borderLeft:`3px solid ${C.accent}`}}><div style={{fontSize:10,color:C.dim,textTransform:"uppercase",marginBottom:4}}>Enlace Zoom</div><a href={form.zoomLink} target="_blank" rel="noreferrer" style={{fontSize:12,color:C.aL,wordBreak:"break-all",textDecoration:"none"}}>{form.zoomLink}</a></div>}
+        <Field label="Enlace de videollamada">
+          <div style={{display:"flex",gap:8}}>
+            <input style={st.input} value={form.zoomLink||""} placeholder="https://… (vacío si es presencial)" onChange={e=>{setEnlaceTocado(true);setForm(p=>({...p,zoomLink:e.target.value}));}}/>
+            {/^https:\/\//.test(form.zoomLink||"")&&<a href={form.zoomLink} target="_blank" rel="noreferrer" style={{...st.btn("sm"),textDecoration:"none",display:"inline-flex",alignItems:"center",flexShrink:0}}>Abrir</a>}
+          </div>
+          {!form.zoomLink&&!enlaceDe(form.pacienteId)&&<div style={{fontSize:12,color:C.muted,marginTop:6}}>Guarda tu enlace fijo en «Mi videollamada» (abajo a la izquierda) y se pondrá solo en cada cita.</div>}
+        </Field>
         {sendStatus==="ok"&&<div style={{padding:"8px 12px",background:C.gD,borderRadius:8,fontSize:12,color:C.green,fontWeight:600}}>✓ Enviado a Make</div>}
-        {sendStatus==="error"&&<div style={{padding:"8px 12px",background:C.rD,borderRadius:8,fontSize:12,color:C.red}}>✗ Error Make — <button style={{...st.btn("sm"),color:C.red}} onClick={()=>onSave({...form,zoomLink:form.zoomLink||generateZoom(),tipo:tipoActual?.nombre||""})}>Guardar sin Make</button></div>}
+        {sendStatus==="error"&&<div style={{padding:"8px 12px",background:C.rD,borderRadius:8,fontSize:12,color:C.red}}>✗ Error Make — <button style={{...st.btn("sm"),color:C.red}} onClick={()=>onSave({...form,zoomLink:(form.zoomLink||"").trim(),tipo:tipoActual?.nombre||""})}>Guardar sin Make</button></div>}
       </div>
       <div style={{display:"flex",gap:10,marginTop:20,justifyContent:"space-between"}}>
         <div>{cita&&<button style={st.btn("danger")} onClick={()=>onDelete(cita.id)}>Eliminar</button>}</div>
@@ -2132,6 +2143,37 @@ function AgendaPersonalPanel({tareas,setTareas,onEditTarea,fechaDefault}){
         </div>
       ))}
     </div>
+  );
+}
+
+// ── Mi videollamada: cada profesional guarda su enlace fijo ───────────────────
+function MiVideollamadaModal({yo,demo,onClose,onGuardado,onDemo}){
+  const[enlace,setEnlace]=useState(yo.enlace_videollamada||"");
+  const[err,setErr]=useState("");const[guardando,setGuardando]=useState(false);
+  const guardar=async()=>{
+    if(demo){onDemo();return;}
+    const e=enlace.trim();
+    if(e&&!/^https:\/\/\S+$/i.test(e)){setErr("El enlace debe empezar por https://");return;}
+    setGuardando(true);setErr("");
+    const{error}=await supabase.rpc("guardar_mi_enlace",{p_enlace:e});
+    setGuardando(false);
+    if(error){setErr(traducirError(error));return;}
+    onGuardado(e||null);
+  };
+  const ej=[["Zoom","Tu sala personal: en Zoom › Perfil › «ID de reunión personal», copia el enlace (zoom.us/j/…)."],
+            ["Google Meet","Crea una reunión desde Google Calendar o meet.google.com › «Crear una reunión para más tarde» y copia el enlace (meet.google.com/…)."],
+            ["Teams, Doxy.me u otra","Copia el enlace fijo de tu sala."]];
+  return(
+    <Modal onClose={onClose} title="Mi videollamada" width={520}>
+      <div style={{fontSize:13,color:C.muted,lineHeight:1.6,marginBottom:14}}>Pega el enlace fijo de tu sala de videollamada. Se pondrá solo en cada cita nueva de tus pacientes y podrás cambiarlo en una cita concreta.</div>
+      <Field label="Enlace"><input style={st.input} value={enlace} onChange={e=>{setEnlace(e.target.value);setErr("");}} placeholder="https://zoom.us/j/… o https://meet.google.com/…" autoFocus/></Field>
+      <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:14}}>
+        {ej.map(([t,d])=><div key={t} style={{fontSize:12,color:C.text,lineHeight:1.5}}><b>{t}:</b> <span style={{color:C.muted}}>{d}</span></div>)}
+      </div>
+      <div style={{fontSize:12,color:C.walnut,background:C.sand,borderRadius:8,padding:"8px 12px",marginTop:14,lineHeight:1.5}}>Usa una cuenta profesional con acuerdo de protección de datos (por ejemplo Zoom de pago o Google Workspace): en la sesión se tratan datos de salud.</div>
+      <Aviso>{err}</Aviso>
+      <MFooter onCancel={onClose} onSave={guardar} saving={guardando}/>
+    </Modal>
   );
 }
 
@@ -3708,6 +3750,7 @@ export default function App({demo=false}){
   const[editCitaDash,setEditCitaDash]=useState(null);
   const[editTareaDash,setEditTareaDash]=useState(null);
   const[newCitaDash,setNewCitaDash]=useState(false);
+  const[showVideo,setShowVideo]=useState(false);
   const[autoNewPaciente,setAutoNewPaciente]=useState(false);
   const[globalSearch,setGlobalSearch]=useState("");
   const[showNotifs,setShowNotifs]=useState(false);
@@ -3885,6 +3928,7 @@ export default function App({demo=false}){
             </div>
           </div>
           <div style={{fontSize:11,color:C.dim,marginBottom:6,padding:"4px 8px",background:C.sand,borderRadius:6}}>{currentClinica?.nombre}</div>
+          <button style={{...st.btn("ghost"),fontSize:11,color:currentUser.enlace_videollamada?C.muted:C.accent,textAlign:"left",padding:"4px 0"}} onClick={()=>setShowVideo(true)}>🎥 Mi videollamada{currentUser.enlace_videollamada?"":" · sin configurar"}</button>
           <button style={{...st.btn("ghost"),marginTop:4,fontSize:11,color:C.muted,textAlign:"left",padding:"4px 0"}} onClick={cerrarSesion}>🔒 {demo?"Salir de la demo":"Cerrar sesión"}</button>
         </div>
       </div>
@@ -3904,6 +3948,8 @@ export default function App({demo=false}){
       </div>
       {showInforme&&<InformeMensual patients={patients} citas={citas} onClose={()=>setShowInforme(false)}/>}
       {editCitaDash&&<CitaModal cita={editCitaDash} patients={patients} tipos={tipos} defaultFecha={editCitaDash.fecha} defaultHora={editCitaDash.hora} defaultTipoId={editCitaDash.tipoId} makeUrl={config.makeOut} onClose={()=>setEditCitaDash(null)} onSave={form=>{setCitas(cs=>cs.map(c=>c.id===form.id?{...c,...form}:c));setEditCitaDash(null);}} onDelete={id=>{setCitas(cs=>cs.filter(c=>c.id!==id));setEditCitaDash(null);}}/>}
+      {showVideo&&<MiVideollamadaModal yo={currentUser} demo={demo} onClose={()=>setShowVideo(false)} onDemo={()=>{setShowVideo(false);setDemoToast(true);}}
+        onGuardado={e=>{setCurrentUser(u=>({...u,enlace_videollamada:e}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,enlace_videollamada:e}:m));setShowVideo(false);}}/>}
       {newCitaDash&&<CitaModal cita={null} defaultPacienteId={newCitaDash?.pacienteId} patients={patients} tipos={tipos} defaultFecha={toYMD(today())} defaultHora="09:00" defaultTipoId={tipos[0]?.id} makeUrl={config.makeOut} onClose={()=>setNewCitaDash(false)} onSave={form=>{setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:form.pacienteId?Number(form.pacienteId):null}]);setNewCitaDash(false);}} onDelete={()=>setNewCitaDash(false)}/>}
       {editTareaDash&&<TareaModal tarea={editTareaDash} onClose={()=>setEditTareaDash(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTareaDash(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTareaDash(null);}}/>}
     </div>
