@@ -144,8 +144,7 @@ export function Terminos() {
       <L>
         <li>El acceso es gratuito y solo con código o invitación.</li>
         <li>Las funciones pueden cambiar, fallar o interrumpirse, y el servicio puede finalizar avisando con 30 días de antelación.</li>
-        <li>{COPIAS_SEGURIDAD ? "Se realizan copias de seguridad diarias." : <><strong>No hay copias de seguridad automáticas.</strong> Los datos borrados o perdidos no se pueden recuperar.</>}</li>
-        <li><strong>El Cliente se compromete a no introducir datos reales de pacientes</strong> y a usar solo datos ficticios, salvo que Praxi le confirme por escrito que su cuenta está habilitada para uso con datos reales.</li>
+        <li>{COPIAS_SEGURIDAD ? "Se realizan copias de seguridad diarias." : <><strong>No hay copias de seguridad automáticas.</strong> Los datos borrados o perdidos no se pueden recuperar, por lo que se recomienda al Cliente exportar sus datos periódicamente desde la aplicación.</>}</li>
       </L>
 
       <H>3. Cuenta, equipo y credenciales</H>
@@ -227,7 +226,7 @@ export function Terminos() {
         <li><strong>Control de acceso:</strong> las reglas de acceso las aplica la propia base de datos, no solo la pantalla. Cada clínica solo puede acceder a sus datos. Cada profesional solo a los pacientes que tiene asignados; el administrador, a todos los de su clínica.</li>
         <li><strong>Altas y bajas:</strong> los miembros solo entran por invitación nominativa, que caduca en 7 días y solo vale para el email invitado. El administrador puede desactivar a un miembro y su acceso se corta al momento.</li>
         <li><strong>Registro de accesos:</strong> queda registrado quién consulta, crea, modifica o borra cada ficha y cita, y cuándo. Nadie puede modificarlo ni borrarlo desde la aplicación.</li>
-        <li><strong>Copias de seguridad:</strong> {COPIAS_SEGURIDAD ? "diarias, conservadas 7 días." : "no disponibles durante el acceso anticipado; se activarán antes del uso con datos reales."}</li>
+        <li><strong>Copias de seguridad:</strong> {COPIAS_SEGURIDAD ? "diarias, conservadas 7 días." : "no hay copias automáticas durante el acceso anticipado; el administrador puede exportar todos los datos de su clínica en cualquier momento desde la aplicación."}</li>
         <li><strong>Asistente IA:</strong> solo se envía información cuando el profesional lo usa, y solo la de la ficha que está consultando (o los datos de facturación en el asistente de facturas). Antes de salir de su navegador, el nombre y los apellidos de los pacientes se sustituyen por un alias y la fecha de nacimiento por la edad. La clave del servicio está solo en el servidor y solo pueden usarlo miembros activos con sesión iniciada. El contenido de las consultas no se guarda en los registros del servidor.</li>
         <li><strong>Sin terceros innecesarios:</strong> los datos no se envían a servicios de análisis ni de publicidad.</li>
       </L>

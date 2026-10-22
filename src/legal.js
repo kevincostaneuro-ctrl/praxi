@@ -3,14 +3,14 @@
 // Cuando rellenes NIF y DOMICILIO, el aviso legal aparecerá en el pie de la web.
 // ═════════════════════════════════════════════════════════════════════════════
 export const TITULAR = "Kevin Costa";
-export const NIF = "";          // RELLENAR: tu NIF (al darte de alta como autónomo)
-export const DOMICILIO = "";    // RELLENAR: dirección postal completa (calle, CP, ciudad)
+export const NIF = "72202218C";
+export const DOMICILIO = "Avenida Riomar 11"; // Añadir código postal y municipio
 export const EMAIL_CONTACTO = "contacto.praxiclinic@gmail.com";
 export const WEB = "www.praxiclinic.com";
 
 // Cambia la versión cada vez que modifiques el texto correspondiente
 export const VERSION_PRIVACIDAD = "2026-10-22";
-export const VERSION_TERMINOS = "2026-10-22";
+export const VERSION_TERMINOS = "2026-10-22.2";
 export const FECHA_TEXTOS = "22 de octubre de 2026";
 
 // Ponlo a true cuando contrates el plan Pro de Supabase (copias diarias)
