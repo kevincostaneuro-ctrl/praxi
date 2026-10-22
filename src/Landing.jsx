@@ -493,7 +493,7 @@ export default function Landing() {
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 32 }}>
           <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
-          <button onClick={() => document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" })} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "14px 28px", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "'Manrope',sans-serif", display: "inline-flex", alignItems: "center", gap: 10 }}>
+          <button onClick={() => navigate("/demo")} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "14px 28px", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "'Manrope',sans-serif", display: "inline-flex", alignItems: "center", gap: 10 }}>
             <span style={{ width: 20, height: 20, borderRadius: "50%", background: C.accent, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: C.bone }}>▶</span>
             Ver la app en directo
           </button>
@@ -501,9 +501,6 @@ export default function Landing() {
       </section>
 
       {/* DEMO INTERACTIVO */}
-      <section id="demo" style={{ maxWidth: 1100, margin: "0 auto 80px", padding: "0 48px", scrollMarginTop: 80 }}>
-        <Demo />
-      </section>
       {/* Contador lista de espera */}
       <div style={{ textAlign: "center", marginBottom: 80 }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 12, background: C.bone, border: `1px solid ${C.border}`, borderRadius: 20, padding: "10px 20px" }}>
