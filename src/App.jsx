@@ -1252,7 +1252,7 @@ function FichaPaciente({patient,setPatients,onBack,citas,setCitas,profesionales,
       {showConsent&&<ConsentModal patient={patient} onClose={()=>setShowConsent(false)} onSave={({texto,firmado})=>{update(p=>({...p,consentimiento:firmado,consentimientoTexto:texto}));setShowConsent(false);}}/>}
       {showAlta&&<AltaModal patient={patient} onClose={()=>setShowAlta(false)} onSave={informe=>{update(p=>({...p,estado:"alta",informeAlta:informe}));setShowAlta(false);}}/>}
       {IA_VISIBLE&&showIA&&<IAPanel patient={patient} onClose={()=>setShowIA(false)}/>}
-      {showNuevaCita&&<CitaModal cita={null} patients={[patient]} tipos={tipos||[]} defaultFecha={toYMD(today())} defaultHora="09:00" makeUrl="" onClose={()=>setShowNuevaCita(false)} onSave={form=>{setCitas&&setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:patient.id,origen:"interno"}]);setShowNuevaCita(false);}} onDelete={()=>{}}/>}
+      {showNuevaCita&&<CitaModal soloEstePaciente cita={null} patients={[patient]} tipos={tipos||[]} defaultFecha={toYMD(today())} defaultHora="09:00" makeUrl="" onClose={()=>setShowNuevaCita(false)} onSave={form=>{setCitas&&setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:patient.id,origen:"interno"}]);setShowNuevaCita(false);}} onDelete={()=>{}}/>}
     </div>
   );
 }
@@ -1889,19 +1889,19 @@ function TiposCitaModal({tipos,setTipos,onClose}){
 // ══════════════════════════════════════════════════════════════════════════════
 // CALENDAR
 // ══════════════════════════════════════════════════════════════════════════════
-function CitaModal({cita,patients,tipos,onClose,onSave,onDelete,defaultFecha,defaultHora,defaultTipoId,defaultPacienteId,makeUrl}){
+function CitaModal({cita,patients,tipos,onClose,onSave,onDelete,defaultFecha,defaultHora,defaultTipoId,defaultPacienteId,makeUrl,soloEstePaciente}){
   const{miembros,miId,crearPaciente}=useContext(EquipoCtx);
-  const permitirNuevo=!cita&&patients.length>1;
-  const[modoPac,setModoPac]=useState("actual");
+  const permitirNuevo=!cita&&!soloEstePaciente;
+  const[modoPac,setModoPac]=useState(permitirNuevo&&patients.length===0?"nuevo":"actual");
   const[nuevo,setNuevo]=useState({nombre:"",apellidos:"",telefono:"",email:""});
   const[errCita,setErrCita]=useState("");
-  useEffect(()=>{setErrCita("");},[nuevo,form.pacienteId]);
   // Enlace por defecto: el del profesional que lleva al paciente (o el tuyo)
   const enlaceDe=pid=>{const pa=patients.find(x=>x.id==pid);const prof=miembros.find(m=>m.id===(pa?.profesionalId||miId))||miembros.find(m=>m.id===miId);return prof?.enlace_videollamada||miembros.find(m=>m.id===miId)?.enlace_videollamada||"";};
   const[enlaceTocado,setEnlaceTocado]=useState(!!cita);
   const tipoInicial=tipos.find(t=>t.id===defaultTipoId)||tipos[0];
   const init=cita?{...cita,tipoId:cita.tipoId||tipos.find(t=>t.nombre===cita.tipo)?.id||tipos[0]?.id}:{pacienteId:defaultPacienteId||"",nombreExterno:"",telefonoExterno:"",emailExterno:"",fecha:defaultFecha||toYMD(today()),hora:defaultHora||"09:00",duracion:tipoInicial?.duracion||60,precio:tipoInicial?.precio||0,tipoId:tipoInicial?.id||tipos[0]?.id,notas:"",zoomLink:enlaceDe(defaultPacienteId),origen:"interno"};
   const[form,setForm]=useState(init);const[saving,setSaving]=useState(false);const[sendStatus,setSendStatus]=useState(null);
+  useEffect(()=>{setErrCita("");},[nuevo,form.pacienteId]);
   const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
   const tipoActual=tipos.find(t=>t.id===form.tipoId)||tipos[0];
   const esPL=tipoActual?.nombre==="Primera llamada";
