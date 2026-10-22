@@ -2147,8 +2147,9 @@ function TimeGrid({days,citas,patients,horario,onNew,onEdit,showHeader}){
   const nameOf=c=>{const p=patients.find(p=>p.id==c.pacienteId);return c.origen==="calendly"||!p?(c.nombreExterno||"Primera llamada"):`${p.nombre} ${p.apellidos}`;};
   return(
     <div>
+      <div style={{overflowY:"auto",maxHeight:"68vh"}}>
       {showHeader&&(
-        <div style={{display:"grid",gridTemplateColumns:cols,borderBottom:`1px solid ${C.border}`}}>
+        <div style={{display:"grid",gridTemplateColumns:cols,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,zIndex:3,background:C.card}}>
           <div/>
           {days.map((d,i)=>{const ds=toYMD(d);const isT=ds===todayStr;return(
             <div key={i} style={{padding:"10px 6px",textAlign:"center",borderLeft:`1px solid ${C.border}`,background:isT?"rgba(166,107,63,0.09)":"transparent"}}>
@@ -2158,7 +2159,6 @@ function TimeGrid({days,citas,patients,horario,onNew,onEdit,showHeader}){
           );})}
         </div>
       )}
-      <div style={{overflowY:"auto",maxHeight:"68vh"}}>
         <div style={{display:"grid",gridTemplateColumns:cols,position:"relative"}}>
           {/* Columna de horas */}
           <div>
