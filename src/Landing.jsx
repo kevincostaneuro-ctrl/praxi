@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { RECURSOS } from "./recursos";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabase.js";
 import { VERSION_PRIVACIDAD, EMAIL_CONTACTO, DATOS_LEGALES_COMPLETOS } from "./legal.js";
@@ -438,24 +437,37 @@ function Demo() {
             {/* ── RECURSOS ── */}
             {active==="recursos"&&<div>
               <div style={{fontFamily:"'Instrument Serif',serif",fontSize:26,color:D.ink,marginBottom:4}}>Recursos</div>
-              <div style={{fontSize:12,color:D.muted,marginBottom:18}}>Biblioteca de {RECURSOS.length} materiales clínicos en PDF · Incluidos en todas las cuentas</div>
-              {[["paciente","Para el paciente","📄"],["profesional","Para el profesional","📋"]].map(([cat,label,icon])=>(
-                <div key={cat}>
-                  <div style={{fontSize:10,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600,marginBottom:10}}>{label}</div>
-                  <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:16}}>
-                    {RECURSOS.filter(r=>r.cat===cat).slice(0,5).map(r=>(
-                      <div key={r.url} style={{background:D.bone,borderRadius:10,padding:"10px 14px",border:`1px solid ${D.border}`,display:"flex",gap:12,alignItems:"center"}}>
-                        <div style={{fontSize:20,flexShrink:0}}>{icon}</div>
-                        <div style={{flex:1,minWidth:0}}>
-                          <div style={{fontSize:12,fontWeight:600,color:D.ink}}>{r.titulo}</div>
-                          <div style={{fontSize:10,color:D.muted,marginTop:1}}>{r.desc}</div>
-                        </div>
-                        <span style={{background:"rgba(166,107,63,0.1)",color:D.accent,fontSize:9,fontWeight:600,padding:"2px 8px",borderRadius:20,flexShrink:0}}>{r.tipo}</span>
-                      </div>
-                    ))}
+              <div style={{fontSize:12,color:D.muted,marginBottom:18}}>Biblioteca de materiales clínicos · Acceso según tu plan</div>
+
+              <div style={{fontSize:10,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600,marginBottom:10}}>Para el paciente</div>
+              <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:16}}>
+                {[["📄","Registro de pensamientos automáticos","Hoja de autorregistro semanal para identificar distorsiones cognitivas","Todos los planes"],["📄","Psicoeducación sobre ansiedad","Guía explicativa para el paciente sobre qué es la ansiedad y cómo funciona","Todos los planes"],["📄","Ejercicios de respiración diafragmática","Instrucciones paso a paso para la técnica 4-7-8 y respiración abdominal","Todos los planes"],["📄","Registro de actividades placenteras","Hoja de seguimiento para activación conductual en depresión","Plan Pro"],["📄","Diario de sueño","Registro semanal de calidad y patrones del sueño","Plan Pro"]].map(([icon,title,desc,plan],i)=>(
+                  <div key={i} style={{background:D.bone,borderRadius:10,padding:"10px 14px",border:`1px solid ${D.border}`,display:"flex",gap:12,alignItems:"center"}}>
+                    <div style={{fontSize:20,flexShrink:0}}>{icon}</div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:12,fontWeight:600,color:D.ink}}>{title}</div>
+                      <div style={{fontSize:10,color:D.muted,marginTop:1}}>{desc}</div>
+                    </div>
+                    <span style={{background:plan==="Todos los planes"?D.gD:"rgba(166,107,63,0.1)",color:plan==="Todos los planes"?D.green:D.accent,fontSize:9,fontWeight:600,padding:"2px 8px",borderRadius:20,flexShrink:0}}>{plan}</span>
+                    <div style={{width:28,height:28,borderRadius:8,background:D.sand,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,cursor:"pointer",flexShrink:0}}>↓</div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              <div style={{fontSize:10,color:D.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600,marginBottom:10}}>Para el profesional</div>
+              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                {[["📋","Protocolo TCC para trastorno de ansiedad generalizada","Guía estructurada de intervención cognitivo-conductual — 12 sesiones","Plan Pro"],["📋","Protocolo de activación conductual para depresión","Protocolo BA con registro de actividades y programación semanal","Plan Pro"],["📋","Escala BAI — Inventario de Ansiedad de Beck","Versión para uso clínico con instrucciones de corrección e interpretación","Todos los planes"],["📋","Escala PHQ-9 — Depresión","Cuestionario de salud del paciente para cribado de depresión","Todos los planes"],["📋","Plantilla de informe de derivación","Estructura profesional para informes de derivación a psiquiatría u otros especialistas","Plan Pro"]].map(([icon,title,desc,plan],i)=>(
+                  <div key={i} style={{background:D.bone,borderRadius:10,padding:"10px 14px",border:`1px solid ${D.border}`,display:"flex",gap:12,alignItems:"center"}}>
+                    <div style={{fontSize:20,flexShrink:0}}>{icon}</div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:12,fontWeight:600,color:D.ink}}>{title}</div>
+                      <div style={{fontSize:10,color:D.muted,marginTop:1}}>{desc}</div>
+                    </div>
+                    <span style={{background:plan==="Todos los planes"?D.gD:"rgba(166,107,63,0.1)",color:plan==="Todos los planes"?D.green:D.accent,fontSize:9,fontWeight:600,padding:"2px 8px",borderRadius:20,flexShrink:0}}>{plan}</span>
+                    <div style={{width:28,height:28,borderRadius:8,background:D.sand,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,cursor:"pointer",flexShrink:0,opacity:0.4}}>🔒</div>
+                  </div>
+                ))}
+              </div>
             </div>}
 
           </div>

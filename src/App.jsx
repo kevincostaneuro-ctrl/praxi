@@ -136,6 +136,13 @@ const toYMD = d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
 const today = ()=>new Date();
 const addDays = (d,n)=>{const r=new Date(d);r.setDate(r.getDate()+n);return r;};
 const startOfWeek = d=>{const r=new Date(d);const day=r.getDay();r.setDate(r.getDate()+(day===0?-6:1-day));return r;};
+const diasEntre=(a,b)=>Math.round((new Date(b.getFullYear(),b.getMonth(),b.getDate())-new Date(a.getFullYear(),a.getMonth(),a.getDate()))/864e5);
+const capit=s=>s.charAt(0).toUpperCase()+s.slice(1);
+// "Hoy", "Mañana", "Ayer" o "Sábado 24"
+const etiquetaDia=d=>{const n=diasEntre(today(),d);if(n===0)return"Hoy";if(n===1)return"Mañana";if(n===-1)return"Ayer";return capit(d.toLocaleDateString("es-ES",{weekday:"long",day:"numeric"}));};
+const etiquetaSemana=d=>{const n=Math.round(diasEntre(startOfWeek(today()),startOfWeek(d))/7);if(n===0)return"Esta semana";if(n===1)return"Siguiente";if(n===-1)return"Anterior";return n>0?`Dentro de ${n} semanas`:`Hace ${-n} semanas`;};
+const etiquetaMes=d=>{const t=today();const n=(d.getFullYear()-t.getFullYear())*12+d.getMonth()-t.getMonth();if(n===0)return"Este mes";if(n===1)return"Siguiente";if(n===-1)return"Anterior";return MONTHS_ES[d.getMonth()];};
+const fechaDe=s=>{const[y,m,dd]=s.split("-").map(Number);return new Date(y,m-1,dd);};
 const timeToMins = t=>{const[h,m]=t.split(":").map(Number);return h*60+m;};
 const minsToTime = m=>`${pad(Math.floor(m/60))}:${pad(m%60)}`;
 const generateZoom = ()=>`https://zoom.us/j/${Math.floor(Math.random()*9e9+1e9)}?pwd=${Math.random().toString(36).slice(2,10)}`;
@@ -441,6 +448,15 @@ const SAMPLE_CITAS=[
   {id:15,pacienteId:15,fecha:toYMD(addDays(today(),5)),hora:"11:00",duracion:90,tipoId:"t2",tipo:"Seguimiento",notas:"",zoomLink:generateZoom(),origen:"interno",precio:90},
   {id:16,pacienteId:null,fecha:toYMD(addDays(today(),6)),hora:"09:30",duracion:30,tipoId:"t1",tipo:"Primera llamada",notas:"",zoomLink:generateZoom(),origen:"calendly",nombreExterno:"Pablo Suárez",telefonoExterno:"688 001 234",emailExterno:"pablo@email.com",precio:0},
 ];
+// En la demo, las fechas de ejemplo se desplazan para que la última sesión sea reciente
+function demoPacientes(){
+  const desf=diasEntre(fechaDe("2026-03-18"),addDays(today(),-6));
+  const mover=f=>f?toYMD(addDays(fechaDe(f),desf)):f;
+  return SAMPLE_PATIENTS.map((p,i)=>({...p,profesionalId:i%3===2?"u2":"demo",
+    sesiones:p.sesiones.map(s=>({...s,fecha:mover(s.fecha)})),
+    pruebasRealizadas:p.pruebasRealizadas.map(x=>({...x,fecha:mover(x.fecha)})),
+    informesMedicos:p.informesMedicos.map(x=>({...x,fecha:mover(x.fecha)}))}));
+}
 // ══════════════════════════════════════════════════════════════════════════════
 // LOGIN
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1872,9 +1888,9 @@ function TiposCitaModal({tipos,setTipos,onClose}){
 // ══════════════════════════════════════════════════════════════════════════════
 // CALENDAR
 // ══════════════════════════════════════════════════════════════════════════════
-function CitaModal({cita,patients,tipos,onClose,onSave,onDelete,defaultFecha,defaultHora,defaultTipoId,makeUrl}){
+function CitaModal({cita,patients,tipos,onClose,onSave,onDelete,defaultFecha,defaultHora,defaultTipoId,defaultPacienteId,makeUrl}){
   const tipoInicial=tipos.find(t=>t.id===defaultTipoId)||tipos[0];
-  const init=cita?{...cita,tipoId:cita.tipoId||tipos.find(t=>t.nombre===cita.tipo)?.id||tipos[0]?.id}:{pacienteId:"",nombreExterno:"",telefonoExterno:"",emailExterno:"",fecha:defaultFecha||toYMD(today()),hora:defaultHora||"09:00",duracion:tipoInicial?.duracion||60,precio:tipoInicial?.precio||0,tipoId:tipoInicial?.id||tipos[0]?.id,notas:"",zoomLink:"",origen:"interno"};
+  const init=cita?{...cita,tipoId:cita.tipoId||tipos.find(t=>t.nombre===cita.tipo)?.id||tipos[0]?.id}:{pacienteId:defaultPacienteId||"",nombreExterno:"",telefonoExterno:"",emailExterno:"",fecha:defaultFecha||toYMD(today()),hora:defaultHora||"09:00",duracion:tipoInicial?.duracion||60,precio:tipoInicial?.precio||0,tipoId:tipoInicial?.id||tipos[0]?.id,notas:"",zoomLink:"",origen:"interno"};
   const[form,setForm]=useState(init);const[saving,setSaving]=useState(false);const[sendStatus,setSendStatus]=useState(null);
   const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
   const tipoActual=tipos.find(t=>t.id===form.tipoId)||tipos[0];
@@ -2251,7 +2267,7 @@ function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tare
           <TimeGrid days={[date]} citas={citas} patients={patients} horario={horario} onNew={openNew} onEdit={openEdit}/>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
-          <Stat val={dc.length} label="Citas hoy"/>
+          <Stat val={dc.length} label={["Hoy","Mañana","Ayer"].includes(etiquetaDia(date))?`Citas ${etiquetaDia(date).toLowerCase()}`:`Citas el ${etiquetaDia(date).toLowerCase()}`}/>
           <CitasList lista={dc} titulo="Citas del día"/>
           <AgendaPersonalPanel tareas={tareas} setTareas={setTareas} onEditTarea={setEditTarea} fechaDefault={ds}/>
         </div>
@@ -2271,7 +2287,7 @@ function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tare
           <TimeGrid days={days} citas={citas} patients={patients} horario={horario} onNew={openNew} onEdit={openEdit} showHeader/>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
-          <Stat val={cw.length} label="Citas esta semana"/>
+          <Stat val={cw.length} label={{"Esta semana":"Citas esta semana","Siguiente":"Citas la semana siguiente","Anterior":"Citas la semana anterior"}[etiquetaSemana(date)]||`Citas · ${etiquetaSemana(date).toLowerCase()}`}/>
           <CitasList lista={cw} titulo="Citas de la semana" conFecha/>
           <AgendaPersonalPanel tareas={tareas} setTareas={setTareas} onEditTarea={setEditTarea}/>
         </div>
@@ -2324,7 +2340,7 @@ function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tare
       </div>
       <div style={{display:"flex",gap:10,marginBottom:16,alignItems:"center"}}>
         <button style={st.btn("sm")} onClick={()=>nav(-1)}>‹</button>
-        <button style={{...st.btn("sm"),background:C.bone,color:C.muted}} onClick={()=>setDate(today())}>Hoy</button>
+        <button title="Volver a hoy" style={{...st.btn("sm"),background:C.bone,color:C.muted,minWidth:96}} onClick={()=>setDate(today())}>{view==="week"?etiquetaSemana(date):view==="month"?etiquetaMes(date):etiquetaDia(date)}</button>
         <button style={st.btn("sm")} onClick={()=>nav(1)}>›</button>
         <div style={{fontSize:15,fontWeight:700,flex:1,textAlign:"center"}}>{navLabel()}</div>
         <div style={{display:"flex",gap:3,background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,padding:3}}>
@@ -2651,7 +2667,56 @@ function Facturas({patients,setPatients}){
 // ══════════════════════════════════════════════════════════════════════════════
 // RECURSOS — biblioteca de PDF (todos disponibles para cualquier cuenta)
 // ══════════════════════════════════════════════════════════════════════════════
+// En la demo pública la biblioteca no está disponible: se muestra la vista de planes
+function RecursosDemo(){
+  const CATEGORIAS=[
+    {id:"paciente",label:"Para el paciente",icon:"👤",desc:"Autorregistros, psicoeducación, hojas de trabajo y ejercicios para dar a tus pacientes."},
+    {id:"profesional",label:"Para el profesional",icon:"🧠",desc:"Protocolos de intervención, escalas estandarizadas, guías clínicas y plantillas de informes."},
+  ];
+  const PLANES={basico:"Básico",pro:"Pro",clinica:"Clínica"};
+  return(
+    <div>
+      <div style={{marginBottom:24}}>
+        <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Recursos</div>
+        <div style={{fontSize:13,color:C.muted,marginTop:2}}>Biblioteca de materiales clínicos disponibles según tu plan</div>
+      </div>
+
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:24}}>
+        {CATEGORIAS.map(cat=>(
+          <div key={cat.id} style={{...st.card,padding:"24px 28px",textAlign:"center",opacity:0.6}}>
+            <div style={{fontSize:36,marginBottom:12}}>{cat.icon}</div>
+            <div style={{fontSize:16,fontWeight:600,marginBottom:8}}>{cat.label}</div>
+            <div style={{fontSize:13,color:C.muted,lineHeight:1.6,marginBottom:16}}>{cat.desc}</div>
+            <span style={{...st.badge(C.amber,C.amD),fontSize:11}}>Próximamente</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{...st.card,padding:"24px 28px",borderLeft:`3px solid ${C.accent}`,background:C.sand}}>
+        <div style={{fontSize:14,fontWeight:600,marginBottom:6}}>¿Qué habrá disponible?</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16,marginTop:12}}>
+          {[
+            ["Plan Básico","5-10 recursos esenciales",C.muted],
+            ["Plan Pro","Biblioteca completa",C.accent],
+            ["Plan Clínica","Todo + recursos de equipo",C.walnut],
+          ].map(([plan,desc,color])=>(
+            <div key={plan} style={{padding:"12px 14px",background:C.bone,borderRadius:10,border:`1px solid ${C.border}`}}>
+              <div style={{fontSize:12,fontWeight:700,color,marginBottom:4}}>{plan}</div>
+              <div style={{fontSize:12,color:C.muted}}>{desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Recursos(){
+  const demo=useContext(DemoCtx);
+  if(demo)return <RecursosDemo/>;
+  return <BibliotecaRecursos/>;
+}
+function BibliotecaRecursos(){
   const[cat,setCat]=useState("paciente");
   const[q,setQ]=useState("");
   const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
@@ -3331,19 +3396,85 @@ Usa estos datos para responder preguntas sobre ingresos, pendientes, seguimiento
   );
 }
 
-function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCita,onEditTarea,onNuevaCita,onNuevoPaciente,onVerCalendario}){
+function Dashboard({patients,citas,setCitas,tareas,setTareas,horario,onInforme,onEditCita,onEditTarea,onNuevaCita,onAgendar,onAbrirPaciente,onNuevoPaciente,onVerCalendario}){
   const[weekStart,setWeekStart]=useState(startOfWeek(today()));
-  const todayStr=toYMD(today());
+  const ahora=today();
+  const todayStr=toYMD(ahora);
+  const ahoraMin=ahora.getHours()*60+ahora.getMinutes();
   const todayCitas=citas.filter(c=>c.fecha===todayStr);
   const days=Array.from({length:7},(_,i)=>addDays(weekStart,i));
-  const nameOf=c=>{const p=patients.find(p=>p.id==c.pacienteId);return c.origen==="calendly"||!p?(c.nombreExterno||"Primera llamada"):`${p.nombre} ${p.apellidos}`;};
+  const pac=id=>patients.find(p=>p.id==id);
+  const nameOf=c=>{const p=pac(c.pacienteId);return c.origen==="calendly"||!p?(c.nombreExterno||"Primera llamada"):`${p.nombre} ${p.apellidos}`;};
+  const activos=patients.filter(p=>p.estado==="activo");
+  const eur=n=>`${Math.round(n).toLocaleString("es-ES")} €`;
+  const yaPaso=c=>c.fecha<todayStr||(c.fecha===todayStr&&timeToMins(c.hora)+(c.duracion||0)<=ahoraMin);
 
-  const Stat=({val,label,color})=>(
+  // ── Ocupación de la semana actual (lunes a viernes en tu horario)
+  const ws0=startOfWeek(ahora);const claves=Array.from({length:7},(_,i)=>toYMD(addDays(ws0,i)));
+  const capacidad=5*Math.max(1,(horario?.end??WORK_END)-(horario?.start??WORK_START))*60;
+  const reservado=citas.filter(c=>claves.includes(c.fecha)).reduce((a,c)=>a+(Number(c.duracion)||0),0);
+  const ocupacion=Math.min(100,Math.round(reservado/capacidad*100));
+
+  // ── Cobros
+  const mes=todayStr.slice(0,7);
+  const todasSes=patients.flatMap(p=>p.sesiones||[]);
+  const cobradoMes=todasSes.filter(s=>s.pagado&&(s.fecha||"").startsWith(mes)).reduce((a,s)=>a+(Number(s.pago)||0),0);
+  const pendiente=todasSes.filter(s=>!s.pagado).reduce((a,s)=>a+(Number(s.pago)||0),0);
+
+  // ── Siguiente cita
+  const proxima=[...citas].filter(c=>!yaPaso(c)&&(c.fecha>todayStr||timeToMins(c.hora)>=ahoraMin-((c.duracion||0)-1)))
+    .sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora))[0];
+  const cuando=c=>{
+    if(c.fecha===todayStr){const m=timeToMins(c.hora)-ahoraMin;if(m<=0)return"En curso";if(m<60)return`En ${m} min`;return`Hoy en ${Math.floor(m/60)} h${m%60?` ${m%60} min`:""}`;}
+    return`${etiquetaDia(fechaDe(c.fecha))} · ${c.hora}`;
+  };
+  const pProx=proxima&&proxima.origen!=="calendly"?pac(proxima.pacienteId):null;
+  const ultSes=pProx?[...(pProx.sesiones||[])].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""))[0]:null;
+  const ultPrueba=pProx?[...(pProx.pruebasRealizadas||[])].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""))[0]:null;
+
+  // ── Pendientes clínicos
+  const hace30=toYMD(addDays(ahora,-30));
+  const sinNota=citas.filter(c=>c.origen!=="calendly"&&c.pacienteId&&yaPaso(c)&&c.fecha>=hace30)
+    .filter(c=>{const p=pac(c.pacienteId);return p&&!(p.sesiones||[]).some(s=>s.fecha===c.fecha);})
+    .sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const escalas=activos.flatMap(p=>{
+    const ult={};(p.pruebasRealizadas||[]).forEach(x=>{if(x.prueba&&x.fecha&&(!ult[x.prueba]||x.fecha>ult[x.prueba]))ult[x.prueba]=x.fecha;});
+    return Object.entries(ult).map(([prueba,f])=>({p,prueba,dias:diasEntre(fechaDe(f),ahora)})).filter(x=>x.dias>=28);
+  }).sort((a,b)=>b.dias-a.dias);
+  const sinConsent=activos.filter(p=>!p.consentimiento);
+  const totalPend=sinNota.length+escalas.length+sinConsent.length;
+
+  // ── Pacientes activos sin próxima cita
+  const conCita=new Set(citas.filter(c=>c.fecha>=todayStr&&c.pacienteId).map(c=>String(c.pacienteId)));
+  const sinCita=activos.filter(p=>!conCita.has(String(p.id))).map(p=>{
+    const fechas=[...(p.sesiones||[]).map(s=>s.fecha),...citas.filter(c=>c.pacienteId==p.id&&c.fecha<todayStr).map(c=>c.fecha)].filter(Boolean).sort();
+    const ult=fechas[fechas.length-1];
+    return{p,dias:ult?diasEntre(fechaDe(ult),ahora):null};
+  }).sort((a,b)=>(b.dias??-1)-(a.dias??-1));
+
+  const Stat=({val,label,color,children})=>(
     <div style={st.statCard}>
       <div style={{fontSize:30,fontWeight:700,color,lineHeight:1}}>{val}</div>
       <div style={{fontSize:13,color:C.muted,marginTop:8}}>{label}</div>
+      {children}
     </div>
   );
+  const Fila=({onClick,icono,color,texto,detalle,accion})=>(
+    <div onClick={onClick} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderTop:`1px solid ${C.border}`,cursor:onClick?"pointer":"default"}}>
+      {icono&&<span style={{width:8,height:8,borderRadius:"50%",background:color,flexShrink:0}}/>}
+      <div style={{flex:1,minWidth:0,fontSize:13,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{texto}</div>
+      {detalle&&<div style={{fontSize:12,color:C.muted,flexShrink:0}}>{detalle}</div>}
+      {accion}
+    </div>
+  );
+  const Titulo=({children,n})=>(
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+      <div style={{fontSize:12,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600}}>{children}</div>
+      {n!=null&&<span style={st.badge(n?C.accent:C.green,n?C.sand:C.gD)}>{n}</span>}
+    </div>
+  );
+  const ddmm=f=>`${f.slice(8,10)}/${f.slice(5,7)}`;
+  const MAX=4;
 
   return(
     <div style={{maxWidth:1280,margin:"0 auto"}}>
@@ -3356,19 +3487,74 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCit
         </div>
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:20}}>
-        <Stat val={patients.filter(p=>p.estado==="activo").length} label="Pacientes activos" color={C.accent}/>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:14,marginBottom:14}}>
+        <Stat val={activos.length} label="Pacientes activos" color={C.accent}/>
         <Stat val={todayCitas.length} label="Citas hoy" color={C.accent}/>
-        <Stat val={getFreeSlots(todayStr,citas).length} label="Huecos libres hoy" color={C.green}/>
+        <Stat val={`${ocupacion} %`} label="Ocupación esta semana" color={C.accent}>
+          <div style={{height:5,background:C.sand,borderRadius:3,marginTop:10}}><div style={{width:`${ocupacion}%`,height:5,background:C.accent,borderRadius:3}}/></div>
+        </Stat>
+        <Stat val={eur(cobradoMes)} label={`Cobrado en ${MONTHS_ES[ahora.getMonth()].toLowerCase()}`} color={C.green}>
+          {pendiente>0&&<div style={{fontSize:12,color:C.amber,marginTop:6,fontWeight:500}}>{eur(pendiente)} pendientes de cobro</div>}
+        </Stat>
+      </div>
+
+      {proxima&&(
+        <div style={{...st.card,padding:"16px 20px",marginBottom:14,display:"flex",alignItems:"center",gap:16,flexWrap:"wrap",borderLeft:`3px solid ${C.accent}`,borderRadius:"0 18px 18px 0"}}>
+          <Avatar nombre={nameOf(proxima)} apellidos="" size={44}/>
+          <div style={{flex:1,minWidth:220}}>
+            <div style={{fontSize:12,color:C.accent,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.06em"}}>Siguiente cita · {cuando(proxima)}</div>
+            <div style={{fontSize:17,fontWeight:700,color:C.ink,marginTop:3}}>{nameOf(proxima)} <span style={{fontWeight:400,color:C.walnut,fontSize:14}}>· {proxima.hora} · {pProx?`sesión ${(pProx.sesiones||[]).length+1}`:(proxima.tipo||"Cita")}</span></div>
+            {pProx&&(ultSes||ultPrueba)&&<div style={{fontSize:12.5,color:C.muted,marginTop:4,lineHeight:1.5}}>
+              {ultSes&&<>Última sesión: {ultSes.trabajado||"sin resumen"}</>}{ultSes&&ultPrueba&&" · "}{ultPrueba&&<>{ultPrueba.prueba}: {ultPrueba.resultado}</>}
+            </div>}
+          </div>
+          <div style={{display:"flex",gap:8}}>
+            {pProx&&<button style={st.btn("sm")} onClick={()=>onAbrirPaciente(pProx.id)}>Abrir ficha</button>}
+            <button style={{...st.btn("sm"),background:C.bone,color:C.muted}} onClick={()=>onEditCita(proxima)}>Ver cita</button>
+          </div>
+        </div>
+      )}
+
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))",gap:14,marginBottom:14,alignItems:"start"}}>
+        <div style={{...st.card,padding:"16px 20px"}}>
+          <Titulo n={totalPend}>Pendientes clínicos</Titulo>
+          {totalPend===0&&<div style={{fontSize:13,color:C.green,padding:"6px 0"}}>Todo al día.</div>}
+          {sinNota.slice(0,MAX).map(c=>(
+            <Fila key={"n"+c.id} icono color={C.amber} onClick={()=>onAbrirPaciente(c.pacienteId)}
+              texto={<><b>{nameOf(c)}</b> · sesión sin registrar</>} detalle={c.fecha===todayStr?`hoy ${c.hora}`:ddmm(c.fecha)}/>
+          ))}
+          {escalas.slice(0,MAX).map(x=>(
+            <Fila key={"e"+x.p.id+x.prueba} icono color={C.accent} onClick={()=>onAbrirPaciente(x.p.id)}
+              texto={<><b>{x.p.nombre} {x.p.apellidos}</b> · repetir {x.prueba}</>} detalle={`hace ${Math.round(x.dias/7)} sem`}/>
+          ))}
+          {sinConsent.slice(0,MAX).map(p=>(
+            <Fila key={"c"+p.id} icono color={C.red} onClick={()=>onAbrirPaciente(p.id)}
+              texto={<><b>{p.nombre} {p.apellidos}</b> · sin consentimiento firmado</>}/>
+          ))}
+          {(sinNota.length>MAX||escalas.length>MAX||sinConsent.length>MAX)&&<div style={{fontSize:12,color:C.muted,paddingTop:8,borderTop:`1px solid ${C.border}`}}>Se muestran los {MAX} más antiguos de cada tipo.</div>}
+        </div>
+
+        <div style={{...st.card,padding:"16px 20px"}}>
+          <Titulo n={sinCita.length}>Sin próxima cita</Titulo>
+          {sinCita.length===0&&<div style={{fontSize:13,color:C.green,padding:"6px 0"}}>Todos tus pacientes activos tienen cita.</div>}
+          {sinCita.slice(0,6).map(({p,dias})=>(
+            <Fila key={p.id} onClick={()=>onAbrirPaciente(p.id)}
+              texto={<b>{p.nombre} {p.apellidos}</b>}
+              detalle={dias==null?"sin sesiones":dias===0?"última hoy":`última hace ${dias} ${dias===1?"día":"días"}`}
+              accion={<button style={st.btn("sm")} onClick={e=>{e.stopPropagation();onAgendar(p.id);}}>Agendar</button>}/>
+          ))}
+          {sinCita.length>6&&<div style={{fontSize:12,color:C.muted,paddingTop:8,borderTop:`1px solid ${C.border}`}}>Y {sinCita.length-6} más.</div>}
+        </div>
       </div>
 
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 300px",gap:14,alignItems:"start"}}>
         <div style={{...st.card,overflow:"hidden"}}>
           <div style={{padding:"10px 14px",borderBottom:`1px solid ${C.border}`,display:"flex",gap:10,alignItems:"center"}}>
             <button style={st.btn("sm")} onClick={()=>setWeekStart(d=>addDays(d,-7))}>‹</button>
+            <button title="Volver a esta semana" style={{...st.btn("sm"),background:C.bone,color:C.muted,minWidth:96}} onClick={()=>setWeekStart(startOfWeek(today()))}>{etiquetaSemana(weekStart)}</button>
             <button style={st.btn("sm")} onClick={()=>setWeekStart(d=>addDays(d,7))}>›</button>
             <span style={{flex:1,fontSize:14,fontWeight:600,color:C.text,textAlign:"center"}}>
-              Semana · {weekStart.getDate()} {MONTHS_ES[weekStart.getMonth()].slice(0,3)} – {addDays(weekStart,6).getDate()} {MONTHS_ES[addDays(weekStart,6).getMonth()].slice(0,3)}
+              {weekStart.getDate()} {MONTHS_ES[weekStart.getMonth()].slice(0,3)} – {addDays(weekStart,6).getDate()} {MONTHS_ES[addDays(weekStart,6).getMonth()].slice(0,3)}
             </span>
             <button style={{...st.btn("sm"),background:C.bone,color:C.muted}} onClick={onVerCalendario}>Ver calendario →</button>
           </div>
@@ -3385,7 +3571,7 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCit
                   </div>
                   {dc.length===0&&dt.length===0&&<div style={{padding:"12px 6px",fontSize:12,color:C.dim,textAlign:"center",fontStyle:"italic"}}>—</div>}
                   {dc.map(c=>(
-                    <div key={c.id} onClick={()=>onEditCita(c)} style={{margin:6,padding:"8px 9px",background:CITA_BG,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.accent}`,borderRadius:6,cursor:"pointer"}}>
+                    <div key={c.id} onClick={()=>onEditCita(c)} style={{margin:6,padding:"8px 9px",background:CITA_BG,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.accent}`,borderRadius:6,cursor:"pointer",opacity:yaPaso(c)?0.55:1}}>
                       <div style={{fontSize:12,color:C.muted,fontWeight:600}}>{c.hora}</div>
                       <div style={{fontSize:13,fontWeight:700,color:C.ink,lineHeight:1.3,marginTop:2,overflow:"hidden",textOverflow:"ellipsis"}}>{nameOf(c)}</div>
                       <div style={{fontSize:12,color:C.walnut,marginTop:2}}>{c.tipo||"Cita"} · {c.duracion}min</div>
@@ -3449,8 +3635,8 @@ export default function App({demo=false}){
   const[pendientes,setPendientes]=useState(0);
 
   // ── Datos ──
-  const[patients,setPatientsSync,cargarPatients,cambioPatients,patientsRef]=useEstadoSincronizado(demo?SAMPLE_PATIENTS.map((p,i)=>({...p,profesionalId:i%3===2?"u2":"demo"})):[]);
-  const[citas,setCitasSync,cargarCitas,cambioCitas]=useEstadoSincronizado(demo?SAMPLE_CITAS:[]);
+  const[patients,setPatientsSync,cargarPatients,cambioPatients,patientsRef]=useEstadoSincronizado(demo?demoPacientes():[]);
+  const[citas,setCitasSync,cargarCitas,cambioCitas]=useEstadoSincronizado(demo?SAMPLE_CITAS.filter(c=>![7,10,12].includes(c.pacienteId)):[]);
   const[tareas,setTareasSync,cargarTareas,cambioTareas]=useEstadoSincronizado([]);
   const[tipos,setTiposSync,cargarTipos,cambioTipos,tiposRef]=useEstadoSincronizado(DEFAULT_TIPOS_CITA);
   const[horario,setHorarioSync,cargarHorario,cambioHorario,horarioRef]=useEstadoSincronizado({start:WORK_START,end:WORK_END});
@@ -3732,7 +3918,7 @@ export default function App({demo=false}){
           <span><strong style={{color:C.accent}}>Modo demo</strong> · Navega por todas las secciones con pacientes de ejemplo. Los cambios no se guardan.</span>
           <a href="/" style={{...st.btn("sm"),textDecoration:"none"}}>Solicitar acceso</a>
         </div>}
-        {page==="dashboard"&&<Dashboard patients={patients} citas={citas} setCitas={setCitas} tareas={tareas} setTareas={setTareas} onInforme={()=>setShowInforme(true)} onEditCita={c=>setEditCitaDash(c)} onEditTarea={t=>setEditTareaDash(t)} onNuevaCita={()=>setNewCitaDash(true)} onNuevoPaciente={()=>{setAutoNewPaciente(true);setPage("pacientes");}} onVerCalendario={()=>setPage("calendario")}/>}
+        {page==="dashboard"&&<Dashboard patients={patients} citas={citas} setCitas={setCitas} tareas={tareas} setTareas={setTareas} onInforme={()=>setShowInforme(true)} onEditCita={c=>setEditCitaDash(c)} onEditTarea={t=>setEditTareaDash(t)} onNuevaCita={()=>setNewCitaDash(true)} onAgendar={id=>setNewCitaDash({pacienteId:id})} onAbrirPaciente={selectPatient} horario={horario} onNuevoPaciente={()=>{setAutoNewPaciente(true);setPage("pacientes");}} onVerCalendario={()=>setPage("calendario")}/>}
         {page==="calendario"&&<Calendario patients={patients} citas={citas} setCitas={setCitas} config={config} setConfig={setConfig} tipos={tipos} horario={horario} tareas={tareas} setTareas={setTareas}/>}
         {page==="pacientes"&&<Pacientes patients={patients} setPatients={setPatients} onSelect={selectPatient} autoNew={autoNewPaciente} onAutoNewDone={()=>setAutoNewPaciente(false)}/>}
         {page==="ficha"&&selectedPatient&&<FichaPaciente patient={selectedPatient} setPatients={setPatients} onBack={goBack} citas={citas} setCitas={setCitas} profesionales={profesionales} tipos={tipos}/>}
@@ -3743,7 +3929,7 @@ export default function App({demo=false}){
       </div>
       {showInforme&&<InformeMensual patients={patients} citas={citas} onClose={()=>setShowInforme(false)}/>}
       {editCitaDash&&<CitaModal cita={editCitaDash} patients={patients} tipos={tipos} defaultFecha={editCitaDash.fecha} defaultHora={editCitaDash.hora} defaultTipoId={editCitaDash.tipoId} makeUrl={config.makeOut} onClose={()=>setEditCitaDash(null)} onSave={form=>{setCitas(cs=>cs.map(c=>c.id===form.id?{...c,...form}:c));setEditCitaDash(null);}} onDelete={id=>{setCitas(cs=>cs.filter(c=>c.id!==id));setEditCitaDash(null);}}/>}
-      {newCitaDash&&<CitaModal cita={null} patients={patients} tipos={tipos} defaultFecha={toYMD(today())} defaultHora="09:00" defaultTipoId={tipos[0]?.id} makeUrl={config.makeOut} onClose={()=>setNewCitaDash(false)} onSave={form=>{setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:form.pacienteId?Number(form.pacienteId):null}]);setNewCitaDash(false);}} onDelete={()=>setNewCitaDash(false)}/>}
+      {newCitaDash&&<CitaModal cita={null} defaultPacienteId={newCitaDash?.pacienteId} patients={patients} tipos={tipos} defaultFecha={toYMD(today())} defaultHora="09:00" defaultTipoId={tipos[0]?.id} makeUrl={config.makeOut} onClose={()=>setNewCitaDash(false)} onSave={form=>{setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:form.pacienteId?Number(form.pacienteId):null}]);setNewCitaDash(false);}} onDelete={()=>setNewCitaDash(false)}/>}
       {editTareaDash&&<TareaModal tarea={editTareaDash} onClose={()=>setEditTareaDash(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTareaDash(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTareaDash(null);}}/>}
     </div>
     </EquipoCtx.Provider>
