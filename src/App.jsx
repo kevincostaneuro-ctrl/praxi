@@ -1,7 +1,10 @@
 import { useState, useMemo, useEffect, useRef, useCallback, createContext, useContext } from "react";
 import { supabase, leerTodo, sincronizar } from "./supabase.js";
+import { RECURSOS } from "./recursos";
 import { VERSION_TERMINOS } from "./legal.js";
 // ── Asistente IA ─────────────────────────────────────────────────────────────
+// Oculto hasta configurar la clave de Anthropic en Vercel. Para activarlo: true.
+const IA_VISIBLE = false;
 // La app nunca habla directamente con Anthropic: llama a /api/ia (servidor de
 // Vercel, donde está la clave) y antes sustituye los nombres de los pacientes
 // por alias ("Paciente 1"…), que se deshacen al recibir la respuesta.
@@ -1157,7 +1160,7 @@ function FichaPaciente({patient,setPatients,onBack,citas,setCitas,profesionales,
           <span style={st.badge(patient.estado==="activo"?C.green:patient.estado==="alta"?C.walnut:C.muted,patient.estado==="activo"?C.gD:patient.estado==="alta"?C.sand:C.card)}>{patient.estado}</span>
           <button style={{...st.btn("sm"),background:C.gD,color:C.green}} onClick={()=>setShowNuevaCita(true)}>+ Nueva cita</button>
           <button style={st.btn("sm")} onClick={()=>exportPatientPDF(patient)}>🖨 Exportar PDF</button>
-          <button style={{...st.btn("sm"),background:C.accent,color:C.bone}} onClick={()=>setShowIA(v=>!v)}>✦ IA</button>
+          {IA_VISIBLE&&<button style={{...st.btn("sm"),background:C.accent,color:C.bone}} onClick={()=>setShowIA(v=>!v)}>✦ IA</button>}
           {patient.estado==="activo"&&<button style={{...st.btn("sm"),background:C.tD,color:C.teal}} onClick={()=>setShowAlta(true)}>Dar de alta</button>}
           {patient.estado==="alta"&&<span style={{...st.badge(C.walnut,C.sand),fontSize:11}}>✓ Dado de alta</span>}
         </div>
@@ -1231,7 +1234,7 @@ function FichaPaciente({patient,setPatients,onBack,citas,setCitas,profesionales,
 
       {showConsent&&<ConsentModal patient={patient} onClose={()=>setShowConsent(false)} onSave={({texto,firmado})=>{update(p=>({...p,consentimiento:firmado,consentimientoTexto:texto}));setShowConsent(false);}}/>}
       {showAlta&&<AltaModal patient={patient} onClose={()=>setShowAlta(false)} onSave={informe=>{update(p=>({...p,estado:"alta",informeAlta:informe}));setShowAlta(false);}}/>}
-      {showIA&&<IAPanel patient={patient} onClose={()=>setShowIA(false)}/>}
+      {IA_VISIBLE&&showIA&&<IAPanel patient={patient} onClose={()=>setShowIA(false)}/>}
       {showNuevaCita&&<CitaModal cita={null} patients={[patient]} tipos={tipos||[]} defaultFecha={toYMD(today())} defaultHora="09:00" makeUrl="" onClose={()=>setShowNuevaCita(false)} onSave={form=>{setCitas&&setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:patient.id,origen:"interno"}]);setShowNuevaCita(false);}} onDelete={()=>{}}/>}
     </div>
   );
@@ -2533,7 +2536,7 @@ function Facturas({patients,setPatients}){
           <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Facturas</div>
           <div style={{fontSize:13,color:C.muted,marginTop:2}}>{todasFacturas.length} facturas emitidas</div>
         </div>
-        <button style={{...st.btn("sm"),background:C.accent,color:C.bone}} onClick={()=>setShowIA(v=>!v)}>✦ IA</button>
+        {IA_VISIBLE&&<button style={{...st.btn("sm"),background:C.accent,color:C.bone}} onClick={()=>setShowIA(v=>!v)}>✦ IA</button>}
       </div>
 
       {/* Stats */}
@@ -2637,7 +2640,7 @@ function Facturas({patients,setPatients}){
           </div>
         </Modal>
       )}
-      {showIA&&<IAFacturasPanel patients={patients} onClose={()=>setShowIA(false)}/>}
+      {IA_VISIBLE&&showIA&&<IAFacturasPanel patients={patients} onClose={()=>setShowIA(false)}/>}
     </div>
   );
 }
@@ -2646,47 +2649,52 @@ function Facturas({patients,setPatients}){
 // AGENDA GLOBAL — todos los profesionales
 // ══════════════════════════════════════════════════════════════════════════════
 // ══════════════════════════════════════════════════════════════════════════════
-// RECURSOS — placeholder (contenido se añade en fase final)
+// RECURSOS — biblioteca de PDF (todos disponibles para cualquier cuenta)
 // ══════════════════════════════════════════════════════════════════════════════
-function Recursos({currentUser}){
-  const CATEGORIAS=[
-    {id:"paciente",label:"Para el paciente",icon:"👤",desc:"Autorregistros, psicoeducación, hojas de trabajo y ejercicios para dar a tus pacientes."},
-    {id:"profesional",label:"Para el profesional",icon:"🧠",desc:"Protocolos de intervención, escalas estandarizadas, guías clínicas y plantillas de informes."},
-  ];
-  const PLANES={basico:"Básico",pro:"Pro",clinica:"Clínica"};
+function Recursos(){
+  const[cat,setCat]=useState("paciente");
+  const[q,setQ]=useState("");
+  const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  const lista=RECURSOS.filter(r=>r.cat===cat&&(!q.trim()||norm(r.titulo+" "+r.desc+" "+r.tipo).includes(norm(q.trim()))));
+  const n=c=>RECURSOS.filter(r=>r.cat===c).length;
   return(
     <div>
-      <div style={{marginBottom:24}}>
+      <div style={{marginBottom:20}}>
         <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Recursos</div>
-        <div style={{fontSize:13,color:C.muted,marginTop:2}}>Biblioteca de materiales clínicos disponibles según tu plan</div>
+        <div style={{fontSize:13,color:C.muted,marginTop:2}}>{RECURSOS.length} materiales clínicos en PDF, listos para imprimir o enviar</div>
       </div>
-
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:24}}>
-        {CATEGORIAS.map(cat=>(
-          <div key={cat.id} style={{...st.card,padding:"24px 28px",textAlign:"center",opacity:0.6}}>
-            <div style={{fontSize:36,marginBottom:12}}>{cat.icon}</div>
-            <div style={{fontSize:16,fontWeight:600,marginBottom:8}}>{cat.label}</div>
-            <div style={{fontSize:13,color:C.muted,lineHeight:1.6,marginBottom:16}}>{cat.desc}</div>
-            <span style={{...st.badge(C.amber,C.amD),fontSize:11}}>Próximamente</span>
-          </div>
-        ))}
-      </div>
-
-      <div style={{...st.card,padding:"24px 28px",borderLeft:`3px solid ${C.accent}`,background:C.sand}}>
-        <div style={{fontSize:14,fontWeight:600,marginBottom:6}}>¿Qué habrá disponible?</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16,marginTop:12}}>
-          {[
-            ["Plan Básico","5-10 recursos esenciales",C.muted],
-            ["Plan Pro","Biblioteca completa",C.accent],
-            ["Plan Clínica","Todo + recursos de equipo",C.walnut],
-          ].map(([plan,desc,color])=>(
-            <div key={plan} style={{padding:"12px 14px",background:C.bone,borderRadius:10,border:`1px solid ${C.border}`}}>
-              <div style={{fontSize:12,fontWeight:700,color,marginBottom:4}}>{plan}</div>
-              <div style={{fontSize:12,color:C.muted}}>{desc}</div>
-            </div>
+      <div style={{display:"flex",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between",gap:12,borderBottom:`1px solid ${C.border}`,marginBottom:20}}>
+        <div style={{display:"flex"}}>
+          {[["paciente","Para el paciente"],["profesional","Para el profesional"]].map(([id,l])=>(
+            <button key={id} onClick={()=>setCat(id)} style={st.tab(cat===id)}>{l} <span style={{color:C.muted,fontWeight:400}}>· {n(id)}</span></button>
           ))}
         </div>
+        <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Buscar recurso…" aria-label="Buscar recurso"
+          style={{...st.input,width:240,maxWidth:"100%",marginBottom:8,borderRadius:10}}/>
       </div>
+      <div style={{fontSize:12.5,color:C.muted,marginBottom:16,lineHeight:1.6}}>
+        {cat==="paciente"
+          ?"Hojas de registro, psicoeducación y ejercicios para entregar a tus pacientes. Incluyen al pie los teléfonos 024 y 112."
+          :"Escalas, protocolos y plantillas para tu práctica clínica. Las escalas reproducen la versión oficial en español e indican su fuente."}
+      </div>
+      {lista.length===0
+        ?<div style={{...st.card,padding:32,textAlign:"center",color:C.muted,fontSize:13}}>No hay recursos que coincidan con «{q}».</div>
+        :<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(250px,1fr))",gap:14}}>
+          {lista.map(r=>(
+            <div key={r.url} style={{...st.card,padding:"18px 20px",display:"flex",flexDirection:"column",gap:8}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+                <span style={{...st.badge(C.walnut,C.sand)}}>{r.tipo}</span>
+                <span style={{fontSize:11,color:C.muted,letterSpacing:"0.05em"}}>{(r.cat==="paciente"?"PAC-":"PRO-")+r.num}</span>
+              </div>
+              <div style={{fontSize:15,fontWeight:600,lineHeight:1.35,color:C.text}}>{r.titulo}</div>
+              <div style={{fontSize:12.5,color:C.muted,lineHeight:1.55,flex:1}}>{r.desc}</div>
+              <div style={{display:"flex",gap:8,marginTop:4}}>
+                <a href={r.url} target="_blank" rel="noopener" style={{...st.btn("sm"),textDecoration:"none",display:"inline-flex",alignItems:"center"}}>Abrir PDF</a>
+                <a href={r.url} download style={{...st.btn("teal"),padding:"5px 14px",fontSize:12,textDecoration:"none",display:"inline-flex",alignItems:"center"}}>Descargar</a>
+              </div>
+            </div>
+          ))}
+        </div>}
     </div>
   );
 }
@@ -3729,7 +3737,7 @@ export default function App({demo=false}){
         {page==="pacientes"&&<Pacientes patients={patients} setPatients={setPatients} onSelect={selectPatient} autoNew={autoNewPaciente} onAutoNewDone={()=>setAutoNewPaciente(false)}/>}
         {page==="ficha"&&selectedPatient&&<FichaPaciente patient={selectedPatient} setPatients={setPatients} onBack={goBack} citas={citas} setCitas={setCitas} profesionales={profesionales} tipos={tipos}/>}
         {page==="facturas"&&<Facturas patients={patients} setPatients={setPatients}/>}
-        {page==="recursos"&&<Recursos currentUser={currentUser}/>}
+        {page==="recursos"&&<Recursos/>}
         {page==="admin"&&currentUser.rol==="admin"&&<EquipoPanel clinica={currentClinica} miembros={profesionales} yo={currentUser} patients={patients} citas={citas} demo={demo} onCambio={cargarTodo} bloquearDemo={()=>setDemoToast(true)} setAviso={setAviso} onBorrada={cerrarSesion}/>}
         {page==="configuracion"&&currentUser.rol==="admin"&&<Configuracion horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos}/>}
       </div>
