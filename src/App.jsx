@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 
+const PRAXI_LOGO="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATwAAAB2CAYAAABVsS+4AAAWfmNhQlgAABZ+anVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAAFlhqdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOjk3MDcyNzY0LWQ5MTItNDgxNS04NWIxLWZmZmEyZDEzZmI2YgAAAAOTanVtYgAAAClqdW1kYzJhcwARABCAAACqADibcQNjMnBhLmFzc2VydGlvbnMAAAAAuGp1bWIAAABEanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5pbmdyZWRpZW50LnYzAAAAABhjMnNodm2EDQbAWyJEphhpr9wNWQAAAGxjYm9yo2lkYzpmb3JtYXRpaW1hZ2UvcG5namluc3RhbmNlSUR4LHhtcDppaWQ6ZDJiMDg2ZjUtOTYxYy00YTc5LWI2MTYtNDY5YzEzNmFlOTA2bHJlbGF0aW9uc2hpcGhwYXJlbnRPZgAAAeJqdW1iAAAAQWp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuYWN0aW9ucy52MgAAAAAYYzJzaFJlJpPkAZPn9JcsJ67IxxoAAAGZY2JvcqJnYWN0aW9uc4KiZmFjdGlvbmtjMnBhLm9wZW5lZGpwYXJhbWV0ZXJzoWtpbmdyZWRpZW50c4GiY3VybHgtc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5pbmdyZWRpZW50LnYzZGhhc2hYILXaPaSAuJCQ1WTi+7TCkaDUgS4sQQalFvnE8b+Zo5QxpGZhY3Rpb254HWNvbS5hbnRocm9waWMuY2xhdWRlLnByb3ZpZGVkanBhcmFtZXRlcnOheB9jb20uYW50aHJvcGljLm9yaWdpbi1jb25maWRlbmNlZ3Vua25vd25rZGVzY3JpcHRpb254ZkNsYXVkZSBwcm92aWRlZCB0aGlzIGZpbGUgYXQgdGhlIHJlcXVlc3Qgb2YgYSB1c2VyIGFuZCBtYXkgaGF2ZSBjcmVhdGVkIG9yIG1vZGlmaWVkIHRoZSBmaWxlIGNvbnRlbnRzLm1zb2Z0d2FyZUFnZW50oWRuYW1lZkNsYXVkZXJhbGxBY3Rpb25zSW5jbHVkZWT1AAAAyGp1bWIAAABAanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5oYXNoLmRhdGEAAAAAGGMyc2gja813DQTaZ4aJmNqAP78jAAAAgGNib3KlY2FsZ2ZzaGEyNTZjcGFkTQAAAAAAAAAAAAAAAABkaGFzaFggZ4zxoi3wWvcJQGb7b4KBskCVjqpuHu49473ZGfSD1cVkbmFtZW5qdW1iZiBtYW5pZmVzdGpleGNsdXNpb25zgaJlc3RhcnQYIWZsZW5ndGgZFooAAAI+anVtYgAAACdqdW1kYzJjbAARABCAAACqADibcQNjMnBhLmNsYWltLnYyAAAAAg9jYm9ypWNhbGdmc2hhMjU2aXNpZ25hdHVyZXhNc2VsZiNqdW1iZj0vYzJwYS91cm46YzJwYTo5NzA3Mjc2NC1kOTEyLTQ4MTUtODViMS1mZmZhMmQxM2ZiNmIvYzJwYS5zaWduYXR1cmVqaW5zdGFuY2VJRHgseG1wOmlpZDoyYzEzODMwYi0wNmI4LTRiNTAtYmI0Yi03YWViMjFkODdlNjJyY3JlYXRlZF9hc3NlcnRpb25zg6JjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggtdo9pIC4kJDVZOL7tMKRoNSBLixBBqUW+cTxv5mjlDGiY3VybHgqc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5hY3Rpb25zLnYyZGhhc2hYINlbdVgZyIdwhgMoOp0vufUYAcgQA+f6eUtWloD8iD5WomN1cmx4KXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaGFzaC5kYXRhZGhhc2hYIJqflx0PdlCz9uKjS6yWHcGwB/VmIHBgu8X0guqLjojSdGNsYWltX2dlbmVyYXRvcl9pbmZvo2RuYW1lb0FudGhyb3BpYyBGaWxlc2d2ZXJzaW9uZTEuMC4wa3NwZWNWZXJzaW9uZTIuNC4wAAAQOGp1bWIAAAAoanVtZGMyY3MAEQAQgAAAqgA4m3EDYzJwYS5zaWduYXR1cmUAAAAQCGNib3LShFkCEqIBJhghWQIKMIICBjCCAY2gAwIBAgIUQOWgCu7COdC+uIP6BkIFPWdVEwAwCgYIKoZIzj0EAwMwSTEXMBUGA1UEChMOQW50aHJvcGljLCBQQkMxLjAsBgNVBAMTJUFudGhyb3BpYyBDb250ZW50IENyZWRlbnRpYWxzIFJvb3QgQ0EwHhcNMjYwODA3MTg0MzU2WhcNMjgwODA2MTk0MzU2WjBEMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEpMCcGA1UEAxMgQW50aHJvcGljIENsYXVkZSBDb250ZW50IFNpZ25pbmcwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASYegpry1AYBRTVNL1CpTlbROnY3dey+UrsF9C3phYrATN3ZHf93Mo8RQN0KOUuOn19P4oWNFWe5n2/She9N7eTo1gwVjAOBgNVHQ8BAf8EBAMCB4AwFQYDVR0lBA4wDAYKKwYBBAGD6F4CATAMBgNVHRMBAf8EAjAAMB8GA1UdIwQYMBaAFM5R4gSBTmRbI/jjxM+aPpzB11zCMAoGCCqGSM49BAMDA2cAMGQCMDFzHRSeAXrSy1WOzkbhPZ6Km2wGTmZ/2gK18k8BQGXyqz88Rdrz6CTX9flAnYNVxgIwcF9c3fVhqmJKpi+UhasNUMko69cyX6STPfta3Q8EjyzDjzoyrol46FP6VFHhvUcJoWNwYWRZDZ4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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";
+
 // ── CONSTANTS ──────────────────────────────────────────────────────────────────
 // ── CLINICA + PROFESIONALES STORE ─────────────────────────────────────────────
 // En producción esto va en Supabase. Por ahora en memoria.
@@ -95,7 +97,7 @@ const C = {
 
 function pad(n){return String(n).padStart(2,"0");}
 const hourLabel = h=>`${pad(h)}:00`;
-const toYMD = d=>d.toISOString().split("T")[0];
+const toYMD = d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const today = ()=>new Date();
 const addDays = (d,n)=>{const r=new Date(d);r.setDate(r.getDate()+n);return r;};
 const startOfWeek = d=>{const r=new Date(d);const day=r.getDay();r.setDate(r.getDate()+(day===0?-6:1-day));return r;};
@@ -132,7 +134,7 @@ const st={
   navItem:(a)=>({display:"flex",alignItems:"center",gap:10,padding:"10px 24px",cursor:"pointer",
     color:a?C.accent:C.walnut,background:a?"rgba(166,107,63,0.08)":"transparent",
     borderLeft:a?`3px solid ${C.accent}`:"3px solid transparent",
-    fontSize:13,fontWeight:a?500:400,transition:"all 150ms"}),
+    fontSize:15,fontWeight:a?500:400,transition:"all 150ms"}),
   tab:(a)=>({padding:"9px 16px",cursor:"pointer",fontSize:13,fontWeight:a?500:400,
     color:a?C.accent:C.walnut,borderBottom:a?`2px solid ${C.accent}`:"2px solid transparent",
     marginBottom:-1,background:"transparent",border:"none",fontFamily:"'Manrope',sans-serif",letterSpacing:"0.01em"}),
@@ -470,8 +472,7 @@ function Login({onLogin}){
 
   const Logo=()=>(
     <div style={{textAlign:"center",marginBottom:32}}>
-      <div style={{fontSize:32,fontWeight:300,color:C.accent,letterSpacing:"-1px",fontFamily:"'Manrope',sans-serif"}}>praxi</div>
-      <div style={{fontSize:11,color:C.muted,letterSpacing:"0.18em",textTransform:"uppercase",marginTop:4}}>gestión clínica</div>
+      <img src={PRAXI_LOGO} alt="praXi" style={{height:56,display:"block",margin:"0 auto"}}/>
     </div>
   );
 
@@ -1057,7 +1058,7 @@ function TabCitasClinica({patient,citas,profesionales}){
 }
 
 function FichaPaciente({patient,setPatients,onBack,citas,setCitas,profesionales,tipos}){
-  const isNew=!patient.motivoConsulta&&patient.sesiones.length===0&&!patient.historiaClinica?.texto;
+  const isNew=!patient.motivoConsulta&&patient.sesiones.length===0&&!patient.historiaClinica?.texto&&!(patient.historiaClinica?.entradas||[]).length;
   const[tab,setTab]=useState("evolucion");
   const[showConsent,setShowConsent]=useState(false);
   const[showAlta,setShowAlta]=useState(false);
@@ -1210,7 +1211,7 @@ function TabPruebas({patient,update}){
 }
 
 // ── TAB SESIONES — payment toggle button only ──────────────────────────────────
-const mkSesion=()=>({id:null,fecha:"",pago:"",pagado:false,trabajado:"",observaciones:""});
+const mkSesion=()=>({id:null,fecha:"",pago:"",pagado:false,trabajado:"",observaciones:"",estadoEmocional:5,alianza:5,observacionesAdicionales:""});
 function TabSesiones({patient,update}){
   const[show,setShow]=useState(false);const[form,setForm]=useState(mkSesion());const[viewF,setViewF]=useState(null);
   const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
@@ -1254,9 +1255,11 @@ function TabSesiones({patient,update}){
             </div>
           </div>
           {ses.trabajado&&<div style={{fontSize:13,color:C.muted,lineHeight:1.6,borderTop:`1px solid ${C.border}`,paddingTop:10,marginTop:10}}>{ses.trabajado}</div>}
+          {(ses.estadoEmocional!=null||ses.alianza!=null)&&<div style={{display:"flex",gap:8,marginTop:10,flexWrap:"wrap"}}>{ses.estadoEmocional!=null&&<span style={st.badge(C.walnut,C.sand)}>Estado emocional {ses.estadoEmocional}/10</span>}{ses.alianza!=null&&<span style={st.badge(C.walnut,C.sand)}>Alianza {ses.alianza}/10</span>}</div>}
+          {ses.observacionesAdicionales&&<div style={{fontSize:12,color:C.muted,lineHeight:1.6,marginTop:8,fontStyle:"italic"}}>{ses.observacionesAdicionales}</div>}
         </div>
       ))}
-      {show&&<Modal onClose={()=>setShow(false)} title={form.id?`Editar sesión ${form.numero}`:`Sesión ${nextNum}`} width={520}><div style={{display:"flex",flexDirection:"column",gap:14}}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><Field label="Fecha"><input type="date" style={st.input} value={form.fecha} onChange={f("fecha")}/></Field><Field label="Importe €"><input type="number" style={st.input} value={form.pago} onChange={f("pago")}/></Field></div><Field label="Estado"><select style={st.input} value={form.pagado} onChange={e=>setForm(p=>({...p,pagado:e.target.value==="true"}))}><option value="false">Pendiente</option><option value="true">Pagado</option></select></Field><Field label="Lo trabajado en esta sesión"><textarea style={{...st.textarea,minHeight:100}} value={form.trabajado} onChange={f("trabajado")}/></Field></div><MFooter onCancel={()=>setShow(false)} onSave={save}/></Modal>}
+      {show&&<Modal onClose={()=>setShow(false)} title={form.id?`Editar sesión ${form.numero}`:`Sesión ${nextNum}`} width={520}><div style={{display:"flex",flexDirection:"column",gap:14}}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><Field label="Fecha"><input type="date" style={st.input} value={form.fecha} onChange={f("fecha")}/></Field><Field label="Importe €"><input type="number" style={st.input} value={form.pago} onChange={f("pago")}/></Field></div><Field label="Estado"><select style={st.input} value={form.pagado} onChange={e=>setForm(p=>({...p,pagado:e.target.value==="true"}))}><option value="false">Pendiente</option><option value="true">Pagado</option></select></Field><Field label="Lo trabajado en esta sesión"><textarea style={{...st.textarea,minHeight:100}} value={form.trabajado} onChange={f("trabajado")}/></Field><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><Field label={`Estado emocional: ${form.estadoEmocional??5}/10`}><input type="range" min="0" max="10" step="1" style={{width:"100%",accentColor:C.accent}} value={form.estadoEmocional??5} onChange={e=>setForm(p=>({...p,estadoEmocional:Number(e.target.value)}))}/></Field><Field label={`Alianza terapéutica: ${form.alianza??5}/10`}><input type="range" min="0" max="10" step="1" style={{width:"100%",accentColor:C.accent}} value={form.alianza??5} onChange={e=>setForm(p=>({...p,alianza:Number(e.target.value)}))}/></Field></div><Field label="Observaciones adicionales"><textarea style={{...st.textarea,minHeight:70}} value={form.observacionesAdicionales||""} onChange={f("observacionesAdicionales")}/></Field></div><MFooter onCancel={()=>setShow(false)} onSave={save}/></Modal>}
       {viewF&&<Modal onClose={()=>setViewF(null)} title="Factura" width={400}><div style={{border:`1px solid ${C.border}`,borderRadius:10,padding:20}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:16}}><div><div style={{fontSize:18,fontWeight:800,color:C.aL}}>FACTURA</div><div style={{fontSize:12,color:C.muted}}>{viewF.factura}</div></div><div style={{textAlign:"right"}}><div style={{fontSize:12,color:C.muted}}>Fecha</div><div style={{fontWeight:600}}>{viewF.fecha}</div></div></div><div style={{borderTop:`1px solid ${C.border}`,borderBottom:`1px solid ${C.border}`,padding:"12px 0",margin:"12px 0"}}><div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:6}}><span style={{color:C.muted}}>Paciente</span><span style={{fontWeight:600}}>{patient.nombre} {patient.apellidos}</span></div><div style={{display:"flex",justifyContent:"space-between",fontSize:13}}><span style={{color:C.muted}}>Sesión nº {viewF.numero} — Psicología</span><span style={{fontWeight:600}}>{viewF.pago}€</span></div></div><div style={{display:"flex",justifyContent:"space-between",fontSize:16,fontWeight:800}}><span>Total</span><span style={{color:C.aL}}>{viewF.pago}€</span></div><div style={{marginTop:14,padding:"8px 12px",background:viewF.pagado?C.gD:C.amD,borderRadius:7,textAlign:"center",fontSize:13,fontWeight:600,color:viewF.pagado?C.green:C.amber}}>{viewF.pagado?"✓ Pagado":"⏳ Pendiente de pago"}</div></div></Modal>}
     </div>
   );
@@ -1390,46 +1393,168 @@ function TabDatos({patient,update}){
 // ── TAB EVOLUCIÓN CLÍNICA ──────────────────────────────────────────────────────
 // ── TAB HISTORIA CLÍNICA ──────────────────────────────────────────────────────
 function TabHistoriaClinica({patient,update}){
-  const[editing,setEditing]=useState(false);
-  const[txt,setTxt]=useState(patient.historiaClinica?.texto||"");
+  const hc=patient.historiaClinica||{};
+  const legacy=hc.texto?[{id:0,sesion:null,fecha:"",texto:hc.texto,legacy:true}]:[];
+  const entradas=[...legacy,...(hc.entradas||[])].sort((a,b)=>b.id-a.id);
+  const[adding,setAdding]=useState(false);
+  const[txt,setTxt]=useState("");
+  const[sesionSel,setSesionSel]=useState("");
+  const[editId,setEditId]=useState(null);
+  const[editTxt,setEditTxt]=useState("");
+  const[editSes,setEditSes]=useState("");
+  const sesOrdenadas=[...patient.sesiones].sort((a,b)=>b.numero-a.numero);
+  const hoy=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;};
 
-  const save=()=>{update(p=>({...p,historiaClinica:{texto:txt}}));setEditing(false);};
+  const saveNew=()=>{
+    if(!txt.trim())return;
+    const sesion=sesionSel?Number(sesionSel):patient.sesiones.length;
+    const fecha=(sesionSel&&patient.sesiones.find(s=>s.numero===sesion)?.fecha)||hoy();
+    update(p=>({...p,historiaClinica:{...p.historiaClinica,entradas:[...(p.historiaClinica?.entradas||[]),{id:Date.now(),sesion,fecha,texto:txt}]}}));
+    setAdding(false);setTxt("");setSesionSel("");
+  };
+  const startEdit=en=>{setEditId(en.id);setEditTxt(en.texto);setEditSes(en.sesion==null?"":String(en.sesion));};
+  const saveEdit=en=>{
+    const sesion=editSes===""?en.sesion:Number(editSes);
+    if(en.legacy){
+      // convierte el texto antiguo en una entrada normal
+      update(p=>({...p,historiaClinica:{...p.historiaClinica,texto:"",entradas:[...(p.historiaClinica?.entradas||[]),{id:1,sesion,fecha:"",texto:editTxt}]}}));
+    }else{
+      update(p=>({...p,historiaClinica:{...p.historiaClinica,entradas:(p.historiaClinica?.entradas||[]).map(x=>x.id===en.id?{...x,texto:editTxt,sesion}:x)}}));
+    }
+    setEditId(null);
+  };
+  const del=en=>{
+    if(en.legacy)update(p=>({...p,historiaClinica:{...p.historiaClinica,texto:""}}));
+    else update(p=>({...p,historiaClinica:{...p.historiaClinica,entradas:(p.historiaClinica?.entradas||[]).filter(x=>x.id!==en.id)}}));
+  };
+
+  const SesSelect=({value,onChange,allowCurrent})=>(
+    <select style={{...st.input,fontSize:12,width:"auto",minWidth:200,padding:"6px 10px"}} value={value} onChange={e=>onChange(e.target.value)}>
+      {allowCurrent&&<option value="">Sesión actual ({patient.sesiones.length})</option>}
+      {!allowCurrent&&<option value="">Sin sesión asignada</option>}
+      {sesOrdenadas.map(s=><option key={s.id} value={s.numero}>Sesión {s.numero} — {s.fecha}</option>)}
+    </select>
+  );
+
+  const serif={fontSize:14,lineHeight:1.9,fontFamily:"'Instrument Serif',serif"};
 
   return(
     <div>
-      <div style={{display:"flex",justifyContent:"flex-end",gap:8,marginBottom:12}}>
-        {editing
-          ?<><button style={st.btn("ghost")} onClick={()=>{setTxt(patient.historiaClinica?.texto||"");setEditing(false);}}>Cancelar</button>
-            <button style={{...st.btn(),background:C.accent,color:C.bone}} onClick={save}>Guardar</button></>
-          :<button style={st.btn()} onClick={()=>setEditing(true)}>Editar</button>
-        }
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+        <div style={{color:C.muted,fontSize:13}}>{entradas.length} {entradas.length===1?"registro":"registros"}</div>
+        {!adding&&<button style={{...st.btn(),background:C.accent,color:C.bone}} onClick={()=>{setAdding(true);setTxt("");setSesionSel("");}}>+ Nueva entrada</button>}
       </div>
-      {editing
-        ?<textarea
-            autoFocus
-            style={{...st.textarea,minHeight:"60vh",fontSize:14,lineHeight:1.9,fontFamily:"'Instrument Serif',serif",padding:"24px 28px",borderRadius:12,resize:"vertical"}}
-            value={txt}
-            onChange={e=>setTxt(e.target.value)}
-            placeholder="Escribe aquí la historia clínica del paciente..."/>
-        :<div
-            onClick={()=>setEditing(true)}
-            style={{...st.card,padding:"28px 32px",fontSize:14,lineHeight:1.9,fontFamily:"'Instrument Serif',serif",whiteSpace:"pre-wrap",minHeight:"50vh",color:patient.historiaClinica?.texto?C.text:C.dim,fontStyle:patient.historiaClinica?.texto?"normal":"italic",cursor:"pointer"}}>
-            {patient.historiaClinica?.texto||"Haz clic para empezar a escribir..."}
+
+      {adding&&(
+        <div style={{...st.card,padding:"18px 20px",marginBottom:14}}>
+          <textarea autoFocus style={{...st.textarea,...serif,minHeight:220,padding:"16px 18px",borderRadius:10,resize:"vertical"}}
+            value={txt} onChange={e=>setTxt(e.target.value)} placeholder="Escribe la historia clínica de esta sesión..."/>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginTop:12,flexWrap:"wrap"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <span style={{fontSize:12,color:C.muted}}>Sesión:</span>
+              {SesSelect({value:sesionSel,onChange:setSesionSel,allowCurrent:true})}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button style={st.btn("ghost")} onClick={()=>setAdding(false)}>Cancelar</button>
+              <button style={{...st.btn(),background:C.accent,color:C.bone}} onClick={saveNew}>Guardar</button>
+            </div>
           </div>
-      }
+        </div>
+      )}
+
+      {entradas.length===0&&!adding&&(
+        <div onClick={()=>setAdding(true)} style={{...st.card,padding:"28px 32px",...serif,color:C.dim,fontStyle:"italic",cursor:"pointer",minHeight:120}}>
+          Sin registros. Haz clic para añadir la primera entrada.
+        </div>
+      )}
+
+      {entradas.map(en=>(
+        <div key={en.id} style={{...st.card,padding:"16px 22px",marginBottom:10}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+            <span style={{fontSize:12,color:C.accent,fontWeight:600}}>
+              {en.sesion!=null?`Sesión ${en.sesion}`:"Registro inicial"}{en.fecha?` · ${en.fecha}`:""}
+            </span>
+            {editId!==en.id&&(
+              <div style={{display:"flex",gap:6}}>
+                <button style={{fontSize:11,color:C.muted,background:"none",border:"none",cursor:"pointer"}} onClick={()=>startEdit(en)}>Editar</button>
+                <button style={{fontSize:11,color:"#c0392b",background:"none",border:"none",cursor:"pointer"}} onClick={()=>del(en)}>Eliminar</button>
+              </div>
+            )}
+          </div>
+          {editId===en.id?(
+            <div>
+              <textarea autoFocus style={{...st.textarea,...serif,minHeight:180,padding:"14px 16px",borderRadius:10,resize:"vertical"}} value={editTxt} onChange={e=>setEditTxt(e.target.value)}/>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,marginTop:10,flexWrap:"wrap"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:12,color:C.muted}}>Sesión:</span>
+                  {SesSelect({value:editSes,onChange:setEditSes})}
+                </div>
+                <div style={{display:"flex",gap:8}}>
+                  <button style={st.btn("ghost")} onClick={()=>setEditId(null)}>Cancelar</button>
+                  <button style={{...st.btn(),background:C.accent,color:C.bone}} onClick={()=>saveEdit(en)}>Guardar</button>
+                </div>
+              </div>
+            </div>
+          ):(
+            <div style={{...serif,whiteSpace:"pre-wrap",color:C.text}}>{en.texto}</div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
 
-// ── TAB FORMULACIÓN DE CASO ───────────────────────────────────────────────────
 function TabFormulacionCaso({patient,update}){
-  const fc=patient.formulacionCaso||{};
+  const historial=patient.formulacionHistorial||{};
   const[editingKey,setEditingKey]=useState(null);
   const[txt,setTxt]=useState("");
+  const[sesionSel,setSesionSel]=useState("");
+  const[editEntryId,setEditEntryId]=useState(null);// id de entrada en edicion
+  const[editTxt,setEditTxt]=useState("");
 
-  const open=key=>{setEditingKey(key);setTxt(fc[key]||"");};
-  const save=()=>{update(p=>({...p,formulacionCaso:{...p.formulacionCaso,[editingKey]:txt}}));setEditingKey(null);};
-  const cancel=()=>setEditingKey(null);
+  const toYMD=d=>{const dd=d||new Date();return `${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,"0")}-${String(dd.getDate()).padStart(2,"0")}`;};
+
+  const openNew=key=>{setEditingKey(key);setTxt("");setSesionSel("");setEditEntryId(null);};
+  const cancel=()=>{setEditingKey(null);setEditEntryId(null);};
+
+  const saveNew=()=>{
+    if(!txt.trim())return;
+    const sesNum=sesionSel?Number(sesionSel):patient.sesiones.length;
+    const fecha=(sesionSel&&patient.sesiones.find(s=>s.numero===sesNum)?.fecha)||toYMD(new Date());
+    const entry={id:Date.now(),fecha,sesion:sesNum,texto:txt};
+    update(p=>({
+      ...p,
+      formulacionHistorial:{
+        ...p.formulacionHistorial,
+        [editingKey]:[...(p.formulacionHistorial?.[editingKey]||[]),entry]
+      }
+    }));
+    setEditingKey(null);
+    setSesionSel("");
+    setTxt("");
+  };
+
+  const deleteEntry=(key,id)=>{
+    update(p=>({
+      ...p,
+      formulacionHistorial:{
+        ...p.formulacionHistorial,
+        [key]:(p.formulacionHistorial?.[key]||[]).filter(e=>e.id!==id)
+      }
+    }));
+  };
+
+  const startEditEntry=(e)=>{setEditEntryId(e.id);setEditTxt(e.texto);};
+  const saveEditEntry=(key,id)=>{
+    update(p=>({
+      ...p,
+      formulacionHistorial:{
+        ...p.formulacionHistorial,
+        [key]:(p.formulacionHistorial?.[key]||[]).map(e=>e.id===id?{...e,texto:editTxt}:e)
+      }
+    }));
+    setEditEntryId(null);
+  };
 
   const SECCIONES=[
     ["habitosDiarios","Hábitos diarios","🗓"],
@@ -1444,44 +1569,86 @@ function TabFormulacionCaso({patient,update}){
     ["otrosFactores","Otros factores relevantes","📌"],
   ];
 
+  const sesOrdenadas=[...patient.sesiones].sort((a,b)=>b.numero-a.numero);
+
   return(
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
       {SECCIONES.map(([key,label,icon])=>{
-        const isEditing=editingKey===key;
-        const hasContent=!!fc[key];
+        const entries=(historial[key]||[]).slice().sort((a,b)=>b.id-a.id);
+        const isAdding=editingKey===key;
         return(
           <div key={key} style={{...st.card,overflow:"hidden",gridColumn:key==="otrosFactores"?"1 / -1":"auto"}}>
+            {/* Cabecera */}
             <div style={{padding:"10px 14px",background:C.sand,borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div style={{display:"flex",gap:8,alignItems:"center"}}>
                 <span style={{fontSize:14}}>{icon}</span>
                 <span style={{fontSize:11,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:500}}>{label}</span>
+                {entries.length>0&&<span style={{fontSize:10,background:C.accent,color:C.bone,borderRadius:10,padding:"1px 6px"}}>{entries.length}</span>}
               </div>
-              {!isEditing&&(
-                <button style={{...st.btn("sm"),fontSize:11}} onClick={()=>open(key)}>
-                  {hasContent?"Editar":"+ Añadir"}
-                </button>
+              {!isAdding&&(
+                <button style={{...st.btn("sm"),fontSize:11}} onClick={()=>openNew(key)}>+ Añadir</button>
               )}
             </div>
 
-            {isEditing?(
-              <div style={{padding:"12px 14px"}}>
+            {/* Formulario nueva entrada */}
+            {isAdding&&(
+              <div style={{padding:"12px 14px",borderBottom:`1px solid ${C.border}`,background:"#fdfaf6"}}>
                 <textarea
                   autoFocus
-                  style={{...st.textarea,minHeight:120,fontSize:13,lineHeight:1.7}}
+                  style={{...st.textarea,minHeight:100,fontSize:13,lineHeight:1.7}}
                   value={txt}
                   onChange={e=>setTxt(e.target.value)}
-                  placeholder={`Escribe aquí sobre ${label.toLowerCase()}...`}
+                  placeholder={`Nueva entrada sobre ${label.toLowerCase()}...`}
                 />
+                {/* Selector de sesión */}
+                <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8}}>
+                  <span style={{fontSize:11,color:C.muted,flexShrink:0}}>Sesión:</span>
+                  <select style={{...st.input,fontSize:11,flex:1,padding:"4px 8px"}} value={sesionSel} onChange={e=>setSesionSel(e.target.value)}>
+                    <option value="">Sesión actual ({patient.sesiones.length})</option>
+                    {sesOrdenadas.map(s=>(
+                      <option key={s.id} value={s.numero}>Sesión {s.numero} — {s.fecha}</option>
+                    ))}
+                  </select>
+                </div>
                 <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:10}}>
                   <button style={st.btn("ghost")} onClick={cancel}>Cancelar</button>
-                  <button style={{...st.btn(),background:C.accent,color:C.bone}} onClick={save}>Guardar</button>
+                  <button style={{...st.btn(),background:C.accent,color:C.bone}} onClick={saveNew}>Guardar</button>
                 </div>
               </div>
-            ):(
-              <div style={{padding:"12px 14px",fontSize:13,color:hasContent?C.text:C.dim,fontStyle:hasContent?"normal":"italic",lineHeight:1.7,minHeight:60,whiteSpace:"pre-wrap",cursor:"pointer"}} onClick={()=>open(key)}>
-                {fc[key]||"Sin registrar. Haz clic para añadir."}
-              </div>
             )}
+
+            {/* Historial de entradas */}
+            <div style={{padding:"8px 14px",minHeight:entries.length===0?48:0}}>
+              {entries.length===0&&!isAdding&&(
+                <div style={{fontSize:12,color:C.dim,fontStyle:"italic",padding:"8px 0",cursor:"pointer"}} onClick={()=>openNew(key)}>
+                  Sin registrar. Haz clic para añadir.
+                </div>
+              )}
+              {entries.map((e,i)=>(
+                <div key={e.id} style={{marginBottom:i<entries.length-1?10:0,paddingBottom:i<entries.length-1?10:0,borderBottom:i<entries.length-1?`1px dashed ${C.border}`:"none"}}>
+                  {editEntryId===e.id?(
+                    <div>
+                      <textarea style={{...st.textarea,minHeight:80,fontSize:13}} value={editTxt} onChange={ev=>setEditTxt(ev.target.value)} autoFocus/>
+                      <div style={{display:"flex",gap:6,justifyContent:"flex-end",marginTop:6}}>
+                        <button style={st.btn("ghost")} onClick={()=>setEditEntryId(null)}>Cancelar</button>
+                        <button style={{...st.btn(),background:C.accent,color:C.bone,fontSize:11}} onClick={()=>saveEditEntry(key,e.id)}>Guardar</button>
+                      </div>
+                    </div>
+                  ):(
+                    <div>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                        <span style={{fontSize:10,color:C.accent,fontWeight:600}}>Sesión {e.sesion} · {e.fecha}</span>
+                        <div style={{display:"flex",gap:6}}>
+                          <button style={{fontSize:10,color:C.muted,background:"none",border:"none",cursor:"pointer",padding:"2px 4px"}} onClick={()=>startEditEntry(e)}>Editar</button>
+                          <button style={{fontSize:10,color:"#c0392b",background:"none",border:"none",cursor:"pointer",padding:"2px 4px"}} onClick={()=>deleteEntry(key,e.id)}>Eliminar</button>
+                        </div>
+                      </div>
+                      <div style={{fontSize:13,color:C.text,lineHeight:1.6,whiteSpace:"pre-wrap"}}>{e.texto}</div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         );
       })}
@@ -1686,7 +1853,7 @@ function CitaModal({cita,patients,tipos,onClose,onSave,onDelete,defaultFecha,def
       <div style={{display:"flex",flexDirection:"column",gap:14}}>
         <Field label="Tipo de cita">
           <select style={st.input} value={form.tipoId} onChange={e=>{const t=tipos.find(x=>x.id===e.target.value);setForm(p=>({...p,tipoId:e.target.value,duracion:t?.duracion||p.duracion,precio:t?.precio??p.precio}));}}>
-            {tipos.map(t=><option key={t.id} value={t.id}>{t.nombre} — {t.duracion} min · {t.precio||0}€</option>)}
+            {tipos.map(t=><option key={t.id} value={t.id}>{t.nombre} — {t.duracion} min</option>)}
           </select>
         </Field>
         {esPL?(<div style={{padding:"12px 14px",background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.teal}`}}><div style={{fontSize:11,color:C.teal,fontWeight:700,marginBottom:10,textTransform:"uppercase"}}>Datos del contacto</div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}><Field label="Nombre"><input style={st.input} value={form.nombreExterno||""} onChange={f("nombreExterno")}/></Field><Field label="Teléfono"><input style={st.input} value={form.telefonoExterno||""} onChange={f("telefonoExterno")}/></Field><div style={{gridColumn:"1/-1"}}><Field label="Email"><input style={st.input} value={form.emailExterno||""} onChange={f("emailExterno")}/></Field></div></div></div>):(<Field label="Paciente"><select style={st.input} value={form.pacienteId} onChange={f("pacienteId")}><option value="">Seleccionar...</option>{patients.map(p=><option key={p.id} value={p.id}>{p.nombre} {p.apellidos}</option>)}</select></Field>)}
@@ -1697,7 +1864,6 @@ function CitaModal({cita,patients,tipos,onClose,onSave,onDelete,defaultFecha,def
         </div>
         <Field label="Notas"><textarea style={st.textarea} value={form.notas} onChange={f("notas")}/></Field>
         {form.zoomLink&&<div style={{background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,padding:"10px 14px",borderLeft:`3px solid ${C.accent}`}}><div style={{fontSize:10,color:C.dim,textTransform:"uppercase",marginBottom:4}}>Enlace Zoom</div><a href={form.zoomLink} target="_blank" rel="noreferrer" style={{fontSize:12,color:C.aL,wordBreak:"break-all",textDecoration:"none"}}>{form.zoomLink}</a></div>}
-        <div style={{fontSize:12,color:C.muted,display:"flex",gap:8,alignItems:"center"}}><span style={{width:7,height:7,borderRadius:"50%",background:makeUrl?C.green:C.amber,display:"inline-block"}}/>{makeUrl?"Make activo — Google Calendar + Zoom + WhatsApp":"Make no configurado"}</div>
         {sendStatus==="ok"&&<div style={{padding:"8px 12px",background:C.gD,borderRadius:8,fontSize:12,color:C.green,fontWeight:600}}>✓ Enviado a Make</div>}
         {sendStatus==="error"&&<div style={{padding:"8px 12px",background:C.rD,borderRadius:8,fontSize:12,color:C.red}}>✗ Error Make — <button style={{...st.btn("sm"),color:C.red}} onClick={()=>onSave({...form,zoomLink:form.zoomLink||generateZoom(),tipo:tipoActual?.nombre||""})}>Guardar sin Make</button></div>}
       </div>
@@ -1828,240 +1994,254 @@ function HuecosModal({fecha,citas,horario,onClose}){
 }
 
 
+// ── AGENDA PERSONAL (reutilizable en Dashboard y Calendario) ──────────────────
+const PRIORIDAD_T={
+  baja: {color:C.green,bg:C.gD,label:"Baja"},
+  media:{color:C.amber,bg:C.amD,label:"Media"},
+  alta: {color:C.red,  bg:C.rD, label:"Alta"},
+};
+function AgendaPersonalPanel({tareas,setTareas,onEditTarea,fechaDefault}){
+  const blank=()=>({titulo:"",texto:"",hora:"",prioridad:"media",fecha:fechaDefault||toYMD(today())});
+  const[show,setShow]=useState(false);
+  const[form,setForm]=useState(blank());
+  const add=()=>{
+    if(!form.titulo.trim()||!form.hora)return;
+    setTareas(ts=>[...ts,{id:Date.now(),...form,hecho:false}]);
+    setForm(blank());setShow(false);
+  };
+  const toggle=id=>setTareas(ts=>ts.map(t=>t.id===id?{...t,hecho:!t.hecho}:t));
+  const del=id=>setTareas(ts=>ts.filter(t=>t.id!==id));
+  const lista=[...tareas].sort((a,b)=>a.fecha.localeCompare(b.fecha)||(a.hora||"").localeCompare(b.hora||""));
+  return(
+    <div style={st.card}>
+      <div style={{padding:"12px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span style={{fontSize:12,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:500}}>Agenda personal</span>
+        <button style={{...st.btn("sm"),background:C.accent,color:C.bone,fontSize:12}} onClick={()=>{setForm(blank());setShow(v=>!v);}}>+ Tarea</button>
+      </div>
+      {show&&(
+        <div style={{padding:"12px 16px",borderBottom:`1px solid ${C.border}`,background:C.bone,display:"flex",flexDirection:"column",gap:8}}>
+          <div><label style={st.label}>Título</label>
+            <input style={{...st.input,fontSize:13}} placeholder="Título de la tarea..." value={form.titulo} onChange={e=>setForm(f=>({...f,titulo:e.target.value}))}/>
+          </div>
+          <div><label style={st.label}>Descripción</label>
+            <textarea style={{...st.textarea,minHeight:56,fontSize:13}} placeholder="Opcional..." value={form.texto} onChange={e=>setForm(f=>({...f,texto:e.target.value}))}/>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+            <div><label style={st.label}>Fecha</label><input type="date" style={{...st.input,fontSize:12}} value={form.fecha} onChange={e=>setForm(f=>({...f,fecha:e.target.value}))}/></div>
+            <div><label style={st.label}>Hora</label><TimePicker value={form.hora} onChange={v=>setForm(f=>({...f,hora:v}))}/></div>
+          </div>
+          <div><label style={st.label}>Prioridad</label>
+            <div style={{display:"flex",gap:5}}>
+              {Object.entries(PRIORIDAD_T).map(([k,v])=>(
+                <button key={k} onClick={()=>setForm(f=>({...f,prioridad:k}))} style={{flex:1,padding:"5px 0",borderRadius:8,border:`1px solid ${form.prioridad===k?v.color:C.border}`,background:form.prioridad===k?v.bg:"transparent",color:form.prioridad===k?v.color:C.muted,fontSize:12,cursor:"pointer",fontFamily:"'Manrope',sans-serif"}}>{v.label}</button>
+              ))}
+            </div>
+          </div>
+          <div style={{display:"flex",gap:6}}>
+            <button style={{...st.btn("ghost"),flex:1,fontSize:12}} onClick={()=>setShow(false)}>Cancelar</button>
+            <button style={{...st.btn(),flex:1,fontSize:12}} onClick={add}>Añadir</button>
+          </div>
+        </div>
+      )}
+      {lista.length===0&&!show&&<div style={{padding:"16px",fontSize:13,color:C.dim,textAlign:"center",fontStyle:"italic"}}>Sin tareas pendientes</div>}
+      {lista.map(t=>(
+        <div key={t.id} onClick={()=>onEditTarea&&onEditTarea(t)} style={{padding:"10px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",gap:8,alignItems:"flex-start",opacity:t.hecho?0.5:1,cursor:onEditTarea?"pointer":"default"}}>
+          <div onClick={e=>{e.stopPropagation();toggle(t.id);}} style={{width:16,height:16,borderRadius:4,border:`2px solid ${t.hecho?PRIORIDAD_T[t.prioridad]?.color:C.border}`,background:t.hecho?PRIORIDAD_T[t.prioridad]?.bg:"transparent",cursor:"pointer",flexShrink:0,marginTop:2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:PRIORIDAD_T[t.prioridad]?.color}}>{t.hecho?"✓":""}</div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:13,fontWeight:600,color:t.hecho?C.muted:C.text,textDecoration:t.hecho?"line-through":"none",lineHeight:1.4}}>{t.titulo||t.texto}</div>
+            {t.titulo&&t.texto&&<div style={{fontSize:12,color:C.muted,marginTop:2,lineHeight:1.4}}>{t.texto}</div>}
+            <div style={{fontSize:11,color:C.dim,marginTop:2}}>{t.fecha} · {t.hora}</div>
+          </div>
+          <div style={{width:6,height:6,borderRadius:"50%",background:PRIORIDAD_T[t.prioridad]?.color,flexShrink:0,marginTop:6}}/>
+          <button onClick={e=>{e.stopPropagation();del(t.id);}} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:12,padding:"0 2px"}}>✕</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── REJILLA HORARIA (Día y Semana comparten esta pieza) ──────────────────────
+const SLOT_H=42;
+const CITA_BG="#FAF6F0";
+function TimeGrid({days,citas,patients,horario,onNew,onEdit,showHeader}){
+  const todayStr=toYMD(today());
+  const slots=[];
+  for(let h=horario.start;h<horario.end;h++){slots.push(`${pad(h)}:00`);slots.push(`${pad(h)}:30`);}
+  const totalH=slots.length*SLOT_H;
+  const cols=`64px repeat(${days.length},1fr)`;
+  const nameOf=c=>{const p=patients.find(p=>p.id==c.pacienteId);return c.origen==="calendly"||!p?(c.nombreExterno||"Primera llamada"):`${p.nombre} ${p.apellidos}`;};
+  return(
+    <div>
+      {showHeader&&(
+        <div style={{display:"grid",gridTemplateColumns:cols,borderBottom:`1px solid ${C.border}`}}>
+          <div/>
+          {days.map((d,i)=>{const ds=toYMD(d);const isT=ds===todayStr;return(
+            <div key={i} style={{padding:"10px 6px",textAlign:"center",borderLeft:`1px solid ${C.border}`,background:isT?"rgba(166,107,63,0.09)":"transparent"}}>
+              <div style={{fontSize:12,color:isT?C.accent:C.walnut,textTransform:"uppercase",letterSpacing:"0.05em",fontWeight:600}}>{DAYS_ES[(d.getDay()+6)%7]}</div>
+              <div style={{fontSize:16,fontWeight:isT?700:400,color:isT?C.accent:C.text,marginTop:2}}>{d.getDate()}</div>
+            </div>
+          );})}
+        </div>
+      )}
+      <div style={{overflowY:"auto",maxHeight:"68vh"}}>
+        <div style={{display:"grid",gridTemplateColumns:cols,position:"relative"}}>
+          {/* Columna de horas */}
+          <div>
+            {slots.map(t=>(
+              <div key={t} style={{height:SLOT_H,boxSizing:"border-box",borderBottom:`1px solid ${C.border}`,fontSize:13,color:t.endsWith(":00")?C.walnut:C.dim,fontWeight:t.endsWith(":00")?600:400,display:"flex",alignItems:"center",justifyContent:"center"}}>{t}</div>
+            ))}
+          </div>
+          {/* Columnas de días */}
+          {days.map((d,i)=>{
+            const ds=toYMD(d);const isT=ds===todayStr;
+            const dc=citas.filter(c=>c.fecha===ds);
+            return(
+              <div key={i} style={{position:"relative",height:totalH,borderLeft:`1px solid ${C.border}`,background:isT&&days.length>1?"rgba(166,107,63,0.03)":"transparent"}}>
+                {slots.map(t=>(
+                  <div key={t} onClick={()=>onNew(d,t)} style={{height:SLOT_H,boxSizing:"border-box",borderBottom:`1px solid ${C.border}`,cursor:"pointer"}}
+                    onMouseEnter={e=>e.currentTarget.style.background="rgba(166,107,63,0.06)"}
+                    onMouseLeave={e=>e.currentTarget.style.background="transparent"}/>
+                ))}
+                {dc.map(c=>{
+                  const top=(timeToMins(c.hora)-horario.start*60)/30*SLOT_H;
+                  const h=Math.max(SLOT_H,(c.duracion||60)/30*SLOT_H);
+                  if(top<0||top>=totalH)return null;
+                  const compact=h<SLOT_H*2;
+                  return(
+                    <div key={c.id} onClick={e=>{e.stopPropagation();onEdit(c);}}
+                      style={{position:"absolute",top:top+2,left:3,right:3,height:h-4,background:CITA_BG,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.accent}`,borderRadius:6,padding:compact?"4px 8px":"8px 10px",boxSizing:"border-box",overflow:"hidden",cursor:"pointer",display:"flex",flexDirection:"column",justifyContent:"center",textAlign:"center",boxShadow:"0 1px 2px rgba(59,42,30,0.06)"}}>
+                      <div style={{fontSize:14,fontWeight:700,color:C.ink,lineHeight:1.25,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:compact||days.length>1?"nowrap":"normal"}}>{nameOf(c)}</div>
+                      {!compact&&<div style={{fontSize:13,color:C.walnut,marginTop:2}}>{c.tipo||"Cita"}</div>}
+                      <div style={{fontSize:12,color:C.muted,marginTop:compact?0:2}}>{c.hora}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CALENDARIO — Día / Semana / Mes
+// ══════════════════════════════════════════════════════════════════════════════
 function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tareas,setTareas}){
-  const[view,setView]=useState("5d");
-  const[showHuecos,setShowHuecos]=useState(false);
+  const[view,setView]=useState("day");
   const[date,setDate]=useState(today());
   const[citaM,setCitaM]=useState(null);
-  const[showCfg,setShowCfg]=useState(false);
-  const[makeUrl,setMakeUrl]=useState(config.makeOut||"");
-  const[hoverSlot,setHoverSlot]=useState(null);
   const[editTarea,setEditTarea]=useState(null);
-
-  const PRIORIDAD_C={baja:C.green,media:C.amber,alta:C.red};
-
-  const HOURS_LOCAL=Array.from({length:horario.end-horario.start},(_,i)=>horario.start+i);
-  const SLOTS_LOCAL=HOURS_LOCAL.flatMap(h=>[`${pad(h)}:00`,`${pad(h)}:30`]);
+  const todayStr=toYMD(today());
 
   const openNew=(d,h,tipoId)=>setCitaM({cita:null,defaultFecha:toYMD(d),defaultHora:typeof h==="number"?`${pad(h)}:00`:h||"09:00",defaultTipoId:tipoId||tipos[0]?.id});
   const openEdit=c=>setCitaM({cita:c,defaultFecha:c.fecha,defaultHora:c.hora,defaultTipoId:c.tipoId});
   const saveCita=form=>{if(form.id)setCitas(cs=>cs.map(c=>c.id===form.id?{...c,...form}:c));else setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:form.pacienteId?Number(form.pacienteId):null}]);setCitaM(null);};
-  const delCita=id=>{if(confirm("¿Eliminar?"))setCitas(cs=>cs.filter(c=>c.id!==id));setCitaM(null);};
-  const nav=dir=>{const d=new Date(date);if(view==="week")d.setDate(d.getDate()+dir*7);else d.setDate(d.getDate()+dir);setDate(d);};
-  const todayStr=toYMD(today());
+  const delCita=id=>{setCitas(cs=>cs.filter(c=>c.id!==id));setCitaM(null);};
+
+  const nav=dir=>{const d=new Date(date);if(view==="week")d.setDate(d.getDate()+dir*7);else if(view==="month"){d.setDate(1);d.setMonth(d.getMonth()+dir);}else d.setDate(d.getDate()+dir);setDate(d);};
+  const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
   const navLabel=()=>{
     if(view==="week"){const ws=startOfWeek(date);const we=addDays(ws,6);return`${ws.getDate()} ${MONTHS_ES[ws.getMonth()]} – ${we.getDate()} ${MONTHS_ES[we.getMonth()]} ${we.getFullYear()}`;}
-    return date.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"});
+    if(view==="month")return`${MONTHS_ES[date.getMonth()]} ${date.getFullYear()}`;
+    return cap(date.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}));
+  };
+  const nameOf=c=>{const p=patients.find(p=>p.id==c.pacienteId);return c.origen==="calendly"||!p?(c.nombreExterno||"Primera llamada"):`${p.nombre} ${p.apellidos}`;};
+
+  const CitasList=({lista,titulo,conFecha})=>(
+    <div style={{...st.card,padding:"14px 16px"}}>
+      <div style={{fontSize:12,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:500,marginBottom:10}}>{titulo}</div>
+      {lista.length===0&&<div style={{fontSize:13,color:C.muted,fontStyle:"italic"}}>Sin citas</div>}
+      {lista.map(c=>(
+        <div key={c.id} onClick={()=>openEdit(c)} style={{display:"flex",gap:10,alignItems:"center",marginBottom:10,cursor:"pointer"}}>
+          <Avatar nombre={nameOf(c)} apellidos="" size={28}/>
+          <div style={{minWidth:0}}>
+            <div style={{fontSize:13,fontWeight:600,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{nameOf(c)}</div>
+            <div style={{fontSize:11,color:C.muted}}>{conFecha?`${c.fecha.slice(8,10)}/${c.fecha.slice(5,7)} · `:""}{c.hora} · {c.duracion}min</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const Stat=({val,label})=>(
+    <div style={st.statCard}>
+      <div style={{fontSize:28,fontWeight:700,color:C.accent,lineHeight:1}}>{val}</div>
+      <div style={{fontSize:13,color:C.muted,marginTop:6}}>{label}</div>
+    </div>
+  );
+
+  // Vista Día
+  const DayV=()=>{
+    const ds=toYMD(date);
+    const dc=[...citas.filter(c=>c.fecha===ds)].sort((a,b)=>a.hora.localeCompare(b.hora));
+    return(
+      <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:16,alignItems:"start"}}>
+        <div style={{...st.card,overflow:"hidden",maxWidth:860,width:"100%",margin:"0 auto"}}>
+          <TimeGrid days={[date]} citas={citas} patients={patients} horario={horario} onNew={openNew} onEdit={openEdit}/>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:12}}>
+          <Stat val={dc.length} label="Citas hoy"/>
+          <CitasList lista={dc} titulo="Citas del día"/>
+          <AgendaPersonalPanel tareas={tareas} setTareas={setTareas} onEditTarea={setEditTarea} fechaDefault={ds}/>
+        </div>
+      </div>
+    );
   };
 
-  const getFreeSlotsLocal=(dateStr,citasArr)=>{
-    const occ=citasArr.filter(c=>c.fecha===dateStr).map(c=>({s:timeToMins(c.hora),e:timeToMins(c.hora)+c.duracion}));
-    const free=[];
-    for(let t=horario.start*60;t+30<=horario.end*60;t+=30){if(!occ.some(o=>t<o.e&&t+30>o.s))free.push(minsToTime(t));}
-    return free;
-  };
-
-  // Vista semanal
+  // Vista Semana (lunes a domingo)
   const WeekV=()=>{
     const ws=startOfWeek(date);
     const days=Array.from({length:7},(_,i)=>addDays(ws,i));
+    const keys=days.map(toYMD);
+    const cw=[...citas.filter(c=>keys.includes(c.fecha))].sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
     return(
-      <div>
-        {/* Header días */}
-        <div style={{display:"grid",gridTemplateColumns:"54px repeat(7,1fr)",borderBottom:`1px solid ${C.border}`}}>
-          <div/>
-          {days.map((d,i)=>{const isT=toYMD(d)===todayStr;const hasCitas=citas.some(c=>c.fecha===toYMD(d));return(
-            <div key={i} onClick={()=>{setDate(d);setView("day");}} style={{padding:"10px 6px",textAlign:"center",cursor:"pointer",background:isT?"rgba(166,107,63,0.09)":hasCitas?"rgba(166,107,63,0.03)":"transparent",borderLeft:`1px solid ${C.border}`}}>
-              <div style={{fontSize:11,color:isT?C.accent:hasCitas?C.walnut:C.muted,textTransform:"uppercase",letterSpacing:"0.05em",fontWeight:hasCitas||isT?600:400}}>{DAYS_ES[i]}</div>
-              <div style={{fontSize:16,fontWeight:isT?700:400,color:isT?C.accent:C.text,width:28,height:28,borderRadius:"50%",background:isT?C.sand:"transparent",display:"flex",alignItems:"center",justifyContent:"center",margin:"4px auto 0"}}>{d.getDate()}</div>
-              {hasCitas&&!isT&&<div style={{width:4,height:4,borderRadius:"50%",background:C.accent,margin:"2px auto 0"}}/>}
-            </div>
-          );})}
-        </div>
-        {/* Franjas horarias */}
-        <div style={{overflowY:"auto",maxHeight:"60vh"}}>
-          {SLOTS_LOCAL.map(time=>(
-            <div key={time} style={{display:"grid",gridTemplateColumns:"54px repeat(7,1fr)",borderBottom:`1px solid ${C.border}`,minHeight:44}}>
-              <div style={{fontSize:10,color:time.endsWith(":00")?C.walnut:C.dim,padding:"6px 8px",textAlign:"right",flexShrink:0,paddingTop:8,fontWeight:time.endsWith(":00")?600:400}}>{time.endsWith(":00")?time:"·"}</div>
-              {days.map((d,i)=>{
-                const ds=toYMD(d);
-                const cita=citas.find(c=>c.fecha===ds&&c.hora===time);
-                const isT=ds===todayStr;
-                const covered=citas.some(c=>c.fecha===ds&&timeToMins(c.hora)<timeToMins(time)&&timeToMins(time)<timeToMins(c.hora)+c.duracion);
-                if(covered)return <div key={i} style={{borderLeft:`1px solid ${C.border}`,background:isT?"rgba(166,107,63,0.03)":"transparent"}}/>;
-                if(cita){
-                  const p=patients.find(p=>p.id==cita.pacienteId);
-                  const isC=cita.origen==="calendly";
-                  const name=isC?(cita.nombreExterno||"Cal"):(p?p.nombre:"?");
-                  const rowH=44*(cita.duracion/30);
-                  return(
-                    <div key={i} onClick={()=>openEdit(cita)} style={{borderLeft:`1px solid ${C.border}`,padding:2,cursor:"pointer",minHeight:rowH}}>
-                      <div style={{background:isC?C.teal:C.accent,borderRadius:5,padding:"3px 6px",height:"calc(100% - 2px)",overflow:"hidden"}}>
-                        <div style={{fontSize:10,fontWeight:700,color:"#fff",lineHeight:1.3}}>{name}</div>
-                        <div style={{fontSize:9,color:"rgba(255,255,255,0.8)"}}>{cita.hora}</div>
-                      </div>
-                    </div>
-                  );
-                }
-                return(
-                  <div key={i} onClick={()=>openNew(d,time)} style={{borderLeft:`1px solid ${C.border}`,background:isT?"rgba(166,107,63,0.03)":"transparent",cursor:"pointer"}}
-                    onMouseEnter={e=>e.currentTarget.style.background="rgba(166,107,63,0.06)"}
-                    onMouseLeave={e=>e.currentTarget.style.background=isT?"rgba(166,107,63,0.03)":"transparent"}
-                  />
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-
-  // Vista 5 días
-  const FiveDayV=()=>{
-    const days=Array.from({length:5},(_,i)=>addDays(date,i));
-    return(
-      <div>
-        <div style={{display:"grid",gridTemplateColumns:`54px repeat(5,1fr)`,borderBottom:`1px solid ${C.border}`}}>
-          <div/>
-          {days.map((d,i)=>{
-            const isT=toYMD(d)===todayStr;
-            const hasCitas=citas.some(c=>c.fecha===toYMD(d));
-            return(
-              <div key={i} onClick={()=>{setDate(d);setView("day");}} style={{padding:"10px 6px",textAlign:"center",cursor:"pointer",background:isT?"rgba(166,107,63,0.09)":"transparent",borderLeft:`1px solid ${C.border}`}}>
-                <div style={{fontSize:11,color:isT?C.accent:C.walnut,textTransform:"uppercase",letterSpacing:"0.05em",fontWeight:600}}>{DAYS_ES[i]}</div>
-                <div style={{fontSize:16,fontWeight:isT?700:400,color:isT?C.accent:C.text,width:28,height:28,borderRadius:"50%",background:isT?C.sand:"transparent",display:"flex",alignItems:"center",justifyContent:"center",margin:"4px auto 0"}}>{d.getDate()}</div>
-                {hasCitas&&!isT&&<div style={{width:4,height:4,borderRadius:"50%",background:C.accent,margin:"2px auto 0"}}/>}
-              </div>
-            );
-          })}
-        </div>
-        <div style={{overflowY:"auto",maxHeight:"60vh"}}>
-          {HOURS.map(h=>[`${pad(h)}:00`,`${pad(h)}:30`]).flat().map(time=>(
-            <div key={time} style={{display:"grid",gridTemplateColumns:`54px repeat(5,1fr)`,borderBottom:`1px solid ${C.border}`,minHeight:44}}>
-              <div style={{fontSize:10,color:time.endsWith(":00")?C.walnut:C.dim,padding:"6px 8px",textAlign:"center",paddingTop:8,fontWeight:time.endsWith(":00")?600:400}}>{time.endsWith(":00")?time:"·"}</div>
-              {days.map((d,i)=>{
-                const ds=toYMD(d);
-                const cita=citas.find(c=>c.fecha===ds&&c.hora===time);
-                const isT=ds===todayStr;
-                const covered=citas.some(c=>c.fecha===ds&&timeToMins(c.hora)<timeToMins(time)&&timeToMins(time)<timeToMins(c.hora)+c.duracion);
-                if(covered)return <div key={i} style={{borderLeft:`1px solid ${C.border}`,background:isT?"rgba(166,107,63,0.03)":"transparent"}}/>;
-                if(cita){
-                  const p=patients.find(p=>p.id==cita.pacienteId);
-                  const isC=cita.origen==="calendly";
-                  const name=isC?(cita.nombreExterno||"Cal"):(p?p.nombre:"?");
-                  const isCompact=cita.duracion<=30;
-                  const rowH=44*(cita.duracion/30);
-                  return(
-                    <div key={i} onClick={()=>openEdit(cita)} style={{borderLeft:`1px solid ${C.border}`,padding:2,cursor:"pointer",minHeight:rowH}}>
-                      {isCompact?(
-                        <div style={{background:isC?C.tD:C.sand,borderLeft:`3px solid ${isC?C.teal:C.accent}`,borderRadius:4,padding:"2px 5px",height:"calc(100% - 2px)",display:"flex",alignItems:"center",gap:4,overflow:"hidden"}}>
-                          <span style={{fontSize:9,fontWeight:700,color:isC?C.teal:C.accent,flexShrink:0}}>{cita.hora}</span>
-                          <span style={{fontSize:9,fontWeight:600,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{name}</span>
-                        </div>
-                      ):(
-                        <div style={{background:isC?C.teal:C.accent,borderRadius:5,padding:"3px 6px",height:"calc(100% - 2px)",overflow:"hidden"}}>
-                          <div style={{fontSize:10,fontWeight:700,color:"#fff",lineHeight:1.3}}>{name}</div>
-                          <div style={{fontSize:9,color:"rgba(255,255,255,0.8)"}}>{cita.hora}</div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-                return(
-                  <div key={i} onClick={()=>openNew(d,time)} style={{borderLeft:`1px solid ${C.border}`,background:isT?"rgba(166,107,63,0.03)":"transparent",cursor:"pointer"}}
-                    onMouseEnter={e=>e.currentTarget.style.background="rgba(166,107,63,0.06)"}
-                    onMouseLeave={e=>e.currentTarget.style.background=isT?"rgba(166,107,63,0.03)":"transparent"}
-                  />
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // Día — hover-to-edit
-  const DayV=()=>{
-    const dateStr=toYMD(date);
-    const dc=citas.filter(c=>c.fecha===dateStr);
-    const free=getFreeSlotsLocal(dateStr,citas);
-    const covered=time=>{const tM=timeToMins(time);return dc.some(c=>{const cs=timeToMins(c.hora);return cs<tM&&tM<cs+c.duracion;});};
-    const rendered=new Set();
-    return(
-      <div style={{display:"grid",gridTemplateColumns:"1fr 260px",gap:14}}>
-        <div style={st.card}>
-          <div style={{padding:"12px 16px",borderBottom:`1px solid ${C.border}`,fontSize:14,fontWeight:700}}>{date.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</div>
-          {SLOTS_LOCAL.map(time=>{
-            if(rendered.has(time)||covered(time))return null;
-            const cita=dc.find(c=>c.hora===time);
-            if(cita){
-              rendered.add(time);
-              const rowH=68*(cita.duracion/30);
-              const p=patients.find(p=>p.id==cita.pacienteId);
-              const isC=cita.origen==="calendly";
-              const bg=isC?C.teal:C.accent;
-              const name=isC?(cita.nombreExterno||"Calendly"):(p?`${p.nombre} ${p.apellidos}`:"Paciente");
-              return(
-                <div key={time} onMouseEnter={()=>setHoverSlot(time)} onMouseLeave={()=>setHoverSlot(null)} onClick={()=>openEdit(cita)} style={{display:"flex",borderBottom:`1px solid ${C.border}`,minHeight:rowH,cursor:"pointer"}}>
-                  <div style={{width:54,fontSize:10,color:C.dim,padding:"10px 8px",textAlign:"right",flexShrink:0}}>{time}</div>
-                  <div style={{flex:1,padding:5}}>
-                    <div style={{background:bg,borderRadius:8,padding:"8px 12px",height:"calc(100% - 4px)",boxSizing:"border-box",transition:"filter 150ms",filter:hoverSlot===time?"brightness(0.94)":"none"}}>
-                      <div style={{display:"flex",justifyContent:"space-between"}}>
-                        <div>
-                          <div style={{fontSize:13,fontWeight:700,color:"#fff"}}>{name}</div>
-                          <div style={{fontSize:11,color:"rgba(255,255,255,0.75)"}}>{cita.hora} · {cita.tipo} · {cita.duracion}min</div>
-                        </div>
-                        {isC&&<span style={{fontSize:9,background:"rgba(255,255,255,0.2)",color:"#fff",padding:"2px 6px",borderRadius:8}}>Calendly</span>}
-                      </div>
-                      {cita.zoomLink&&<a href={cita.zoomLink} target="_blank" rel="noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:11,color:"rgba(255,255,255,0.85)",display:"inline-flex",gap:4,textDecoration:"none",background:"rgba(166,107,63,0.12)",borderRadius:5,padding:"3px 8px",marginTop:5}}>🎥 Unirse a Zoom</a>}
-                    </div>
-                  </div>
-                </div>
-              );
-            }
-            const isHover=hoverSlot===time;
-            return(
-              <div key={time} onMouseEnter={()=>setHoverSlot(time)} onMouseLeave={()=>setHoverSlot(null)} onClick={()=>openNew(date,time)} style={{display:"flex",borderBottom:`1px solid ${C.border}`,minHeight:68,cursor:"pointer"}}>
-                <div style={{width:54,fontSize:10,color:C.dim,padding:"10px 8px",textAlign:"right",flexShrink:0}}>{time}</div>
-                <div style={{flex:1,padding:5}}>
-                  <div style={{height:"100%",borderRadius:7,border:isHover?`1px solid ${C.accent}`:`1px dashed ${C.clay}`,background:isHover?"rgba(166,107,63,0.06)":"transparent",display:"flex",alignItems:"center",justifyContent:"center",color:isHover?C.accent:C.dim,fontSize:11,transition:"all 150ms"}}>
-                    {isHover?"+ Añadir cita":"Libre"}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+      <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:16,alignItems:"start"}}>
+        <div style={{...st.card,overflow:"hidden"}}>
+          <TimeGrid days={days} citas={citas} patients={patients} horario={horario} onNew={openNew} onEdit={openEdit} showHeader/>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
-          <StatCard val={dc.length} label="Citas" color={C.aL}/>
-          <StatCard val={free.length} label="Slots libres" color={C.green}/>
-          <div style={{...st.card,padding:"14px 16px"}}>
-            <div style={{fontSize:11,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:500,marginBottom:10}}>Agenda</div>
-            {dc.length===0&&<div style={{fontSize:13,color:C.muted}}>Sin citas</div>}
-            {[...dc].sort((a,b)=>a.hora.localeCompare(b.hora)).map(c=>{const p=patients.find(p=>p.id==c.pacienteId);const isC=c.origen==="calendly";const name=isC?(c.nombreExterno||"Calendly"):(p?`${p.nombre} ${p.apellidos}`:"?");return(<div key={c.id} onClick={()=>openEdit(c)} style={{marginBottom:10,cursor:"pointer"}}><div style={{display:"flex",gap:8,alignItems:"center",marginBottom:3}}><div style={{width:26,height:26,borderRadius:"50%",background:isC?C.tD:C.sand,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:700,color:isC?C.teal:C.walnut,flexShrink:0}}>{name[0]}</div><div><div style={{fontSize:12,fontWeight:600}}>{name}</div><div style={{fontSize:10,color:C.muted}}>{c.hora} · {c.duracion}min</div></div></div>{c.zoomLink&&<a href={c.zoomLink} target="_blank" rel="noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:11,color:isC?C.teal:C.accent,display:"inline-flex",gap:4,textDecoration:"none",background:isC?C.tD:C.sand,borderRadius:5,padding:"3px 8px",marginLeft:34}}>🎥 Zoom</a>}</div>);})}
+          <Stat val={cw.length} label="Citas esta semana"/>
+          <CitasList lista={cw} titulo="Citas de la semana" conFecha/>
+          <AgendaPersonalPanel tareas={tareas} setTareas={setTareas} onEditTarea={setEditTarea}/>
+        </div>
+      </div>
+    );
+  };
+
+  // Vista Mes
+  const MonthV=()=>{
+    const first=new Date(date.getFullYear(),date.getMonth(),1);
+    const gridStart=startOfWeek(first);
+    const cells=Array.from({length:42},(_,i)=>addDays(gridStart,i));
+    const mesKey=`${date.getFullYear()}-${pad(date.getMonth()+1)}`;
+    const cm=[...citas.filter(c=>c.fecha.startsWith(mesKey))].sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
+    return(
+      <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:16,alignItems:"start"}}>
+        <div style={{...st.card,overflow:"hidden"}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",borderBottom:`1px solid ${C.border}`}}>
+            {DAYS_ES.map(d=><div key={d} style={{padding:"10px 0",textAlign:"center",fontSize:12,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.05em",fontWeight:600}}>{d}</div>)}
           </div>
-          {/* Tareas del día */}
-          {(()=>{const tareasDia=tareas.filter(t=>t.fecha===dateStr).sort((a,b)=>a.hora.localeCompare(b.hora));return tareasDia.length>0&&(
-            <div style={{...st.card,padding:"14px 16px"}}>
-              <div style={{fontSize:11,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:500,marginBottom:8}}>Tareas del día</div>
-              {tareasDia.map(t=>(
-                <div key={t.id} onClick={()=>setEditTarea(t)} style={{marginBottom:8,cursor:"pointer",padding:"8px 10px",borderRadius:8,background:t.hecho?C.card:C.bone,border:`1px solid ${C.border}`,borderLeft:`3px solid ${PRIORIDAD_C[t.prioridad]||C.muted}`,opacity:t.hecho?0.55:1}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                    <div style={{fontSize:12,fontWeight:600,color:C.text,textDecoration:t.hecho?"line-through":"none"}}>{t.titulo||t.texto}</div>
-                    <span style={{fontSize:10,color:PRIORIDAD_C[t.prioridad],fontWeight:600}}>{t.hora}</span>
-                  </div>
-                  {t.titulo&&t.texto&&<div style={{fontSize:11,color:C.muted,marginTop:2}}>{t.texto}</div>}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)"}}>
+            {cells.map((d,i)=>{
+              const ds=toYMD(d);const inMonth=d.getMonth()===date.getMonth();const isT=ds===todayStr;
+              const n=citas.filter(c=>c.fecha===ds).length;
+              return(
+                <div key={i} onClick={()=>{setDate(d);setView("day");}}
+                  style={{minHeight:84,padding:"8px 10px",borderLeft:i%7?`1px solid ${C.border}`:"none",borderTop:i>=7?`1px solid ${C.border}`:"none",cursor:"pointer",background:isT?"rgba(166,107,63,0.09)":"transparent",opacity:inMonth?1:0.4}}
+                  onMouseEnter={e=>{if(!isT)e.currentTarget.style.background="rgba(166,107,63,0.05)";}}
+                  onMouseLeave={e=>{if(!isT)e.currentTarget.style.background="transparent";}}>
+                  <div style={{fontSize:14,fontWeight:isT?700:500,color:isT?C.accent:C.text}}>{d.getDate()}</div>
+                  {n>0&&<div style={{marginTop:8,display:"inline-block",fontSize:11,fontWeight:600,color:C.accent,background:C.sand,borderRadius:999,padding:"2px 8px"}}>{n} {n===1?"cita":"citas"}</div>}
                 </div>
-              ))}
-            </div>
-          );})()}
-          <div style={{...st.card,padding:"14px 16px"}}>
-            <div style={{fontSize:11,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:500,marginBottom:6}}>Libres (Calendly)</div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:5}}>{free.length===0?<div style={{fontSize:12,color:C.muted}}>Agenda completa</div>:free.map(t=><span key={t} onClick={()=>openNew(date,t,tipos.find(x=>x.nombre==="Primera llamada")?.id)} style={{...st.badge(C.green,C.gD),cursor:"pointer",fontSize:11}}>{t}</span>)}</div>
+              );
+            })}
           </div>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:12}}>
+          <Stat val={cm.length} label="Citas este mes"/>
+          <AgendaPersonalPanel tareas={tareas} setTareas={setTareas} onEditTarea={setEditTarea}/>
         </div>
       </div>
     );
@@ -2070,69 +2250,21 @@ function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tare
   return(
     <div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-        <div>
-          <div style={{fontSize:26,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Calendario</div>
-          <div style={{color:C.muted,fontSize:13,marginTop:2}}>{hourLabel(horario.start)}–{hourLabel(horario.end)} · {tipos.map(t=>t.nombre).join(" · ")}</div>
-        </div>
-        <div style={{display:"flex",gap:8}}>
-          <button style={{...st.btn("sm"),background:config.makeOut?C.gD:C.rD,color:config.makeOut?C.green:C.red}} onClick={()=>setShowCfg(true)}>{config.makeOut?"● Integraciones":"○ Configurar Make"}</button>
-          <button style={{...st.btn("sm"),background:C.tD,color:C.teal}} onClick={()=>setShowHuecos(true)}>📋 Huecos libres</button>
-          <button style={st.btn()} onClick={()=>openNew(date,"09:00",tipos[0]?.id)}>+ Añadir</button>
-        </div>
+        <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Calendario</div>
+        <button style={st.btn()} onClick={()=>openNew(date,"09:00",tipos[0]?.id)}>+ Añadir</button>
       </div>
-      <div style={{display:"flex",gap:10,marginBottom:14,alignItems:"center"}}>
+      <div style={{display:"flex",gap:10,marginBottom:16,alignItems:"center"}}>
         <button style={st.btn("sm")} onClick={()=>nav(-1)}>‹</button>
         <button style={{...st.btn("sm"),background:C.bone,color:C.muted}} onClick={()=>setDate(today())}>Hoy</button>
         <button style={st.btn("sm")} onClick={()=>nav(1)}>›</button>
         <div style={{fontSize:15,fontWeight:700,flex:1,textAlign:"center"}}>{navLabel()}</div>
         <div style={{display:"flex",gap:3,background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,padding:3}}>
-          {[["day","Día"],["5d","5 días"],["week","Semana"]].map(([v,l])=><button key={v} style={{...st.btn("sm"),background:view===v?C.aD:"transparent",color:view===v?C.bone:C.muted,border:"none"}} onClick={()=>setView(v)}>{l}</button>)}
+          {[["day","Día"],["week","Semana"],["month","Mes"]].map(([v,l])=><button key={v} style={{...st.btn("sm"),background:view===v?C.aD:"transparent",color:view===v?C.bone:C.muted,border:"none"}} onClick={()=>setView(v)}>{l}</button>)}
         </div>
       </div>
-      <div style={st.card}>{view==="week"?<WeekV/>:view==="5d"?<FiveDayV/>:<DayV/>}</div>
-      {showHuecos&&<HuecosModal fecha={date} citas={citas} horario={horario} onClose={()=>setShowHuecos(false)}/>}
+      {view==="day"?DayV():view==="week"?WeekV():MonthV()}
       {citaM&&<CitaModal cita={citaM.cita} patients={patients} tipos={tipos} defaultFecha={citaM.defaultFecha} defaultHora={citaM.defaultHora} defaultTipoId={citaM.defaultTipoId} makeUrl={config.makeOut} onClose={()=>setCitaM(null)} onSave={saveCita} onDelete={delCita}/>}
       {editTarea&&<TareaModal tarea={editTarea} onClose={()=>setEditTarea(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTarea(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTarea(null);}}/>}
-      {showCfg&&<Modal onClose={()=>setShowCfg(false)} title="⚙ Configurar integraciones Make" width={540}>
-        <div style={{display:"flex",flexDirection:"column",gap:14}}>
-          <div style={{padding:"14px 16px",background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.accent}`}}>
-            <div style={{fontSize:13,fontWeight:700,color:C.accent,marginBottom:4}}>Webhook saliente — URL de Make</div>
-            <div style={{fontSize:12,color:C.muted,marginBottom:10}}>La app envía <strong>dos llamadas simultáneas</strong> al crear cada cita: una para el recordatorio de 24h y otra para el de 1h.</div>
-            <Field label="URL Make (misma para los dos)"><input style={st.input} value={makeUrl} onChange={e=>setMakeUrl(e.target.value)} placeholder="https://hook.eu1.make.com/xxx"/></Field>
-          </div>
-          <div style={{padding:"14px 16px",background:C.bone,borderRadius:10,border:`1px solid ${C.border}`}}>
-            <div style={{fontSize:12,fontWeight:600,color:C.text,marginBottom:8}}>📱 Recordatorio 24h antes — WhatsApp</div>
-            <pre style={{fontSize:11,color:C.muted,background:C.bg,borderRadius:7,padding:"10px 12px",margin:0,overflow:"auto"}}>{`{
-  "recordatorio": "24h",
-  "minutos_aviso": 1440,
-  "canal": "whatsapp",
-  "paciente": "María González",
-  "telefono": "+34 612 345 678",
-  "fecha": "2026-07-10",
-  "hora": "09:00",
-  "zoom_link": "https://zoom.us/j/...",
-  "mensaje": "Hola María, te recordamos tu sesión..."
-}`}</pre>
-          </div>
-          <div style={{padding:"14px 16px",background:C.bone,borderRadius:10,border:`1px solid ${C.border}`}}>
-            <div style={{fontSize:12,fontWeight:600,color:C.text,marginBottom:8}}>📧 Recordatorio 1h antes — Email + WhatsApp</div>
-            <pre style={{fontSize:11,color:C.muted,background:C.bg,borderRadius:7,padding:"10px 12px",margin:0,overflow:"auto"}}>{`{
-  "recordatorio": "1h",
-  "minutos_aviso": 60,
-  "canal": "email_whatsapp",
-  "paciente": "María González",
-  "email": "maria@email.com",
-  "telefono": "+34 612 345 678",
-  "zoom_link": "https://zoom.us/j/...",
-  "mensaje": "Hola María, tu sesión empieza en 1 hora..."
-}`}</pre>
-          </div>
-          <div style={{padding:"10px 14px",background:C.amD,borderRadius:8,fontSize:12,color:C.amber}}>
-            💡 En Make: Webhook → Router → rama 24h (Sleep 1440min → WhatsApp) · rama 1h (Sleep 60min → Gmail + WhatsApp)
-          </div>
-        </div>
-        <MFooter onCancel={()=>setShowCfg(false)} onSave={()=>{setConfig(c=>({...c,makeOut:makeUrl}));setShowCfg(false);}} saveLabel="Guardar URL"/>
-      </Modal>}
     </div>
   );
 }
@@ -2140,17 +2272,18 @@ function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tare
 // ══════════════════════════════════════════════════════════════════════════════
 // PACIENTES
 // ══════════════════════════════════════════════════════════════════════════════
-function Pacientes({patients,setPatients,onSelect}){
+function Pacientes({patients,setPatients,onSelect,autoNew,onAutoNewDone}){
   const[editP,setEditP]=useState(null);
   const[editForm,setEditForm]=useState({});
   const[showM,setShowM]=useState(false);const[form,setForm]=useState(mkPatient());const[editId,setEditId]=useState(null);const[filtro,setFiltro]=useState("todos");
   const openNew=()=>{setForm(mkPatient());setEditId(null);setShowM(true);};
+  useEffect(()=>{if(autoNew){openNew();onAutoNewDone&&onAutoNewDone();}},[autoNew]);
   const openEdit=(p,e)=>{e.stopPropagation();setForm({...p});setEditId(p.id);setShowM(true);};
   const save=()=>{if(!form.nombre)return;if(editId)setPatients(ps=>ps.map(p=>p.id===editId?{...p,...form}:p));else setPatients(ps=>[...ps,{...mkPatient(),...form,id:Date.now()}]);setShowM(false);};
   const del=(id,e)=>{e.stopPropagation();if(confirm("¿Eliminar este paciente?\n\nSe eliminarán todas las sesiones, evolución clínica y facturas. No se puede deshacer."))setPatients(ps=>ps.filter(p=>p.id!==id));};
   const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
   const lista=filtro==="todos"?patients:patients.filter(p=>p.estado===filtro);
-  return(<div><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}><div><div style={{fontSize:26,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.5px"}}>Pacientes</div><div style={{color:C.muted,fontSize:13}}>{patients.length} registrados</div></div><div style={{display:"flex",gap:8}}><select style={{...st.input,width:130}} value={filtro} onChange={e=>setFiltro(e.target.value)}><option value="todos">Todos</option><option value="activo">Activos</option><option value="alta">Con alta</option><option value="inactivo">Inactivos</option></select><button style={st.btn()} onClick={openNew}>+ Nuevo paciente</button></div></div><div style={st.card}><table style={{width:"100%",borderCollapse:"collapse"}}><thead><tr><th style={st.th}>Paciente</th><th style={st.th}>Teléfono</th><th style={st.th}>Sesiones</th><th style={st.th}>Estado</th><th style={st.th}>Consentimiento</th><th style={st.th}>Docs</th><th style={st.th}>Acciones</th></tr></thead><tbody>{lista.map(p=>(<tr key={p.id} onClick={()=>onSelect(p.id)} style={{cursor:"pointer"}}><td style={st.td}><div style={{display:"flex",gap:10,alignItems:"center"}}><Avatar nombre={p.nombre} apellidos={p.apellidos} size={34}/><div><div style={{fontWeight:600}}>{p.nombre} {p.apellidos}</div><div style={{fontSize:11,color:C.muted}}>{p.email}</div></div></div></td><td style={st.td}>{p.telefono}</td><td style={st.td}><span style={st.badge(C.accent,C.sand)}>{p.sesiones.length}</span></td><td style={st.td}><span style={st.badge(p.estado==="activo"?C.green:p.estado==="alta"?C.walnut:C.muted,p.estado==="activo"?C.gD:p.estado==="alta"?C.sand:C.card)}>{p.estado}</span></td><td style={st.td}><span style={st.badge(p.consentimiento?C.green:C.amber,p.consentimiento?C.gD:C.amD)}>{p.consentimiento?"✓":"Pendiente"}</span></td><td style={st.td}><span style={st.badge(C.muted,C.card)}>{(p.documentos||[]).length}</span></td><td style={st.td}><div style={st.rowActions}><button style={st.btn("sm")} onClick={e=>{e.stopPropagation();onSelect(p.id);}}>Ver ficha</button><button style={st.btn("sm")} onClick={e=>openEdit(p,e)}>Editar</button><button style={{...st.btn("sm"),color:C.red,background:C.rD}} onClick={e=>del(p.id,e)}>Eliminar</button></div></td></tr>))}</tbody></table></div>{showM&&<Modal onClose={()=>setShowM(false)} title={editId?"Editar paciente":"Nuevo paciente"}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}><Field label="Nombre"><input style={st.input} value={form.nombre} onChange={f("nombre")}/></Field><Field label="Apellidos"><input style={st.input} value={form.apellidos} onChange={f("apellidos")}/></Field><Field label="Teléfono"><input style={st.input} value={form.telefono} onChange={f("telefono")}/></Field><Field label="Email"><input style={st.input} value={form.email} onChange={f("email")}/></Field><Field label="Fecha nacimiento"><input type="date" style={st.input} value={form.fechaNacimiento} onChange={f("fechaNacimiento")}/></Field><Field label="Estado"><select style={st.input} value={form.estado} onChange={f("estado")}><option value="activo">Activo</option><option value="alta">Alta</option><option value="inactivo">Inactivo</option></select></Field></div><MFooter onCancel={()=>setShowM(false)} onSave={save}/></Modal>}</div>);
+  return(<div><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}><div><div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.5px"}}>Pacientes</div><div style={{color:C.muted,fontSize:13}}>{patients.length} registrados</div></div><div style={{display:"flex",gap:8}}><select style={{...st.input,width:130}} value={filtro} onChange={e=>setFiltro(e.target.value)}><option value="todos">Todos</option><option value="activo">Activos</option><option value="alta">Con alta</option><option value="inactivo">Inactivos</option></select><button style={st.btn()} onClick={openNew}>+ Nuevo paciente</button></div></div><div style={st.card}><table style={{width:"100%",borderCollapse:"collapse"}}><thead><tr><th style={st.th}>Paciente</th><th style={st.th}>Teléfono</th><th style={st.th}>Sesiones</th><th style={st.th}>Estado</th><th style={st.th}>Consentimiento</th><th style={st.th}>Docs</th><th style={st.th}>Acciones</th></tr></thead><tbody>{lista.map(p=>(<tr key={p.id} onClick={()=>onSelect(p.id)} style={{cursor:"pointer"}}><td style={st.td}><div style={{display:"flex",gap:10,alignItems:"center"}}><Avatar nombre={p.nombre} apellidos={p.apellidos} size={34}/><div><div style={{fontWeight:600}}>{p.nombre} {p.apellidos}</div><div style={{fontSize:11,color:C.muted}}>{p.email}</div></div></div></td><td style={st.td}>{p.telefono}</td><td style={st.td}><span style={st.badge(C.accent,C.sand)}>{p.sesiones.length}</span></td><td style={st.td}><span style={st.badge(p.estado==="activo"?C.green:p.estado==="alta"?C.walnut:C.muted,p.estado==="activo"?C.gD:p.estado==="alta"?C.sand:C.card)}>{p.estado}</span></td><td style={st.td}><span style={st.badge(p.consentimiento?C.green:C.amber,p.consentimiento?C.gD:C.amD)}>{p.consentimiento?"✓":"Pendiente"}</span></td><td style={st.td}><span style={st.badge(C.muted,C.card)}>{(p.documentos||[]).length}</span></td><td style={st.td}><div style={st.rowActions}><button style={st.btn("sm")} onClick={e=>{e.stopPropagation();onSelect(p.id);}}>Ver ficha</button><button style={st.btn("sm")} onClick={e=>openEdit(p,e)}>Editar</button><button style={{...st.btn("sm"),color:C.red,background:C.rD}} onClick={e=>del(p.id,e)}>Eliminar</button></div></td></tr>))}</tbody></table></div>{showM&&<Modal onClose={()=>setShowM(false)} title={editId?"Editar paciente":"Nuevo paciente"}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}><Field label="Nombre"><input style={st.input} value={form.nombre} onChange={f("nombre")}/></Field><Field label="Apellidos"><input style={st.input} value={form.apellidos} onChange={f("apellidos")}/></Field><Field label="Teléfono"><input style={st.input} value={form.telefono} onChange={f("telefono")}/></Field><Field label="Email"><input style={st.input} value={form.email} onChange={f("email")}/></Field><Field label="Fecha nacimiento"><input type="date" style={st.input} value={form.fechaNacimiento} onChange={f("fechaNacimiento")}/></Field><Field label="Estado"><select style={st.input} value={form.estado} onChange={f("estado")}><option value="activo">Activo</option><option value="alta">Alta</option><option value="inactivo">Inactivo</option></select></Field></div><MFooter onCancel={()=>setShowM(false)} onSave={save}/></Modal>}</div>);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -2181,7 +2314,7 @@ function Configuracion({horario,setHorario,tipos,setTipos}){
   return(
     <div>
       <div style={{marginBottom:28}}>
-        <div style={{fontSize:26,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Configuración</div>
+        <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Configuración</div>
         <div style={{color:C.muted,fontSize:13,marginTop:2}}>Horario y tipos de cita del consultorio</div>
       </div>
 
@@ -2304,7 +2437,7 @@ function Facturas({patients,setPatients}){
       @media print{body{padding:20px;background:white;}}
     </style></head><body>
     <div class="header">
-      <div><div class="brand">praxi</div><div class="brand-sub">Gestión Clínica</div></div>
+      <div><img src="${PRAXI_LOGO}" alt="praXi" style="height:44px;display:block"/></div>
       <div class="fac-num"><div class="num">${f.factura}</div><div class="date">Fecha: ${f.fecha}</div></div>
     </div>
     <hr class="divider"/>
@@ -2329,7 +2462,7 @@ function Facturas({patients,setPatients}){
     <div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
         <div>
-          <div style={{fontSize:26,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Facturas</div>
+          <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Facturas</div>
           <div style={{fontSize:13,color:C.muted,marginTop:2}}>{todasFacturas.length} facturas emitidas</div>
         </div>
         <button style={{...st.btn("sm"),background:C.accent,color:C.bone}} onClick={()=>setShowIA(v=>!v)}>✦ IA</button>
@@ -2407,8 +2540,7 @@ function Facturas({patients,setPatients}){
           <div style={{border:`1px solid ${C.border}`,borderRadius:12,padding:24}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20}}>
               <div>
-                <div style={{fontSize:22,fontWeight:300,color:C.accent,letterSpacing:"-0.5px",fontFamily:"'Manrope',sans-serif"}}>praxi</div>
-                <div style={{fontSize:9,color:C.muted,letterSpacing:"0.15em",textTransform:"uppercase"}}>gestión clínica</div>
+                <img src={PRAXI_LOGO} alt="praXi" style={{height:34,display:"block"}}/>
               </div>
               <div style={{textAlign:"right"}}>
                 <div style={{fontSize:16,fontWeight:700,color:C.text}}>{viewF.factura}</div>
@@ -2457,7 +2589,7 @@ function Recursos({currentUser}){
   return(
     <div>
       <div style={{marginBottom:24}}>
-        <div style={{fontSize:26,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Recursos</div>
+        <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Recursos</div>
         <div style={{fontSize:13,color:C.muted,marginTop:2}}>Biblioteca de materiales clínicos disponibles según tu plan</div>
       </div>
 
@@ -2532,7 +2664,7 @@ MOTIVO DE CONSULTA:
 ${patient.motivoConsulta||"No registrado"}
 
 HISTORIA CLÍNICA:
-${patient.historiaClinica?.texto||"No registrada"}
+${[patient.historiaClinica?.texto,...(patient.historiaClinica?.entradas||[]).map(e=>`[Sesión ${e.sesion??"-"}${e.fecha?" · "+e.fecha:""}]\n${e.texto}`)].filter(Boolean).join("\n\n")||"No registrada"}
 
 FORMULACIÓN DE CASO:
 - Hábitos diarios: ${patient.formulacionCaso?.habitosDiarios||"—"}
@@ -2666,7 +2798,7 @@ function AgendaGlobal({citas,patients,profesionales}){
     <div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
         <div>
-          <div style={{fontSize:26,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Agenda global</div>
+          <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Agenda global</div>
           <div style={{fontSize:13,color:C.muted,marginTop:2}}>Todos los profesionales de la clínica</div>
         </div>
       </div>
@@ -2794,7 +2926,7 @@ function AdminPanel({profesionales,setProfesionales,clinica}){
   return(
     <div>
       <div style={{marginBottom:24}}>
-        <div style={{fontSize:26,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Administración</div>
+        <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Administración</div>
         <div style={{fontSize:13,color:C.muted,marginTop:2}}>{clinica?.nombre}</div>
       </div>
 
@@ -2979,225 +3111,78 @@ Usa estos datos para responder preguntas sobre ingresos, pendientes, seguimiento
   );
 }
 
-function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCita,onEditTarea}){
-  const pend=patients.flatMap(p=>p.sesiones).filter(s=>!s.pagado).reduce((a,s)=>a+s.pago,0);
-  const mes=toYMD(today()).slice(0,7);
-  const mesCob=patients.flatMap(p=>p.sesiones.filter(s=>s.fecha.startsWith(mes)&&s.pagado)).reduce((a,s)=>a+s.pago,0);
-  const sinConsent=patients.filter(p=>p.estado==="activo"&&!p.consentimiento);
-  const[dias,setDias]=useState(5);
-  const[startDate,setStartDate]=useState(today());
-  const[expanded,setExpanded]=useState(null);
-  const[prepNotes,setPrepNotes]=useState({});
-  const[showAddTarea,setShowAddTarea]=useState(false);
-  const[tareaForm,setTareaForm]=useState({titulo:"",texto:"",hora:"",prioridad:"media",fecha:toYMD(today())});
-
-  const toggle=id=>setExpanded(v=>v===id?null:id);
-  const cancelar=id=>{if(confirm("¿Cancelar esta cita?"))setCitas(cs=>cs.filter(c=>c.id!==id));};
-  const navDash=dir=>setStartDate(d=>{const n=new Date(d);n.setDate(n.getDate()+dir*dias);return n;});
-
-  // Build array of days to show
-  const dayRange=Array.from({length:dias},(_,i)=>addDays(startDate,i));
-
-  const PRIORIDAD={
-    baja: {color:C.green,bg:C.gD,label:"Baja"},
-    media:{color:C.amber,bg:C.amD,label:"Media"},
-    alta: {color:C.red,  bg:C.rD, label:"Alta"},
-  };
-
-  const addTarea=()=>{
-    if(!tareaForm.titulo.trim()||!tareaForm.hora)return;
-    setTareas(ts=>[...ts,{id:Date.now(),...tareaForm,hecho:false}]);
-    setTareaForm({titulo:"",texto:"",hora:"",prioridad:"media",fecha:toYMD(today())});
-    setShowAddTarea(false);
-  };
-  const toggleTarea=id=>setTareas(ts=>ts.map(t=>t.id===id?{...t,hecho:!t.hecho}:t));
-  const delTarea=id=>{if(confirm("¿Eliminar tarea?"))setTareas(ts=>ts.filter(t=>t.id!==id));};
-
+function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCita,onEditTarea,onNuevaCita,onNuevoPaciente,onVerCalendario}){
+  const[weekStart,setWeekStart]=useState(startOfWeek(today()));
   const todayStr=toYMD(today());
   const todayCitas=citas.filter(c=>c.fecha===todayStr);
+  const days=Array.from({length:7},(_,i)=>addDays(weekStart,i));
+  const nameOf=c=>{const p=patients.find(p=>p.id==c.pacienteId);return c.origen==="calendly"||!p?(c.nombreExterno||"Primera llamada"):`${p.nombre} ${p.apellidos}`;};
 
-  const renderDayCol=(date,idx)=>{
-    const ds=toYMD(date);
-    const dc=[...citas.filter(c=>c.fecha===ds)].sort((a,b)=>a.hora.localeCompare(b.hora));
-    const isToday=ds===todayStr;
-    const dayLabel=date.toLocaleDateString("es-ES",{weekday:dias===1?"long":"short",day:"numeric",month:dias===1?"long":"short"});
-    return(
-      <div key={idx} style={{flex:1,minWidth:0}}>
-        <div style={{padding:"10px 12px",textAlign:"center",borderBottom:`1px solid ${C.border}`,background:isToday?C.sand:"transparent"}}>
-          <div style={{fontSize:12,fontWeight:isToday?700:500,color:isToday?C.accent:C.walnut,textTransform:"capitalize"}}>{dayLabel}</div>
-          {isToday&&<div style={{fontSize:10,color:C.accent,fontWeight:600,marginTop:1}}>Hoy</div>}
-        </div>
-        {dc.length===0&&tareas.filter(t=>t.fecha===ds&&!t.hecho).length===0&&<div style={{padding:"12px",fontSize:12,color:C.dim,textAlign:"center",fontStyle:"italic"}}>Sin eventos</div>}
-        {dc.map(c=>{
-          const p=patients.find(p=>p.id==c.pacienteId);
-          const isC=c.origen==="calendly";
-          const name=isC?(c.nombreExterno||"Primera llamada"):(p?`${p.nombre} ${p.apellidos}`:"?");
-          const isOpen=expanded===c.id&&isToday;
-          return(
-            <div key={c.id} style={{borderBottom:`1px solid ${C.border}`}}>
-              <div onClick={()=>toggle(c.id)} style={{padding:"10px 12px",cursor:"pointer",background:isOpen?"rgba(166,107,63,0.05)":"transparent",display:"flex",flexDirection:"column",gap:4}}>
-                <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                  <div style={{width:6,height:6,borderRadius:"50%",background:isC?C.teal:C.accent,flexShrink:0}}/>
-                  <span style={{fontSize:11,color:C.muted,fontWeight:500}}>{c.hora}</span>
-                  {c.zoomLink&&<a href={c.zoomLink} target="_blank" rel="noreferrer" onClick={e=>e.stopPropagation()} style={{marginLeft:"auto",fontSize:10,color:C.accent,textDecoration:"none",background:C.sand,borderRadius:4,padding:"1px 6px"}}>Zoom</a>}
-                </div>
-                <div style={{fontSize:12,fontWeight:600,color:C.text,lineHeight:1.3}}>{name}</div>
-                <div style={{fontSize:11,color:C.muted}}>{c.tipo||"Cita"} · {c.duracion}min{c.precio?` · ${c.precio}€`:""}</div>
-              </div>
-              {isOpen&&(
-                <div style={{padding:"0 12px 12px",background:"rgba(166,107,63,0.03)"}}>
-                  <label style={{...st.label,marginTop:8}}>Objetivos de sesión</label>
-                  <textarea style={{...st.textarea,minHeight:60,fontSize:11}} placeholder="Objetivos para esta sesión..." value={prepNotes[c.id]||""} onChange={e=>setPrepNotes(n=>({...n,[c.id]:e.target.value}))} onClick={e=>e.stopPropagation()}/>
-                  <div style={{display:"flex",gap:6,marginTop:8}}>
-                    <button style={{...st.btn("sm"),flex:1,background:C.accent,color:C.bone,fontSize:11}} onClick={e=>{e.stopPropagation();onEditCita(c);}}>✏ Modificar</button>
-                    <button style={{...st.btn("sm"),flex:1,background:C.rD,color:C.red,fontSize:11}} onClick={e=>{e.stopPropagation();cancelar(c.id);}}>✕ Cancelar</button>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-        {tareas.filter(t=>t.fecha===ds&&!t.hecho).map(t=>(
-          <div key={t.id} style={{padding:"8px 12px",borderBottom:`1px solid ${C.border}`,borderLeft:`3px solid ${PRIORIDAD[t.prioridad]?.color||C.muted}`,background:`${PRIORIDAD[t.prioridad]?.bg}44`}}>
-            <div style={{fontSize:10,color:PRIORIDAD[t.prioridad]?.color,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>{t.hora} · {PRIORIDAD[t.prioridad]?.label}</div>
-            <div style={{fontSize:12,color:C.text,marginTop:2,fontWeight:600}}>{t.titulo||t.texto}</div>
-            {t.titulo&&t.texto&&<div style={{fontSize:11,color:C.muted,marginTop:1}}>{t.texto}</div>}
-          </div>
-        ))}
-      </div>
-    );
-  };
+  const Stat=({val,label,color})=>(
+    <div style={st.statCard}>
+      <div style={{fontSize:30,fontWeight:700,color,lineHeight:1}}>{val}</div>
+      <div style={{fontSize:13,color:C.muted,marginTop:8}}>{label}</div>
+    </div>
+  );
 
   return(
-    <div style={{maxWidth:1200,margin:"0 auto"}}>
-      {/* Header */}
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-        <div style={{fontSize:26,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Dashboard</div>
-        <div style={{display:"flex",gap:8}}>
-          <button style={{...st.btn("sm"),background:C.accent,color:C.bone}} onClick={()=>{}}>+ Nueva cita</button>
+    <div style={{maxWidth:1280,margin:"0 auto"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,gap:12,flexWrap:"wrap"}}>
+        <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Dashboard</div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          <button style={st.btn("sm")} onClick={onNuevoPaciente}>+ Nuevo paciente</button>
+          <button style={st.btn("sm")} onClick={onNuevaCita}>+ Nueva cita</button>
           <button style={{...st.btn("sm"),background:C.gD,color:C.green}} onClick={onInforme}>📊 Informe mensual</button>
         </div>
       </div>
 
-      {/* Stats */}
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:20,maxWidth:700}}>
-        <StatCard val={patients.filter(p=>p.estado==="activo").length} label="Pacientes activos" color={C.aL}/>
-        <StatCard val={todayCitas.length} label="Citas hoy" color={C.text}/>
-        <StatCard val={getFreeSlots(toYMD(today()),citas).length} label="Huecos libres hoy" color={C.green}/>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:20}}>
+        <Stat val={patients.filter(p=>p.estado==="activo").length} label="Pacientes activos" color={C.accent}/>
+        <Stat val={todayCitas.length} label="Citas hoy" color={C.accent}/>
+        <Stat val={getFreeSlots(todayStr,citas).length} label="Huecos libres hoy" color={C.green}/>
       </div>
 
-
-
-      {/* Próximas citas — solo hoy */}
-      {(()=>{
-        const citasHoy=[...citas.filter(c=>c.fecha===todayStr)].sort((a,b)=>a.hora.localeCompare(b.hora));
-        if(citasHoy.length===0)return(
-          <div style={{...st.card,padding:"16px 20px",marginBottom:16,textAlign:"center",color:C.muted,fontSize:13,fontStyle:"italic"}}>
-            Sin citas hoy
-          </div>
-        );
-        return(
-          <div style={{...st.card,marginBottom:16}}>
-            <div style={{padding:"10px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <span style={{fontSize:11,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:500}}>Citas de hoy</span>
-              <span style={st.badge(C.aL,C.sand)}>{citasHoy.length} citas</span>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)"}}>
-              {citasHoy.map((c,i)=>{
-                const p=patients.find(p=>p.id==c.pacienteId);
-                const isC=c.origen==="calendly";
-                const name=isC?(c.nombreExterno||"Calendly"):(p?`${p.nombre} ${p.apellidos}`:"?");
-                return(
-                  <div key={c.id} onClick={()=>onEditCita(c)} style={{padding:"10px 14px",borderLeft:i%3!==0?`1px solid ${C.border}`:"none",borderTop:i>=3?`1px solid ${C.border}`:"none",cursor:"pointer",display:"flex",gap:10,alignItems:"center"}}>
-                    <span style={{fontSize:12,fontWeight:600,color:C.muted,flexShrink:0,minWidth:36}}>{c.hora.slice(0,5)}</span>
-                    <div style={{minWidth:0}}>
-                      <div style={{fontSize:12,fontWeight:600,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{name}</div>
-                      <div style={{fontSize:11,color:C.muted}}>{c.tipo||"Cita"} · {c.duracion}min</div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })()}
-
-      {sinConsent.length>0&&(
-        <div style={{background:C.amD,border:`1px solid ${C.amber}`,borderRadius:10,padding:"12px 16px",marginBottom:16,display:"flex",gap:10,alignItems:"center"}}>
-          <span>⚠</span><div><div style={{fontSize:13,fontWeight:600,color:C.amber}}>Consentimientos pendientes</div><div style={{fontSize:12,color:C.amber,opacity:0.8}}>{sinConsent.map(p=>`${p.nombre} ${p.apellidos}`).join(", ")}</div></div>
-        </div>
-      )}
-
-      <div style={{display:"grid",gridTemplateColumns:"1fr 280px",gap:14}}>
-
-        {/* AGENDA MULTI-DÍA */}
-        <div style={st.card}>
+      <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 300px",gap:14,alignItems:"start"}}>
+        <div style={{...st.card,overflow:"hidden"}}>
           <div style={{padding:"10px 14px",borderBottom:`1px solid ${C.border}`,display:"flex",gap:10,alignItems:"center"}}>
-            <button style={st.btn("sm")} onClick={()=>navDash(-1)}>‹</button>
-            <button style={{...st.btn("sm"),background:C.bone,color:C.muted}} onClick={()=>setStartDate(today())}>Hoy</button>
-            <button style={st.btn("sm")} onClick={()=>navDash(1)}>›</button>
-            <span style={{flex:1,fontSize:13,fontWeight:600,color:C.text,textAlign:"center"}}>
-              {dias===1?startDate.toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}):
-               `${startDate.toLocaleDateString("es-ES",{day:"numeric",month:"short"})} – ${addDays(startDate,dias-1).toLocaleDateString("es-ES",{day:"numeric",month:"short"})}`}
+            <button style={st.btn("sm")} onClick={()=>setWeekStart(d=>addDays(d,-7))}>‹</button>
+            <button style={st.btn("sm")} onClick={()=>setWeekStart(d=>addDays(d,7))}>›</button>
+            <span style={{flex:1,fontSize:14,fontWeight:600,color:C.text,textAlign:"center"}}>
+              Semana · {weekStart.getDate()} {MONTHS_ES[weekStart.getMonth()].slice(0,3)} – {addDays(weekStart,6).getDate()} {MONTHS_ES[addDays(weekStart,6).getMonth()].slice(0,3)}
             </span>
-            <button style={{...st.btn("sm"),background:C.bone,color:C.muted,fontSize:11}} onClick={()=>setPage&&setPage("calendario")}>Ver calendario →</button>
+            <button style={{...st.btn("sm"),background:C.bone,color:C.muted}} onClick={onVerCalendario}>Ver calendario →</button>
           </div>
-          <div style={{display:"flex",borderBottom:`1px solid ${C.border}`,minHeight:200}}>
-            {dayRange.map((d,i)=>(
-              <div key={i} style={{flex:1,borderLeft:i>0?`1px solid ${C.border}`:"none"}}>
-                {renderDayCol(d,i)}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* PANEL DERECHO: solo Tareas */}
-        <div style={{display:"flex",flexDirection:"column",gap:12}}>
-          <div style={st.card}>
-            <div style={{padding:"10px 14px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <span style={{fontSize:11,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:500}}>Agenda personal</span>
-              <button style={{...st.btn("sm"),background:C.accent,color:C.bone,fontSize:11}} onClick={()=>setShowAddTarea(v=>!v)}>+ Tarea</button>
-            </div>
-            {showAddTarea&&(
-              <div style={{padding:"12px 14px",borderBottom:`1px solid ${C.border}`,background:C.bone,display:"flex",flexDirection:"column",gap:8}}>
-                <div><label style={st.label}>Título</label>
-                  <input style={{...st.input,fontSize:12}} placeholder="Título de la tarea..." value={tareaForm.titulo} onChange={e=>setTareaForm(f=>({...f,titulo:e.target.value}))}/>
-                </div>
-                <div><label style={st.label}>Descripción</label>
-                  <textarea style={{...st.textarea,minHeight:60,fontSize:12}} placeholder="Descripción detallada..." value={tareaForm.texto} onChange={e=>setTareaForm(f=>({...f,texto:e.target.value}))}/>
-                </div>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-                  <div><label style={st.label}>Fecha</label><input type="date" style={{...st.input,fontSize:11}} value={tareaForm.fecha} onChange={e=>setTareaForm(f=>({...f,fecha:e.target.value}))}/></div>
-                  <div><label style={st.label}>Hora</label><TimePicker value={tareaForm.hora} onChange={v=>setTareaForm(f=>({...f,hora:v}))}/></div>
-                </div>
-                <div><label style={st.label}>Prioridad</label>
-                  <div style={{display:"flex",gap:5}}>
-                    {Object.entries(PRIORIDAD).map(([k,v])=>(
-                      <button key={k} onClick={()=>setTareaForm(f=>({...f,prioridad:k}))} style={{flex:1,padding:"5px 0",borderRadius:8,border:`1px solid ${tareaForm.prioridad===k?v.color:C.border}`,background:tareaForm.prioridad===k?v.bg:"transparent",color:tareaForm.prioridad===k?v.color:C.muted,fontSize:11,cursor:"pointer",fontWeight:tareaForm.prioridad===k?600:400}}>{v.label}</button>
-                    ))}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(7,minmax(0,1fr))",minHeight:260}}>
+            {days.map((d,i)=>{
+              const ds=toYMD(d);const isT=ds===todayStr;
+              const dc=[...citas.filter(c=>c.fecha===ds)].sort((a,b)=>a.hora.localeCompare(b.hora));
+              const dt=tareas.filter(t=>t.fecha===ds&&!t.hecho);
+              return(
+                <div key={i} style={{borderLeft:i?`1px solid ${C.border}`:"none",minWidth:0}}>
+                  <div style={{padding:"10px 6px",textAlign:"center",borderBottom:`1px solid ${C.border}`,background:isT?C.sand:"transparent"}}>
+                    <div style={{fontSize:12,color:isT?C.accent:C.walnut,textTransform:"uppercase",letterSpacing:"0.05em",fontWeight:600}}>{DAYS_ES[i]}</div>
+                    <div style={{fontSize:16,fontWeight:isT?700:400,color:isT?C.accent:C.text,marginTop:2}}>{d.getDate()}</div>
                   </div>
+                  {dc.length===0&&dt.length===0&&<div style={{padding:"12px 6px",fontSize:12,color:C.dim,textAlign:"center",fontStyle:"italic"}}>—</div>}
+                  {dc.map(c=>(
+                    <div key={c.id} onClick={()=>onEditCita(c)} style={{margin:6,padding:"8px 9px",background:CITA_BG,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.accent}`,borderRadius:6,cursor:"pointer"}}>
+                      <div style={{fontSize:12,color:C.muted,fontWeight:600}}>{c.hora}</div>
+                      <div style={{fontSize:13,fontWeight:700,color:C.ink,lineHeight:1.3,marginTop:2,overflow:"hidden",textOverflow:"ellipsis"}}>{nameOf(c)}</div>
+                      <div style={{fontSize:12,color:C.walnut,marginTop:2}}>{c.tipo||"Cita"} · {c.duracion}min</div>
+                    </div>
+                  ))}
+                  {dt.map(t=>(
+                    <div key={t.id} onClick={()=>onEditTarea(t)} style={{margin:6,padding:"6px 9px",borderRadius:6,borderLeft:`3px solid ${PRIORIDAD_T[t.prioridad]?.color||C.muted}`,background:`${PRIORIDAD_T[t.prioridad]?.bg||C.bone}`,cursor:"pointer"}}>
+                      <div style={{fontSize:11,color:PRIORIDAD_T[t.prioridad]?.color,fontWeight:600}}>{t.hora}</div>
+                      <div style={{fontSize:12,color:C.text,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis"}}>{t.titulo||t.texto}</div>
+                    </div>
+                  ))}
                 </div>
-                <div style={{display:"flex",gap:6}}>
-                  <button style={{...st.btn("ghost"),flex:1,fontSize:11}} onClick={()=>setShowAddTarea(false)}>Cancelar</button>
-                  <button style={{...st.btn(),flex:1,fontSize:11,background:C.accent,color:C.bone}} onClick={addTarea}>Añadir</button>
-                </div>
-              </div>
-            )}
-            {tareas.length===0&&!showAddTarea&&<div style={{padding:"14px",fontSize:12,color:C.dim,textAlign:"center",fontStyle:"italic"}}>Sin tareas pendientes</div>}
-            {[...tareas].sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora)).map(t=>(
-              <div key={t.id} onClick={()=>onEditTarea(t)} style={{padding:"10px 14px",borderBottom:`1px solid ${C.border}`,display:"flex",gap:8,alignItems:"flex-start",opacity:t.hecho?0.5:1,cursor:"pointer"}}>
-                <div onClick={e=>{e.stopPropagation();toggleTarea(t.id);}} style={{width:16,height:16,borderRadius:4,border:`2px solid ${t.hecho?PRIORIDAD[t.prioridad]?.color:C.border}`,background:t.hecho?PRIORIDAD[t.prioridad]?.bg:"transparent",cursor:"pointer",flexShrink:0,marginTop:2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:PRIORIDAD[t.prioridad]?.color}}>{t.hecho?"✓":""}</div>
-                <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:12,fontWeight:600,color:t.hecho?C.muted:C.text,textDecoration:t.hecho?"line-through":"none",lineHeight:1.4}}>{t.titulo||t.texto}</div>
-                  {t.titulo&&t.texto&&<div style={{fontSize:11,color:C.muted,marginTop:2,lineHeight:1.4}}>{t.texto}</div>}
-                  <div style={{fontSize:10,color:C.dim,marginTop:2}}>{t.fecha} · {t.hora}</div>
-                </div>
-                <div style={{width:6,height:6,borderRadius:"50%",background:PRIORIDAD[t.prioridad]?.color,flexShrink:0,marginTop:4}}/>
-                <button onClick={e=>{e.stopPropagation();delTarea(t.id);}} style={{background:"none",border:"none",color:C.dim,cursor:"pointer",fontSize:12,padding:"0 2px"}}>✕</button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
+        <AgendaPersonalPanel tareas={tareas} setTareas={setTareas} onEditTarea={onEditTarea}/>
       </div>
     </div>
   );
@@ -3220,6 +3205,8 @@ export default function App(){
   const[showInforme,setShowInforme]=useState(false);
   const[editCitaDash,setEditCitaDash]=useState(null);
   const[editTareaDash,setEditTareaDash]=useState(null);
+  const[newCitaDash,setNewCitaDash]=useState(false);
+  const[autoNewPaciente,setAutoNewPaciente]=useState(false);
   const[globalSearch,setGlobalSearch]=useState("");
   const[showNotifs,setShowNotifs]=useState(false);
   const[dismissedNotifs,setDismissedNotifs]=useState(new Set());
@@ -3242,7 +3229,7 @@ export default function App(){
   return(
     <div style={st.app}>
       <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
-      {reminders.length>0&&<div style={{position:"fixed",top:16,right:16,zIndex:200,display:"flex",flexDirection:"column",gap:8}}>{reminders.map(r=><div key={r.id} style={{background:r.type==="soon"?C.rD:C.amD,border:`1px solid ${r.type==="soon"?C.red:C.amber}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:r.type==="soon"?C.red:C.amber,display:"flex",gap:10,alignItems:"center",maxWidth:340,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"}}><span style={{flex:1}}>{r.msg}</span><button onClick={()=>setReminders(rs=>rs.filter(x=>x.id!==r.id))} style={{background:"none",border:"none",color:"inherit",cursor:"pointer",fontSize:14}}>✕</button></div>)}</div>}
+      {reminders.length>0&&<div style={{position:"fixed",bottom:16,right:16,zIndex:200,display:"flex",flexDirection:"column",gap:8}}>{reminders.map(r=><div key={r.id} style={{background:r.type==="soon"?C.rD:C.amD,border:`1px solid ${r.type==="soon"?C.red:C.amber}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:r.type==="soon"?C.red:C.amber,display:"flex",gap:10,alignItems:"center",maxWidth:340,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"}}><span style={{flex:1}}>{r.msg}</span><button onClick={()=>setReminders(rs=>rs.filter(x=>x.id!==r.id))} style={{background:"none",border:"none",color:"inherit",cursor:"pointer",fontSize:14}}>✕</button></div>)}</div>}
 
       {/* Panel de notificaciones — fixed dentro del área principal */}
       {showNotifs&&(
@@ -3280,8 +3267,7 @@ export default function App(){
       <div style={st.sidebar}>
         <div style={{...st.sidebarBrand,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div>
-            <div style={{fontSize:20,fontWeight:300,color:C.accent,letterSpacing:"-0.5px",fontFamily:"'Manrope',sans-serif",lineHeight:1}}>praxi</div>
-            <div style={{fontSize:10,color:C.muted,letterSpacing:"0.15em",textTransform:"uppercase",marginTop:3}}>gestión clínica</div>
+            <img src={PRAXI_LOGO} alt="praXi" style={{height:38,display:"block"}}/>
           </div>
           <div style={{position:"relative"}}>
             <button onClick={()=>setShowNotifs(v=>!v)} style={{background:"none",border:"none",cursor:"pointer",fontSize:18,color:notifs.filter(n=>!dismissedNotifs.has(n.id)).length>0?C.amber:C.muted,position:"relative"}}>
@@ -3386,14 +3372,13 @@ export default function App(){
             </div>
           </div>
           <div style={{fontSize:11,color:C.dim,marginBottom:6,padding:"4px 8px",background:C.sand,borderRadius:6}}>{currentClinica?.nombre}</div>
-          <div style={{display:"flex",gap:6,alignItems:"center",fontSize:11,color:config.makeOut?C.green:C.dim}}><div style={{width:6,height:6,borderRadius:"50%",background:config.makeOut?C.green:C.dim}}/> Make {config.makeOut?"conectado":"sin configurar"}</div>
           <button style={{...st.btn("ghost"),marginTop:4,fontSize:11,color:C.muted,textAlign:"left",padding:"4px 0"}} onClick={()=>{setCurrentUser(null);setCurrentClinica(null);}}>🔒 Cerrar sesión</button>
         </div>
       </div>
       <div style={st.main}>
-        {page==="dashboard"&&<Dashboard patients={patients} citas={citas} setCitas={setCitas} tareas={tareas} setTareas={setTareas} onInforme={()=>setShowInforme(true)} onEditCita={c=>setEditCitaDash(c)} onEditTarea={t=>setEditTareaDash(t)}/>}
+        {page==="dashboard"&&<Dashboard patients={patients} citas={citas} setCitas={setCitas} tareas={tareas} setTareas={setTareas} onInforme={()=>setShowInforme(true)} onEditCita={c=>setEditCitaDash(c)} onEditTarea={t=>setEditTareaDash(t)} onNuevaCita={()=>setNewCitaDash(true)} onNuevoPaciente={()=>{setAutoNewPaciente(true);setPage("pacientes");}} onVerCalendario={()=>setPage("calendario")}/>}
         {page==="calendario"&&<Calendario patients={patients} citas={citas} setCitas={setCitas} config={config} setConfig={setConfig} tipos={tipos} horario={horario} tareas={tareas} setTareas={setTareas}/>}
-        {page==="pacientes"&&<Pacientes patients={patients} setPatients={setPatients} onSelect={selectPatient}/>}
+        {page==="pacientes"&&<Pacientes patients={patients} setPatients={setPatients} onSelect={selectPatient} autoNew={autoNewPaciente} onAutoNewDone={()=>setAutoNewPaciente(false)}/>}
         {page==="ficha"&&selectedPatient&&<FichaPaciente patient={selectedPatient} setPatients={setPatients} onBack={goBack} citas={citas} setCitas={setCitas} profesionales={profesionales} tipos={tipos}/>}
         {page==="facturas"&&<Facturas patients={patients} setPatients={setPatients}/>}
         {page==="recursos"&&<Recursos currentUser={currentUser}/>}
@@ -3401,7 +3386,8 @@ export default function App(){
         {page==="configuracion"&&<Configuracion horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos}/>}
       </div>
       {showInforme&&<InformeMensual patients={patients} citas={citas} onClose={()=>setShowInforme(false)}/>}
-      {editCitaDash&&<CitaModal cita={editCitaDash} patients={patients} tipos={tipos} defaultFecha={editCitaDash.fecha} defaultHora={editCitaDash.hora} defaultTipoId={editCitaDash.tipoId} makeUrl={config.makeOut} onClose={()=>setEditCitaDash(null)} onSave={form=>{setCitas(cs=>cs.map(c=>c.id===form.id?{...c,...form}:c));setEditCitaDash(null);}} onDelete={id=>{if(confirm("¿Eliminar?"))setCitas(cs=>cs.filter(c=>c.id!==id));setEditCitaDash(null);}}/>}
+      {editCitaDash&&<CitaModal cita={editCitaDash} patients={patients} tipos={tipos} defaultFecha={editCitaDash.fecha} defaultHora={editCitaDash.hora} defaultTipoId={editCitaDash.tipoId} makeUrl={config.makeOut} onClose={()=>setEditCitaDash(null)} onSave={form=>{setCitas(cs=>cs.map(c=>c.id===form.id?{...c,...form}:c));setEditCitaDash(null);}} onDelete={id=>{setCitas(cs=>cs.filter(c=>c.id!==id));setEditCitaDash(null);}}/>}
+      {newCitaDash&&<CitaModal cita={null} patients={patients} tipos={tipos} defaultFecha={toYMD(today())} defaultHora="09:00" defaultTipoId={tipos[0]?.id} makeUrl={config.makeOut} onClose={()=>setNewCitaDash(false)} onSave={form=>{setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:form.pacienteId?Number(form.pacienteId):null}]);setNewCitaDash(false);}} onDelete={()=>setNewCitaDash(false)}/>}
       {editTareaDash&&<TareaModal tarea={editTareaDash} onClose={()=>setEditTareaDash(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTareaDash(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTareaDash(null);}}/>}
     </div>
   );

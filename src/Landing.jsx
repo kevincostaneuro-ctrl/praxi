@@ -11,9 +11,7 @@ const C = {
 const FEATURES = [
   { icon: "🧠", title: "IA clínica contextual", desc: "Redacta notas, genera informes y analiza casos conociendo la historia completa del paciente." },
   { icon: "📋", title: "Ficha clínica estructurada", desc: "Historia clínica, formulación, evolución por sesión y objetivos terapéuticos." },
-  { icon: "📅", title: "Agenda con videollamada", desc: "Calendario con videollamada integrada y recordatorios por WhatsApp." },
   { icon: "🧾", title: "Facturación automática", desc: "Facturas PDF, control de pagos e informes financieros mensuales con un clic." },
-  { icon: "💬", title: "WhatsApp automático", desc: "Recordatorios de cita enviados automáticamente. Sin configuración ni costes extra." },
   { icon: "👥", title: "Gestión multi-profesional", desc: "Agenda compartida y panel de administración para clínicas con varios profesionales." },
   { icon: "🔒", title: "Cumplimiento RGPD", desc: "Datos cifrados, hosting en Europa y acuerdos de procesamiento con todos los proveedores." },
   { icon: "📊", title: "Informe mensual", desc: "Resumen automático de actividad clínica y financiera listo para tu asesoría." },
@@ -22,8 +20,8 @@ const FEATURES = [
 ];
 
 const PLANES = [
-  { nombre: "Básico", precio: "9,99€", desc: "Para empezar", destacado: false, features: ["Hasta 20 pacientes", "Agenda y calendario", "Historia clínica", "Facturación PDF", "IA para seguimientos"] },
-  { nombre: "Pro", precio: "19,99€", desc: "Para consultas activas", destacado: true, features: ["Pacientes ilimitados", "Asistente IA", "WhatsApp automático", "Videollamada integrada", "Informes con IA"] },
+  { nombre: "Básico", precio: "9,99€", desc: "Para empezar", destacado: false, features: ["Hasta 20 pacientes", "Agenda y calendario", "Historia clínica", "Facturación PDF", "Asistente clínico IA"] },
+  { nombre: "Pro", precio: "19,99€", desc: "Para consultas activas", destacado: true, features: ["Pacientes ilimitados", "Asistente clínico IA", "Informes clínicos con IA"] },
   { nombre: "Clínica", precio: "50€", desc: "Para equipos", destacado: false, features: ["Hasta 6 profesionales", "Todo lo del plan Pro", "Agenda multi-profesional", "Panel de administración"] },
 ];
 
