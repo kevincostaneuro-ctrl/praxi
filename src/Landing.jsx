@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabase.js";
 import { VERSION_PRIVACIDAD, EMAIL_CONTACTO } from "./Privacidad.jsx";
@@ -486,9 +486,23 @@ function Demo() {
 }
 
 
+// Pantallas pequeñas (móvil)
+function useEsMovil(ancho = 720) {
+  const consulta = `(max-width: ${ancho}px)`;
+  const [m, setM] = useState(() => typeof window !== "undefined" && window.matchMedia(consulta).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(consulta);
+    const f = e => setM(e.matches);
+    mq.addEventListener("change", f);
+    return () => mq.removeEventListener("change", f);
+  }, [consulta]);
+  return m;
+}
+
 export default function Landing() {
   const navigate = useNavigate();
   const [waitlist, setWaitlist] = useState(false);
+  const m = useEsMovil();
 
   return (
     <div style={{ fontFamily: "'Manrope', sans-serif", background: C.bg, color: C.text, minHeight: "100vh" }}>
@@ -496,32 +510,32 @@ export default function Landing() {
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400&family=Instrument+Serif:ital@0;1&family=Manrope:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* NAV */}
-      <nav style={{ position: "sticky", top: 0, zIndex: 50, background: `${C.bone}ee`, backdropFilter: "blur(12px)", borderBottom: `1px solid ${C.border}`, padding: "0 48px", display: "flex", justifyContent: "space-between", alignItems: "center", height: 64 }}>
-        <Logo size={22} />
-        <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
-          <a href="#features" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Funcionalidades</a>
-          <a href="#precios" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Precios</a>
-          <button onClick={() => navigate("/app")} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Iniciar sesión</button>
-          <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
+      <nav style={{ position: "sticky", top: 0, zIndex: 50, background: `${C.bone}ee`, backdropFilter: "blur(12px)", borderBottom: `1px solid ${C.border}`, padding: m ? "0 16px" : "0 48px", display: "flex", justifyContent: "space-between", alignItems: "center", height: m ? 56 : 64, gap: 8 }}>
+        <Logo size={m ? 19 : 22} />
+        <div style={{ display: "flex", gap: m ? 8 : 32, alignItems: "center" }}>
+          {!m && <a href="#features" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Funcionalidades</a>}
+          {!m && <a href="#precios" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Precios</a>}
+          <button onClick={() => navigate("/app")} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 8, padding: m ? "7px 11px" : "7px 18px", fontSize: m ? 12 : 13, whiteSpace: "nowrap", fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Iniciar sesión</button>
+          <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 8, padding: m ? "8px 11px" : "8px 20px", fontSize: m ? 12 : 13, whiteSpace: "nowrap", fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
         </div>
       </nav>
 
       {/* HERO */}
-      <section style={{ maxWidth: 1000, margin: "0 auto", padding: "100px 48px 80px", textAlign: "center" }}>
+      <section style={{ maxWidth: 1000, margin: "0 auto", padding: m ? "56px 16px 44px" : "100px 48px 80px", textAlign: "center" }}>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", lineHeight: 1, marginBottom: 12 }}>
-          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 96, color: C.ink, letterSpacing: "-3px" }}>pra</span>
-          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 114, color: C.accent, letterSpacing: "-3px", lineHeight: 0.9, marginLeft: 6 }}>X</span>
-          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: 96, color: C.ink, letterSpacing: "-3px" }}>i</span>
-          <span style={{ display: "inline-block", width: 20, height: 20, borderRadius: "50%", background: C.accent, marginLeft: 22, marginBottom: 14, flexShrink: 0 }} />
+          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: m ? 62 : 96, color: C.ink, letterSpacing: m ? "-2px" : "-3px" }}>pra</span>
+          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: m ? 74 : 114, color: C.accent, letterSpacing: m ? "-2px" : "-3px", lineHeight: 0.9, marginLeft: m ? 4 : 6 }}>X</span>
+          <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontSize: m ? 62 : 96, color: C.ink, letterSpacing: m ? "-2px" : "-3px" }}>i</span>
+          <span style={{ display: "inline-block", width: m ? 13 : 20, height: m ? 13 : 20, borderRadius: "50%", background: C.accent, marginLeft: m ? 14 : 22, marginBottom: m ? 9 : 14, flexShrink: 0 }} />
         </div>
         <div style={{ fontSize: 10, color: C.muted, letterSpacing: "5px", textTransform: "uppercase", marginBottom: 28 }}>gestión clínica</div>
-        <div style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontWeight: 400, fontSize: 24, color: C.ink, marginBottom: 28 }}>Menos papeleo. Más presencia.</div>
-        <p style={{ fontSize: 15, color: C.muted, lineHeight: 1.7, maxWidth: 520, margin: "0 auto 44px" }}>
+        <div style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontWeight: 400, fontSize: m ? 20 : 24, color: C.ink, marginBottom: m ? 20 : 28 }}>Menos papeleo. Más presencia.</div>
+        <p style={{ fontSize: m ? 14 : 15, color: C.muted, lineHeight: 1.7, maxWidth: 520, margin: m ? "0 auto 32px" : "0 auto 44px" }}>
           Para psicólogos, fisioterapeutas, nutricionistas, logopedas y cualquier profesional sanitario que trabaje con pacientes.
         </p>
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginBottom: 32 }}>
-          <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
-          <button onClick={() => navigate("/demo")} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "14px 28px", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "'Manrope',sans-serif", display: "inline-flex", alignItems: "center", gap: 10 }}>
+          <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 10, padding: "14px 32px", width: m ? "100%" : "auto", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
+          <button onClick={() => navigate("/demo")} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "14px 28px", width: m ? "100%" : "auto", justifyContent: "center", fontSize: 14, fontWeight: 500, cursor: "pointer", fontFamily: "'Manrope',sans-serif", display: "inline-flex", alignItems: "center", gap: 10 }}>
             <span style={{ width: 20, height: 20, borderRadius: "50%", background: C.accent, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 9, color: C.bone }}>▶</span>
             Ver la app en directo
           </button>
@@ -530,7 +544,7 @@ export default function Landing() {
 
       {/* DEMO INTERACTIVO */}
       {/* Contador lista de espera */}
-      <div style={{ textAlign: "center", marginBottom: 80 }}>
+      <div style={{ textAlign: "center", marginBottom: m ? 56 : 80, padding: "0 16px" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 12, background: C.bone, border: `1px solid ${C.border}`, borderRadius: 20, padding: "10px 20px" }}>
           <div style={{ display: "flex" }}>
             {["K","M","A","L","P"].map((l,i) => (
@@ -542,15 +556,15 @@ export default function Landing() {
       </div>
 
       {/* FEATURES */}
-      <section id="features" style={{ maxWidth: 1000, margin: "0 auto 90px", padding: "0 48px" }}>
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
+      <section id="features" style={{ maxWidth: 1000, margin: m ? "0 auto 60px" : "0 auto 90px", padding: m ? "0 16px" : "0 48px" }}>
+        <div style={{ textAlign: "center", marginBottom: m ? 28 : 56 }}>
           <div style={{ fontSize: 10, color: C.accent, textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 600, marginBottom: 12 }}>Funcionalidades</div>
           <h2 style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, fontSize: 22, color: C.ink, margin: 0, letterSpacing: "-0.3px" }}>Todo lo que necesitas en un solo sitio</h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "0 48px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "repeat(2,1fr)", gap: "0 48px" }}>
           {FEATURES.map((f, i) => (
-            <div key={i} style={{ padding: "28px 0", borderBottom: `1px solid ${C.border}`, display: "grid", gridTemplateColumns: "64px 1fr", gap: 24, alignItems: "start" }}>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, fontSize: 48, color: C.accent, lineHeight: 1, letterSpacing: "-2px", userSelect: "none", opacity: 0.4 }}>
+            <div key={i} style={{ padding: m ? "22px 0" : "28px 0", borderBottom: `1px solid ${C.border}`, display: "grid", gridTemplateColumns: m ? "44px 1fr" : "64px 1fr", gap: m ? 14 : 24, alignItems: "start" }}>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, fontSize: m ? 34 : 48, color: C.accent, lineHeight: 1, letterSpacing: "-2px", userSelect: "none", opacity: 0.4 }}>
                 {String(i + 1).padStart(2, "0")}
               </div>
               <div>
@@ -563,9 +577,9 @@ export default function Landing() {
       </section>
 
       {/* QUOTE */}
-      <section style={{ background: C.ink, padding: "70px 48px", textAlign: "center" }}>
+      <section style={{ background: C.ink, padding: m ? "48px 20px" : "70px 48px", textAlign: "center" }}>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
-          <p style={{ fontFamily: "'Instrument Serif',serif", fontStyle: "italic", fontSize: 28, color: C.bone, lineHeight: 1.5, margin: "0 0 20px" }}>
+          <p style={{ fontFamily: "'Instrument Serif',serif", fontStyle: "italic", fontSize: m ? 21 : 28, color: C.bone, lineHeight: 1.5, margin: "0 0 20px" }}>
             "Las herramientas de gestión clínica que existen están pensadas por equipos técnicos. Praxi está pensada por alguien que pasa consulta."
           </p>
           <div style={{ fontSize: 12, color: C.muted }}>Kevin Costa · Neuropsicólogo clínico</div>
@@ -573,16 +587,16 @@ export default function Landing() {
       </section>
 
       {/* PRECIOS */}
-      <section id="precios" style={{ maxWidth: 1000, margin: "0 auto", padding: "90px 48px" }}>
+      <section id="precios" style={{ maxWidth: 1000, margin: "0 auto", padding: m ? "56px 16px" : "90px 48px" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{ fontSize: 10, color: C.accent, textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 600, marginBottom: 12 }}>Precios</div>
-          <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 36, fontWeight: 400, color: C.ink, margin: "0 0 8px" }}>Simple y sin sorpresas</h2>
+          <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: m ? 30 : 36, fontWeight: 400, color: C.ink, margin: "0 0 8px" }}>Simple y sin sorpresas</h2>
           <p style={{ fontSize: 13, color: C.muted, marginBottom: 20 }}>IVA incluido · Cancela cuando quieras</p>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: C.gD, border: `1px solid ${C.green}`, borderRadius: 20, padding: "8px 20px", marginTop: 4 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: C.green, letterSpacing: "0.02em" }}>3 meses gratis · Sin tarjeta de crédito</span>
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "repeat(3,1fr)", gap: m ? 24 : 14 }}>
           {PLANES.map((p, i) => (
             <div key={i} style={{ background: p.destacado ? C.ink : C.bone, borderRadius: 18, padding: "30px 26px", border: p.destacado ? `2px solid ${C.accent}` : `1px solid ${C.border}`, position: "relative" }}>
               {p.destacado && <div style={{ position: "absolute", top: -11, left: "50%", transform: "translateX(-50%)", background: C.accent, color: C.bone, fontSize: 10, fontWeight: 700, padding: "3px 14px", borderRadius: 20, whiteSpace: "nowrap" }}>MÁS POPULAR</div>}
@@ -599,7 +613,7 @@ export default function Landing() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ background: C.ink, padding: "28px 48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <footer style={{ background: C.ink, padding: m ? "28px 16px" : "28px 48px", display: "flex", flexDirection: m ? "column" : "row", gap: m ? 14 : 0, justifyContent: "space-between", alignItems: "center", textAlign: "center" }}>
         <div>
           <Logo size={18} textColor={C.bone} />
           <div style={{ fontSize: 7, color: C.walnut, letterSpacing: "3px", textTransform: "uppercase", marginTop: 2 }}>gestión clínica</div>

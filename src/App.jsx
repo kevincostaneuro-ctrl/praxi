@@ -423,6 +423,7 @@ const traducirError=e=>{
   if(m.includes("otro email"))return "Esta invitación es para otro email. Entra con el email al que te invitaron.";
   if(m.includes("no válida")||m.includes("caducada"))return "La invitación no es válida o ha caducado. Pide una nueva al administrador.";
   if(m.includes("ya pertenece"))return "Tu cuenta ya pertenece a una clínica.";
+  if(m.includes("código de acceso"))return "El código de acceso no es válido o ya se ha usado todas las veces permitidas.";
   if(m.includes("failed to fetch")||m.includes("network"))return "No hay conexión con el servidor. Revisa tu internet.";
   return e?.message||"Ha ocurrido un error.";
 };
@@ -496,6 +497,7 @@ function Acceso({recuperando,onPasswordCambiada}){
     <CajaAcceso>
       <div style={{fontSize:22,fontFamily:"'Instrument Serif',serif",textAlign:"center",color:C.ink,marginBottom:invInfo&&modo==="alta"?8:22}}>{titulo}</div>
       {invInfo&&modo==="alta"&&<div style={{fontSize:13,color:C.walnut,textAlign:"center",marginBottom:22,lineHeight:1.5}}>Te han invitado a <strong>{invInfo.clinica}</strong>. Crea tu contraseña para entrar.</div>}
+      {!invInfo&&!inv&&modo==="alta"&&<div style={{fontSize:12,color:C.walnut,background:C.sand,borderRadius:8,padding:"9px 12px",marginBottom:18,lineHeight:1.5}}>Praxi está en acceso anticipado: para crear tu clínica necesitarás un <strong>código de acceso</strong>. Si no lo tienes, <a href="/" style={{color:C.accent}}>apúntate a la lista de espera</a>. Si te ha invitado tu clínica, usa el enlace de la invitación.</div>}
       <div style={{display:"flex",flexDirection:"column",gap:14}}>
         {modo!=="nueva"&&<div><label style={st.label}>Email</label>
           <input style={st.input} type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" autoFocus={!invInfo} readOnly={!!invInfo&&modo==="alta"} onKeyDown={enter}/>
@@ -523,7 +525,7 @@ function Acceso({recuperando,onPasswordCambiada}){
 function Onboarding({session,onListo}){
   const inv=leerInvitacion();
   const[invInfo,setInvInfo]=useState(null);
-  const[form,setForm]=useState({clinica:"",nombre:"",especialidad:""});
+  const[form,setForm]=useState({clinica:"",nombre:"",especialidad:"",codigo:""});
   const[err,setErr]=useState("");
   const[cargando,setCargando]=useState(false);
   const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
@@ -532,10 +534,11 @@ function Onboarding({session,onListo}){
     setErr("");
     if(!form.nombre.trim()){setErr("Escribe tu nombre.");return;}
     if(!invInfo&&!form.clinica.trim()){setErr("Escribe el nombre de la clínica o consulta.");return;}
+    if(!invInfo&&!form.codigo.trim()){setErr("Escribe tu código de acceso.");return;}
     setCargando(true);
     const{error}=invInfo
       ?await supabase.rpc("aceptar_invitacion",{p_token:inv,p_nombre:form.nombre.trim(),p_especialidad:form.especialidad.trim()||null})
-      :await supabase.rpc("crear_clinica",{p_nombre:form.clinica.trim(),p_mi_nombre:form.nombre.trim(),p_especialidad:form.especialidad.trim()||null});
+      :await supabase.rpc("crear_clinica",{p_nombre:form.clinica.trim(),p_mi_nombre:form.nombre.trim(),p_especialidad:form.especialidad.trim()||null,p_codigo:form.codigo.trim()});
     setCargando(false);
     if(error){setErr(traducirError(error));return;}
     olvidarInvitacion();
@@ -549,6 +552,8 @@ function Onboarding({session,onListo}){
         {!invInfo&&<div><label style={st.label}>Nombre de la clínica o consulta</label><input style={st.input} value={form.clinica} onChange={f("clinica")} autoFocus placeholder="Ej. Centro de Psicología Costa"/></div>}
         <div><label style={st.label}>Tu nombre y apellidos</label><input style={st.input} value={form.nombre} onChange={f("nombre")} autoFocus={!!invInfo}/></div>
         <div><label style={st.label}>Especialidad (opcional)</label><input style={st.input} value={form.especialidad} onChange={f("especialidad")} placeholder="Ej. Psicología clínica"/></div>
+        {!invInfo&&<div><label style={st.label}>Código de acceso</label><input style={{...st.input,textTransform:"uppercase"}} value={form.codigo} onChange={f("codigo")} placeholder="Ej. PRAXI-XXXX" onKeyDown={e=>e.key==="Enter"&&!cargando&&enviar()}/>
+          <div style={{fontSize:12,color:C.muted,marginTop:6,lineHeight:1.5}}>Praxi está en acceso anticipado. ¿No tienes código? <a href="/" style={{color:C.accent}}>Apúntate a la lista de espera</a>.</div></div>}
       </div>
       <Aviso>{err}</Aviso>
       <button disabled={cargando} style={{...st.btn(),width:"100%",padding:"12px 0",fontSize:14,marginTop:20,opacity:cargando?0.6:1}} onClick={enviar}>{cargando?"Un momento…":invInfo?"Entrar en la clínica":"Crear clínica"}</button>
@@ -2112,12 +2117,22 @@ function TimeGrid({days,citas,patients,horario,onNew,onEdit,showHeader}){
                   const h=Math.max(SLOT_H,(c.duracion||60)/30*SLOT_H);
                   if(top<0||top>=totalH)return null;
                   const compact=h<SLOT_H*2;
+                  const caja={position:"absolute",top:top+2,left:3,right:3,height:h-4,background:CITA_BG,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.accent}`,borderRadius:6,boxSizing:"border-box",overflow:"hidden",cursor:"pointer",boxShadow:"0 1px 2px rgba(59,42,30,0.06)"};
+                  // Citas cortas (≤45 min): todo en una línea para que no se corte
+                  if(compact)return(
+                    <div key={c.id} title={`${c.hora} · ${nameOf(c)} · ${c.tipo||"Cita"}`} onClick={e=>{e.stopPropagation();onEdit(c);}}
+                      style={{...caja,padding:"0 10px",display:"flex",alignItems:"center",justifyContent:days.length>1?"flex-start":"center",gap:8,whiteSpace:"nowrap"}}>
+                      {days.length===1&&<span style={{fontSize:12,color:C.muted,fontWeight:600,flexShrink:0}}>{c.hora}</span>}
+                      <span style={{fontSize:days.length>1?13:14,fontWeight:700,color:C.ink,overflow:"hidden",textOverflow:"ellipsis",minWidth:0}}>{nameOf(c)}</span>
+                      {days.length===1&&<span style={{fontSize:13,color:C.walnut,flexShrink:0}}>· {c.tipo||"Cita"}</span>}
+                    </div>
+                  );
                   return(
                     <div key={c.id} onClick={e=>{e.stopPropagation();onEdit(c);}}
-                      style={{position:"absolute",top:top+2,left:3,right:3,height:h-4,background:CITA_BG,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.accent}`,borderRadius:6,padding:compact?"4px 8px":"8px 10px",boxSizing:"border-box",overflow:"hidden",cursor:"pointer",display:"flex",flexDirection:"column",justifyContent:"center",textAlign:"center",boxShadow:"0 1px 2px rgba(59,42,30,0.06)"}}>
-                      <div style={{fontSize:14,fontWeight:700,color:C.ink,lineHeight:1.25,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:compact||days.length>1?"nowrap":"normal"}}>{nameOf(c)}</div>
-                      {!compact&&<div style={{fontSize:13,color:C.walnut,marginTop:2}}>{c.tipo||"Cita"}</div>}
-                      <div style={{fontSize:12,color:C.muted,marginTop:compact?0:2}}>{c.hora}</div>
+                      style={{...caja,padding:"8px 10px",display:"flex",flexDirection:"column",justifyContent:"center",textAlign:"center"}}>
+                      <div style={{fontSize:14,fontWeight:700,color:C.ink,lineHeight:1.25,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:days.length>1?"nowrap":"normal"}}>{nameOf(c)}</div>
+                      <div style={{fontSize:13,color:C.walnut,marginTop:2}}>{c.tipo||"Cita"}</div>
+                      <div style={{fontSize:12,color:C.muted,marginTop:2}}>{c.hora}</div>
                     </div>
                   );
                 })}
