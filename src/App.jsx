@@ -14,7 +14,7 @@ const INITIAL_CLINICA={
 };
 
 const INITIAL_PROFESIONALES=[
-  {id:"u1",nombre:"Kevin Costa",email:"kevin@praxi.com",password:"psico2026",
+  {id:"u1",nombre:"Kevin Costa",usuario:"kevin",email:"kevin@praxi.com",password:"kevinpraxi",
    especialidad:"Neuropsicología",color:"#A66B3F",rol:"admin",
    clinicaId:"c1",activo:true,creadoEn:new Date().toISOString()},
   {id:"u2",nombre:"María López",email:"maria@praxi.com",password:"psico2026",
@@ -410,153 +410,38 @@ const SAMPLE_CITAS=[
 // LOGIN
 // ══════════════════════════════════════════════════════════════════════════════
 function Login({onLogin}){
-  // Paso 1: login de clínica. Paso 2: login/registro de profesional
-  const[step,setStep]=useState("clinica"); // "clinica" | "profesional"
-  const[clinica,setClinica]=useState(null);
-  const[mode,setMode]=useState("login"); // "login" | "register"
+  const[usuario,setUsuario]=useState("");
+  const[password,setPassword]=useState("");
   const[show,setShow]=useState(false);
   const[err,setErr]=useState("");
-  const[ok,setOk]=useState("");
 
-  const[cForm,setCForm]=useState({email:"",password:""});
-  const[pForm,setPForm]=useState({nombre:"",especialidad:"",email:"",password:"",confirm:""});
-  const fc=k=>e=>setCForm(p=>({...p,[k]:e.target.value}));
-  const fp=k=>e=>setPForm(p=>({...p,[k]:e.target.value}));
-
-  // PASO 1 — Acceso a la clínica
-  const loginClinica=()=>{
+  const entrar=()=>{
     setErr("");
-    if(CLINICA_STORE.email.toLowerCase()===cForm.email.trim().toLowerCase()&&CLINICA_STORE.password===cForm.password){
-      setClinica(CLINICA_STORE);
-      setStep("profesional");
-    } else {
-      setErr("Email o contraseña de clínica incorrectos.");
-    }
+    const u=usuario.trim().toLowerCase();
+    const prof=PROF_STORE.find(p=>(p.usuario||"").toLowerCase()===u||p.email.toLowerCase()===u);
+    if(!prof||prof.password!==password){setErr("Usuario o contraseña incorrectos.");return;}
+    if(!prof.activo){setErr("Esta cuenta está desactivada.");return;}
+    onLogin(prof,CLINICA_STORE);
   };
 
-  // PASO 2 — Login profesional
-  const loginProf=()=>{
-    setErr("");
-    const prof=PROF_STORE.find(p=>p.clinicaId===clinica.id&&p.email.toLowerCase()===pForm.email.trim().toLowerCase());
-    if(!prof){setErr("No existe ningún profesional con ese email en esta clínica.");return;}
-    if(!prof.activo){setErr("Esta cuenta está desactivada. Contacta con el administrador.");return;}
-    if(prof.password!==pForm.password){setErr("Contraseña incorrecta.");return;}
-    onLogin(prof,clinica);
-  };
-
-  // PASO 2 — Registro profesional
-  const registerProf=()=>{
-    setErr("");
-    if(!pForm.nombre.trim()){setErr("El nombre es obligatorio.");return;}
-    if(!pForm.especialidad.trim()){setErr("La especialidad es obligatoria.");return;}
-    if(!pForm.email.trim()||!pForm.email.includes("@")){setErr("Email no válido.");return;}
-    if(pForm.password.length<6){setErr("La contraseña debe tener al menos 6 caracteres.");return;}
-    if(pForm.password!==pForm.confirm){setErr("Las contraseñas no coinciden.");return;}
-    if(PROF_STORE.find(p=>p.email.toLowerCase()===pForm.email.trim().toLowerCase())){setErr("Ya existe una cuenta con ese email.");return;}
-    const colors=["#A66B3F","#6B8C5A","#C48C2A","#7B6B8C","#8C4A3A","#4A7B6B"];
-    const newProf={
-      id:"u"+Date.now(),nombre:pForm.nombre.trim(),especialidad:pForm.especialidad.trim(),
-      email:pForm.email.trim().toLowerCase(),password:pForm.password,
-      rol:"profesional",clinicaId:clinica.id,activo:true,
-      color:colors[PROF_STORE.length%colors.length],
-      creadoEn:new Date().toISOString(),
-    };
-    PROF_STORE=[...PROF_STORE,newProf];
-    setOk(`Cuenta creada para ${newProf.nombre}. Ya puedes iniciar sesión.`);
-    setMode("login");
-    setPForm({nombre:"",especialidad:"",email:"",password:"",confirm:""});
-  };
-
-  const cardStyle={width:420,background:C.bone,border:`1px solid ${C.border}`,borderRadius:18,padding:44,boxShadow:"0 1px 2px rgba(59,42,30,0.06),0 8px 24px -12px rgba(59,42,30,0.14)"};
-  const wrapStyle={minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Manrope',sans-serif"};
-
-  const Logo=()=>(
-    <div style={{textAlign:"center",marginBottom:32}}>
-      <img src={PRAXI_LOGO} alt="praXi" style={{height:56,display:"block",margin:"0 auto"}}/>
-    </div>
-  );
-
-  // ── PASO 1: Login clínica ──────────────────────────────────────────────────
-  if(step==="clinica") return(
-    <div style={wrapStyle}>
+  return(
+    <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Manrope',sans-serif",padding:16,boxSizing:"border-box"}}>
       <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
-      <div style={cardStyle}>
-        <Logo/>
-        <div style={{fontSize:13,color:C.muted,textAlign:"center",marginBottom:24}}>Accede con las credenciales de tu clínica</div>
+      <div style={{width:"100%",maxWidth:400,background:C.bone,border:`1px solid ${C.border}`,borderRadius:18,padding:"44px 36px",boxSizing:"border-box",boxShadow:"0 1px 2px rgba(59,42,30,0.06),0 8px 24px -12px rgba(59,42,30,0.14)"}}>
+        <img src={PRAXI_LOGO} alt="praXi" style={{height:56,display:"block",margin:"0 auto 32px"}}/>
         <div style={{display:"flex",flexDirection:"column",gap:14}}>
-          <div><label style={st.label}>Email de la clínica</label>
-            <input style={st.input} type="email" value={cForm.email} onChange={fc("email")} placeholder="clinica@email.com" autoFocus onKeyDown={e=>e.key==="Enter"&&loginClinica()}/>
+          <div><label style={st.label}>Usuario</label>
+            <input style={st.input} value={usuario} onChange={e=>setUsuario(e.target.value)} autoFocus autoComplete="username" onKeyDown={e=>e.key==="Enter"&&entrar()}/>
           </div>
           <div><label style={st.label}>Contraseña</label>
             <div style={{position:"relative"}}>
-              <input style={{...st.input,paddingRight:40}} type={show?"text":"password"} value={cForm.password} onChange={fc("password")} placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&loginClinica()}/>
-              <button onClick={()=>setShow(v=>!v)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:14}}>{show?"🙈":"👁"}</button>
+              <input style={{...st.input,paddingRight:40}} type={show?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&entrar()}/>
+              <button type="button" onClick={()=>setShow(v=>!v)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:14}}>{show?"🙈":"👁"}</button>
             </div>
           </div>
         </div>
         {err&&<div style={{fontSize:12,color:C.red,marginTop:14,padding:"8px 12px",background:C.rD,borderRadius:8}}>{err}</div>}
-        <button style={{...st.btn(),width:"100%",padding:"12px 0",fontSize:14,marginTop:20,background:C.accent,color:C.bone}} onClick={loginClinica}>
-          Acceder a la clínica
-        </button>
-        <div style={{fontSize:11,color:C.dim,textAlign:"center",marginTop:14}}>Demo: admin@praxi.com / praxi2026</div>
-      </div>
-    </div>
-  );
-
-  // ── PASO 2: Login/registro profesional ────────────────────────────────────
-  return(
-    <div style={wrapStyle}>
-      <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
-      <div style={cardStyle}>
-        <Logo/>
-        {/* Badge clínica */}
-        <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 12px",background:C.sand,borderRadius:10,marginBottom:24,justifyContent:"space-between"}}>
-          <div>
-            <div style={{fontSize:11,color:C.muted,textTransform:"uppercase",letterSpacing:"0.05em"}}>Clínica</div>
-            <div style={{fontSize:13,fontWeight:600,color:C.text}}>{clinica.nombre}</div>
-          </div>
-          <button onClick={()=>{setStep("clinica");setErr("");}} style={{background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:11,textDecoration:"underline"}}>Cambiar</button>
-        </div>
-
-        {/* Toggle login/registro */}
-        <div style={{display:"flex",background:C.card,borderRadius:10,padding:3,marginBottom:24}}>
-          {[["login","Soy profesional"],["register","Registrarme"]].map(([m,label])=>(
-            <button key={m} onClick={()=>{setMode(m);setErr("");setOk("");}} style={{flex:1,padding:"8px 0",borderRadius:8,border:"none",cursor:"pointer",fontSize:13,fontWeight:mode===m?600:400,background:mode===m?C.bone:"transparent",color:mode===m?C.accent:C.muted,transition:"all 150ms"}}>
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div style={{display:"flex",flexDirection:"column",gap:12}}>
-          {mode==="register"&&<>
-            <div><label style={st.label}>Nombre completo</label>
-              <input style={st.input} value={pForm.nombre} onChange={fp("nombre")} placeholder="Ej: María García" autoFocus/>
-            </div>
-            <div><label style={st.label}>Especialidad</label>
-              <input style={st.input} value={pForm.especialidad} onChange={fp("especialidad")} placeholder="Ej: Psicología clínica, Fisioterapia..."/>
-            </div>
-          </>}
-          <div><label style={st.label}>Email profesional</label>
-            <input style={st.input} type="email" value={pForm.email} onChange={fp("email")} placeholder="tu@email.com" autoFocus={mode==="login"} onKeyDown={e=>mode==="login"&&e.key==="Enter"&&loginProf()}/>
-          </div>
-          <div><label style={st.label}>Contraseña</label>
-            <div style={{position:"relative"}}>
-              <input style={{...st.input,paddingRight:40}} type={show?"text":"password"} value={pForm.password} onChange={fp("password")} placeholder="••••••••" onKeyDown={e=>mode==="login"&&e.key==="Enter"&&loginProf()}/>
-              <button onClick={()=>setShow(v=>!v)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:14}}>{show?"🙈":"👁"}</button>
-            </div>
-          </div>
-          {mode==="register"&&<div><label style={st.label}>Confirmar contraseña</label>
-            <input style={st.input} type="password" value={pForm.confirm} onChange={fp("confirm")} placeholder="••••••••"/>
-          </div>}
-        </div>
-
-        {err&&<div style={{fontSize:12,color:C.red,marginTop:12,padding:"8px 12px",background:C.rD,borderRadius:8}}>{err}</div>}
-        {ok&&<div style={{fontSize:12,color:C.green,marginTop:12,padding:"8px 12px",background:C.gD,borderRadius:8}}>{ok}</div>}
-
-        <button style={{...st.btn(),width:"100%",padding:"12px 0",fontSize:14,marginTop:20,background:C.accent,color:C.bone}} onClick={mode==="login"?loginProf:registerProf}>
-          {mode==="login"?"Entrar":"Crear cuenta"}
-        </button>
-        {mode==="login"&&<div style={{fontSize:11,color:C.dim,textAlign:"center",marginTop:12}}>Demo: kevin@praxi.com / psico2026</div>}
+        <button style={{...st.btn(),width:"100%",padding:"12px 0",fontSize:14,marginTop:20}} onClick={entrar}>Entrar</button>
       </div>
     </div>
   );
@@ -3192,7 +3077,7 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCit
 // APP ROOT
 // ══════════════════════════════════════════════════════════════════════════════
 export default function App(){
-  const[currentUser,setCurrentUser]=useState(INITIAL_PROFESIONALES[0]);
+  const[currentUser,setCurrentUser]=useState(null);
   const[currentClinica,setCurrentClinica]=useState(CLINICA_STORE);
   const[profesionales,setProfesionales]=useState(INITIAL_PROFESIONALES);
   const[page,setPage]=useState("dashboard");
