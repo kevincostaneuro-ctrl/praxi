@@ -164,6 +164,7 @@ export function Terminos() {
 
       <H>6. Disponibilidad</H>
       <P>Praxi pondrá medios razonables para que el servicio funcione de forma continua, pero no garantiza una disponibilidad determinada, especialmente durante el acceso anticipado.</P>
+      <P>El asistente IA no tiene límite de uso para una actividad profesional normal. Para evitar abusos (por ejemplo, el uso automatizado de una cuenta), se aplica un máximo de 300 consultas al día por profesional.</P>
 
       <H>7. Propiedad</H>
       <P>El software, la marca y el diseño de Praxi pertenecen a su titular. <strong>Los datos que introduce el Cliente son del Cliente</strong>: Praxi no adquiere ningún derecho sobre ellos y solo los trata para prestar el servicio.</P>
