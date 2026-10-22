@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabase.js";
+import { VERSION_PRIVACIDAD, EMAIL_CONTACTO } from "./Privacidad.jsx";
 
 const C = {
   bg: "#F5EFE4", bone: "#FBF8F1", sand: "#E2D9C8",
@@ -42,14 +43,19 @@ function WaitlistModal({ open, onClose }) {
   const [enviado, setEnviado] = useState(false);
   const [form, setForm] = useState({ nombre: "", email: "", profesion: "" });
   const [error, setError] = useState("");
+  const [acepta, setAcepta] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
   const apuntarse = async () => {
     setError("");
     if (!form.nombre.trim() || !form.profesion) { setError("Rellena todos los campos."); return; }
     if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) { setError("Escribe un email válido."); return; }
+    if (!acepta) { setError("Para apuntarte tienes que aceptar la política de privacidad."); return; }
     setEnviando(true);
-    const { error } = await supabase.from("lista_espera").insert({ nombre: form.nombre.trim(), email: form.email.trim().toLowerCase(), profesion: form.profesion });
+    const fila = { nombre: form.nombre.trim(), email: form.email.trim().toLowerCase(), profesion: form.profesion };
+    let { error } = await supabase.from("lista_espera").insert({ ...fila, acepta_privacidad: true, version_privacidad: VERSION_PRIVACIDAD });
+    // Mientras no se haya ejecutado supabase/02_lista_espera.sql la tabla no tiene esas columnas
+    if (error && error.code === "PGRST204") ({ error } = await supabase.from("lista_espera").insert(fila));
     setEnviando(false);
     // 23505 = ese email ya estaba apuntado: para la persona es igual que apuntarse
     if (error && error.code !== "23505") { setError("No se ha podido enviar. Inténtalo de nuevo en un momento."); return; }
@@ -60,8 +66,8 @@ function WaitlistModal({ open, onClose }) {
 
   if (!open) return null;
   return (
-    <div onClick={e => e.target === e.currentTarget && onClose()} style={{ position: "fixed", inset: 0, background: "rgba(34,22,16,0.55)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ background: C.bone, borderRadius: 24, maxWidth: 480, width: "100%", padding: "40px 44px", border: `1px solid ${C.border}`, boxShadow: "0 24px 60px rgba(34,22,16,0.2)" }}>
+    <div onClick={e => e.target === e.currentTarget && onClose()} style={{ position: "fixed", inset: 0, background: "rgba(34,22,16,0.55)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+      <div style={{ background: C.bone, borderRadius: 24, maxWidth: 480, width: "100%", maxHeight: "92vh", overflowY: "auto", boxSizing: "border-box", padding: "clamp(24px, 6vw, 40px) clamp(20px, 6vw, 44px)", border: `1px solid ${C.border}`, boxShadow: "0 24px 60px rgba(34,22,16,0.2)" }}>
         {!enviado ? (
           <>
             <div style={{ textAlign: "center", marginBottom: 28 }}>
@@ -88,6 +94,13 @@ function WaitlistModal({ open, onClose }) {
                 <option value="" disabled>Selecciona tu profesión</option>
                 {["Psicólogo/a","Neuropsicólogo/a","Fisioterapeuta","Nutricionista","Logopeda","Terapeuta ocupacional","Médico/a","Otro profesional sanitario"].map(p => <option key={p}>{p}</option>)}
               </select>
+            </div>
+            <label style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 12, color: C.text, lineHeight: 1.5, marginBottom: 12, cursor: "pointer" }}>
+              <input type="checkbox" checked={acepta} onChange={e => setAcepta(e.target.checked)} style={{ marginTop: 2, accentColor: C.accent, width: 16, height: 16, flexShrink: 0 }} />
+              <span>He leído y acepto la <a href="/privacidad" target="_blank" rel="noreferrer" style={{ color: C.accent }}>política de privacidad</a>.</span>
+            </label>
+            <div style={{ fontSize: 10.5, color: C.muted, lineHeight: 1.5, marginBottom: 16, padding: "8px 10px", background: C.bg, borderRadius: 8 }}>
+              <strong>Responsable:</strong> Kevin Costa. <strong>Finalidad:</strong> gestionar tu acceso a Praxi y avisarte de su lanzamiento. <strong>Legitimación:</strong> tu consentimiento. <strong>Destinatarios:</strong> no se ceden a terceros; proveedores técnicos en la UE. <strong>Derechos:</strong> acceso, rectificación, supresión y otros en {EMAIL_CONTACTO}. Más información en la <a href="/privacidad" target="_blank" rel="noreferrer" style={{ color: C.accent }}>política de privacidad</a>.
             </div>
             {error && <div style={{ fontSize: 12, color: "#B85040", background: "#FAEAE8", borderRadius: 8, padding: "8px 12px", marginBottom: 12 }}>{error}</div>}
             <button disabled={enviando} onClick={apuntarse} style={{ opacity: enviando ? 0.6 : 1, width: "100%", background: C.accent, color: C.bone, border: "none", borderRadius: 12, padding: "14px 0", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Manrope',sans-serif", marginBottom: 14 }}>
@@ -593,7 +606,7 @@ export default function Landing() {
         </div>
         <div style={{ fontSize: 11, color: C.walnut }}>© 2026 Praxi · Hecho en España</div>
         <div style={{ display: "flex", gap: 20 }}>
-          {["Privacidad", "Términos", "Contacto"].map(l => <a key={l} href="#" style={{ fontSize: 11, color: C.walnut, textDecoration: "none" }}>{l}</a>)}
+          {[["Privacidad", "/privacidad"], ["Contacto", `mailto:${EMAIL_CONTACTO}`]].map(([l, h]) => <a key={l} href={h} style={{ fontSize: 11, color: C.walnut, textDecoration: "none" }}>{l}</a>)}
         </div>
       </footer>
     </div>
