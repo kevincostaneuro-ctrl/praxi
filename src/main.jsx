@@ -10,7 +10,8 @@ function Root() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/demo" element={<App />} />
+        <Route path="/demo" element={<App demo />} />
+        <Route path="/app" element={<App />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

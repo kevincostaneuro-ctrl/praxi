@@ -79,7 +79,7 @@ function WaitlistModal({ open, onClose }) {
               Apuntarme a la lista
             </button>
             <div style={{ textAlign: "center", fontSize: 12, color: C.muted }}>
-              ¿Ya tienes cuenta? <span onClick={() => { onClose(); window.location.href = "/demo"; }} style={{ color: C.accent, fontWeight: 500, cursor: "pointer" }}>Iniciar sesión</span>
+              ¿Ya tienes cuenta? <span onClick={() => { onClose(); window.location.href = "/app"; }} style={{ color: C.accent, fontWeight: 500, cursor: "pointer" }}>Iniciar sesión</span>
             </div>
           </>
         ) : (
@@ -473,7 +473,7 @@ export default function Landing() {
         <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
           <a href="#features" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Funcionalidades</a>
           <a href="#precios" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Precios</a>
-          <button onClick={() => navigate("/demo")} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Iniciar sesión</button>
+          <button onClick={() => navigate("/app")} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 8, padding: "7px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Iniciar sesión</button>
           <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 8, padding: "8px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
         </div>
       </nav>
