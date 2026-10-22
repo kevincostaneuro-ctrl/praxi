@@ -61,3 +61,11 @@ grant execute on function crear_clinica(text,text,text,text) to authenticated;
 --   insert into codigos_acceso (codigo, usos_max, nota) values ('MICODIGO', 10, 'Beta testers');
 -- Si ejecutaste una versión anterior de este archivo, desactiva el código de ejemplo:
 update codigos_acceso set activo = false where codigo = 'PRAXI-BETA';
+
+-- Si ya está instalada la versión con aceptación de términos (04_cumplimiento.sql),
+-- se elimina la de este archivo para que no quede una forma de crear clínicas sin aceptarlos.
+do $$ begin
+  if exists (select 1 from pg_proc where proname = 'crear_clinica' and pronargs = 5) then
+    drop function if exists crear_clinica(text, text, text, text);
+  end if;
+end $$;
