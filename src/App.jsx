@@ -2338,12 +2338,17 @@ function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tare
         <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Calendario</div>
         <button style={st.btn()} onClick={()=>openNew(date,"09:00",tipos[0]?.id)}>+ Añadir</button>
       </div>
-      <div style={{display:"flex",gap:10,marginBottom:16,alignItems:"center"}}>
+      <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:16,marginBottom:16,alignItems:"center"}}>
+       <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",alignItems:"center",gap:10}}>
+        <div style={{display:"flex",gap:10,alignItems:"center"}}>
         <button style={st.btn("sm")} onClick={()=>nav(-1)}>‹</button>
         <button title="Volver a hoy" style={{...st.btn("sm"),background:C.bone,color:C.muted,minWidth:96}} onClick={()=>setDate(today())}>{view==="week"?etiquetaSemana(date):view==="month"?etiquetaMes(date):etiquetaDia(date)}</button>
         <button style={st.btn("sm")} onClick={()=>nav(1)}>›</button>
-        <div style={{fontSize:15,fontWeight:700,flex:1,textAlign:"center"}}>{navLabel()}</div>
-        <div style={{display:"flex",gap:3,background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,padding:3}}>
+        </div>
+        <div style={{fontSize:15,fontWeight:700,textAlign:"center",whiteSpace:"nowrap"}}>{navLabel()}</div>
+        <div/>
+       </div>
+        <div style={{justifySelf:"end",display:"flex",gap:3,background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,padding:3}}>
           {[["day","Día"],["week","Semana"],["month","Mes"]].map(([v,l])=><button key={v} style={{...st.btn("sm"),background:view===v?C.aD:"transparent",color:view===v?C.bone:C.muted,border:"none"}} onClick={()=>setView(v)}>{l}</button>)}
         </div>
       </div>
@@ -3517,14 +3522,16 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,horario,onInforme,o
 
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 300px",gap:14,alignItems:"start"}}>
         <div style={{...st.card,overflow:"hidden"}}>
-          <div style={{padding:"10px 14px",borderBottom:`1px solid ${C.border}`,display:"flex",gap:10,alignItems:"center"}}>
+          <div style={{padding:"10px 14px",borderBottom:`1px solid ${C.border}`,display:"grid",gridTemplateColumns:"1fr auto 1fr",gap:10,alignItems:"center"}}>
+           <div style={{display:"flex",gap:10,alignItems:"center"}}>
             <button style={st.btn("sm")} onClick={()=>setWeekStart(d=>addDays(d,-7))}>‹</button>
             <button title="Volver a esta semana" style={{...st.btn("sm"),background:C.bone,color:C.muted,minWidth:96}} onClick={()=>setWeekStart(startOfWeek(today()))}>{etiquetaSemana(weekStart)}</button>
             <button style={st.btn("sm")} onClick={()=>setWeekStart(d=>addDays(d,7))}>›</button>
-            <span style={{flex:1,fontSize:14,fontWeight:600,color:C.text,textAlign:"center"}}>
+           </div>
+            <span style={{fontSize:14,fontWeight:600,color:C.text,textAlign:"center",whiteSpace:"nowrap"}}>
               {weekStart.getDate()} {MONTHS_ES[weekStart.getMonth()].slice(0,3)} – {addDays(weekStart,6).getDate()} {MONTHS_ES[addDays(weekStart,6).getMonth()].slice(0,3)}
             </span>
-            <button style={{...st.btn("sm"),background:C.bone,color:C.muted}} onClick={onVerCalendario}>Ver calendario →</button>
+            <button style={{...st.btn("sm"),background:C.bone,color:C.muted,justifySelf:"end"}} onClick={onVerCalendario}>Ver calendario →</button>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(7,minmax(0,1fr))",minHeight:260}}>
             {days.map((d,i)=>{
