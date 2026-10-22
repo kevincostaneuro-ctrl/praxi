@@ -21,14 +21,6 @@ const FEATURES = [
   { icon: "📆", title: "Agenda pública de reservas", desc: "Tus pacientes reservan cita desde tu enlace. Sin llamadas ni gestión manual." },
 ];
 
-const PLANES = [
-  { nombre: "Básico", precio: "9,99€", desc: "Para empezar", destacado: false, features: ["Hasta 20 pacientes", "Agenda y calendario", "Historia clínica", "Facturación PDF", "Asistente clínico IA"] },
-  { nombre: "Pro", precio: "19,99€", desc: "Para consultas activas", destacado: true, features: ["Pacientes ilimitados", "Asistente clínico IA", "Informes clínicos con IA"] },
-  { nombre: "Clínica", precio: "50€", desc: "Para equipos", destacado: false, features: ["Hasta 6 profesionales", "Todo lo del plan Pro", "Agenda multi-profesional", "Panel de administración"] },
-];
-
-
-
 const Logo = ({ size = 22, textColor = C.ink }) => (
   <div style={{ display: "flex", alignItems: "flex-end", lineHeight: 1, gap: 0 }}>
     <span style={{ fontFamily: "'Playfair Display',serif", fontStyle: "italic", fontWeight: 400, fontSize: size, color: textColor, letterSpacing: "-0.5px" }}>pra</span>
@@ -78,7 +70,7 @@ function WaitlistModal({ open, onClose }) {
                 <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: C.accent, marginLeft: 12, marginBottom: 4 }} />
               </div>
               <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: 22, fontWeight: 400, color: C.ink, margin: "0 0 6px", fontStyle: "italic" }}>Únete a la lista de espera</h2>
-              <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>3 meses gratuitos · Sin tarjeta de crédito</p>
+              <p style={{ fontSize: 13, color: C.muted, margin: 0 }}>Acceso anticipado gratuito</p>
             </div>
             <div style={{ marginBottom: 14 }}>
               <label style={labelStyle}>Nombre</label>
@@ -513,7 +505,6 @@ export default function Landing() {
         <Logo size={m ? 19 : 22} />
         <div style={{ display: "flex", gap: m ? 8 : 32, alignItems: "center" }}>
           {!m && <a href="#features" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Funcionalidades</a>}
-          {!m && <a href="#precios" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Precios</a>}
           <button onClick={() => navigate("/app")} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 8, padding: m ? "7px 11px" : "7px 18px", fontSize: m ? 12 : 13, whiteSpace: "nowrap", fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Iniciar sesión</button>
           <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 8, padding: m ? "8px 11px" : "8px 20px", fontSize: m ? 12 : 13, whiteSpace: "nowrap", fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
         </div>
@@ -582,32 +573,6 @@ export default function Landing() {
             "Las herramientas de gestión clínica que existen están pensadas por equipos técnicos. Praxi está pensada por alguien que pasa consulta."
           </p>
           <div style={{ fontSize: 12, color: C.muted }}>Kevin Costa · Neuropsicólogo clínico</div>
-        </div>
-      </section>
-
-      {/* PRECIOS */}
-      <section id="precios" style={{ maxWidth: 1000, margin: "0 auto", padding: m ? "56px 16px" : "90px 48px" }}>
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <div style={{ fontSize: 10, color: C.accent, textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 600, marginBottom: 12 }}>Precios</div>
-          <h2 style={{ fontFamily: "'Instrument Serif',serif", fontSize: m ? 30 : 36, fontWeight: 400, color: C.ink, margin: "0 0 8px" }}>Simple y sin sorpresas</h2>
-          <p style={{ fontSize: 13, color: C.muted, marginBottom: 20 }}>IVA incluido · Cancela cuando quieras</p>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: C.gD, border: `1px solid ${C.green}`, borderRadius: 20, padding: "8px 20px", marginTop: 4 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: C.green, letterSpacing: "0.02em" }}>3 meses gratis · Sin tarjeta de crédito</span>
-          </div>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "repeat(3,1fr)", gap: m ? 24 : 14 }}>
-          {PLANES.map((p, i) => (
-            <div key={i} style={{ background: p.destacado ? C.ink : C.bone, borderRadius: 18, padding: "30px 26px", border: p.destacado ? `2px solid ${C.accent}` : `1px solid ${C.border}`, position: "relative" }}>
-              {p.destacado && <div style={{ position: "absolute", top: -11, left: "50%", transform: "translateX(-50%)", background: C.accent, color: C.bone, fontSize: 10, fontWeight: 700, padding: "3px 14px", borderRadius: 20, whiteSpace: "nowrap" }}>MÁS POPULAR</div>}
-              <div style={{ fontSize: 11, fontWeight: 600, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 8 }}>{p.nombre}</div>
-              <div style={{ fontSize: 34, fontWeight: 700, color: p.destacado ? C.bone : C.ink, marginBottom: 4 }}>{p.precio}<span style={{ fontSize: 12, fontWeight: 400, color: C.muted }}>/mes</span></div>
-              <div style={{ fontSize: 12, color: C.muted, marginBottom: 22 }}>{p.desc}</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 24 }}>
-                {p.features.map((f, j) => <div key={j} style={{ fontSize: 12, color: p.destacado ? "#C8A882" : C.muted }}>✓ {f}</div>)}
-              </div>
-              <button onClick={() => setWaitlist(true)} style={{ width: "100%", padding: "11px 0", borderRadius: 10, border: p.destacado ? "none" : `1px solid ${C.border}`, background: p.destacado ? C.accent : "transparent", color: p.destacado ? C.bone : C.accent, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
-            </div>
-          ))}
         </div>
       </section>
 

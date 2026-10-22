@@ -110,7 +110,7 @@ export function Privacidad() {
       <P>Solo comunicaremos datos a autoridades cuando una ley nos obligue.</P>
 
       <H>5. Transferencias fuera de la Unión Europea</H>
-      <P>Los datos de la aplicación se guardan en la Unión Europea. Algunos proveedores son empresas con sede en EE. UU.; cuando puedan acceder a datos desde fuera del Espacio Económico Europeo, lo hacen con las garantías del capítulo V del RGPD (cláusulas contractuales tipo de la Comisión Europea o el Marco de Privacidad de Datos UE-EE. UU., según el proveedor).</P>
+      <P>Los datos de la aplicación se guardan en la Unión Europea. Algunos proveedores son empresas con sede en EE. UU. y el asistente IA (Anthropic) procesa las consultas en EE. UU.; cuando se traten datos fuera del Espacio Económico Europeo, lo hacen con las garantías del capítulo V del RGPD (cláusulas contractuales tipo de la Comisión Europea o el Marco de Privacidad de Datos UE-EE. UU., según el proveedor).</P>
 
       <H>6. Tus derechos</H>
       <P>Puedes pedir <strong>acceso</strong>, <strong>rectificación</strong>, <strong>supresión</strong>, <strong>oposición</strong>, <strong>limitación</strong> y <strong>portabilidad</strong> de tus datos, y retirar tu consentimiento cuando quieras, escribiendo a <Mail />. Responderemos en un mes como máximo. Si no estás de acuerdo con nuestra respuesta, puedes reclamar ante la Agencia Española de Protección de Datos (<A href="https://www.aepd.es">www.aepd.es</A>).</P>
@@ -227,7 +227,8 @@ export function Terminos() {
         <li><strong>Altas y bajas:</strong> los miembros solo entran por invitación nominativa, que caduca en 7 días y solo vale para el email invitado. El administrador puede desactivar a un miembro y su acceso se corta al momento.</li>
         <li><strong>Registro de accesos:</strong> queda registrado quién consulta, crea, modifica o borra cada ficha y cita, y cuándo. Nadie puede modificarlo ni borrarlo desde la aplicación.</li>
         <li><strong>Copias de seguridad:</strong> {COPIAS_SEGURIDAD ? "diarias, conservadas 7 días." : "no disponibles durante el acceso anticipado; se activarán antes del uso con datos reales."}</li>
-        <li><strong>Mínimo privilegio:</strong> los datos clínicos no se envían a servicios de análisis, publicidad ni inteligencia artificial.</li>
+        <li><strong>Asistente IA:</strong> solo se envía información cuando el profesional lo usa, y solo la de la ficha que está consultando (o los datos de facturación en el asistente de facturas). Antes de salir de su navegador, el nombre y los apellidos de los pacientes se sustituyen por un alias y la fecha de nacimiento por la edad. La clave del servicio está solo en el servidor y solo pueden usarlo miembros activos con sesión iniciada. El contenido de las consultas no se guarda en los registros del servidor.</li>
+        <li><strong>Sin terceros innecesarios:</strong> los datos no se envían a servicios de análisis ni de publicidad.</li>
       </L>
 
       {/* ── ANEXO III ── */}

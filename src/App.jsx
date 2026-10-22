@@ -1,8 +1,42 @@
 import { useState, useMemo, useEffect, useRef, useCallback, createContext, useContext } from "react";
 import { supabase, leerTodo, sincronizar } from "./supabase.js";
 import { VERSION_TERMINOS } from "./legal.js";
-// El asistente IA no envía datos a ningún servicio hasta que se active con su contrato (subencargado)
-const IA_ACTIVA = false;
+// ── Asistente IA ─────────────────────────────────────────────────────────────
+// La app nunca habla directamente con Anthropic: llama a /api/ia (servidor de
+// Vercel, donde está la clave) y antes sustituye los nombres de los pacientes
+// por alias ("Paciente 1"…), que se deshacen al recibir la respuesta.
+const escRe=s=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+function crearSeudonimos(pares){
+  const nombresRepetidos=new Set();
+  const vistos=new Set();
+  pares.forEach(p=>{const n=(p.nombre||"").trim().toLowerCase();if(vistos.has(n))nombresRepetidos.add(n);vistos.add(n);});
+  const reemplazos=[];
+  pares.forEach(({nombre,apellidos,alias})=>{
+    const n=(nombre||"").trim(),a=(apellidos||"").trim(),full=`${n} ${a}`.trim();
+    if(full.length>=3)reemplazos.push([full,alias]);
+    if(a.length>=3)reemplazos.push([a,alias]);
+    if(n.length>=3)reemplazos.push([n,nombresRepetidos.has(n.toLowerCase())?"[paciente]":alias]);
+  });
+  reemplazos.sort((x,y)=>y[0].length-x[0].length);
+  const enmascarar=txt=>reemplazos.reduce((s,[t,al])=>s.replace(new RegExp(`(?<![\\p{L}\\p{N}])${escRe(t)}(?![\\p{L}\\p{N}])`,"giu"),al),txt||"");
+  const vuelta=pares.map(p=>[p.alias,`${p.nombre||""} ${p.apellidos||""}`.trim()]).sort((x,y)=>y[0].length-x[0].length);
+  const desenmascarar=txt=>vuelta.reduce((s,[al,n])=>s.split(al).join(n),txt||"");
+  return{enmascarar,desenmascarar};
+}
+async function enviarIA({system,messages,seud}){
+  const{data}=await supabase.auth.getSession();
+  const token=data.session?.access_token;
+  if(!token)throw new Error("Tu sesión ha caducado. Vuelve a iniciar sesión.");
+  let r;
+  try{
+    r=await fetch("/api/ia",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},
+      body:JSON.stringify({system:seud.enmascarar(system),messages:messages.map(m=>({role:m.role,content:seud.enmascarar(m.content)}))})});
+  }catch{throw new Error("No se ha podido conectar con el asistente. Revisa tu conexión.");}
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error||"El asistente no ha podido responder.");
+  return seud.desenmascarar(j.texto);
+}
+const edadDe=f=>{if(!f)return null;const d=new Date(f);if(isNaN(d))return null;const h=new Date();let e=h.getFullYear()-d.getFullYear();if(h<new Date(h.getFullYear(),d.getMonth(),d.getDate()))e--;return e;};
 const DemoCtx=createContext(false);
 // Equipo: quién soy, si soy admin y los miembros de la clínica
 const EquipoCtx=createContext({esAdmin:true,miembros:[],miId:null,registrarVista:()=>{}});
@@ -560,7 +594,6 @@ function Onboarding({session,onListo}){
         <div><label style={st.label}>Especialidad (opcional)</label><input style={st.input} value={form.especialidad} onChange={f("especialidad")}/></div>
         {!invInfo&&<div><label style={st.label}>Código de acceso</label><input style={{...st.input,textTransform:"uppercase"}} value={form.codigo} onChange={f("codigo")} onKeyDown={e=>e.key==="Enter"&&!cargando&&enviar()}/>
           <div style={{fontSize:12,color:C.muted,marginTop:6,lineHeight:1.5}}>Praxi está en acceso anticipado. ¿No tienes código? <a href="/" style={{color:C.accent}}>Apúntate a la lista de espera</a>.</div></div>}
-        {!invInfo&&<div style={{fontSize:12,color:C.walnut,background:C.amD,border:`1px solid ${C.amber}`,borderRadius:8,padding:"9px 12px",lineHeight:1.5}}><strong>Acceso anticipado:</strong> usa solo pacientes ficticios. Todavía no hay copias de seguridad y Praxi aún no está habilitado para datos reales de pacientes.</div>}
         {!invInfo&&<label style={{display:"flex",gap:10,alignItems:"flex-start",fontSize:12.5,color:C.text,lineHeight:1.5,cursor:"pointer"}}>
           <input type="checkbox" checked={aceptaTerminos} onChange={e=>setAceptaTerminos(e.target.checked)} style={{marginTop:2,accentColor:C.accent,width:16,height:16,flexShrink:0}}/>
           <span>Acepto los <a href="/terminos" target="_blank" rel="noreferrer" style={{color:C.accent}}>Términos del servicio</a> y el <a href="/terminos#encargo" target="_blank" rel="noreferrer" style={{color:C.accent}}>Contrato de encargo del tratamiento</a>, en nombre propio o de la clínica que represento.</span>
@@ -2663,6 +2696,7 @@ function Recursos({currentUser}){
 // ══════════════════════════════════════════════════════════════════════════════
 function IAPanel({patient,onClose}){
   const isDemo=useContext(DemoCtx);
+  const seud=useMemo(()=>crearSeudonimos([{nombre:patient.nombre,apellidos:patient.apellidos,alias:"Paciente X"}]),[patient.nombre,patient.apellidos]);
   const[messages,setMessages]=useState([]);
   const[input,setInput]=useState("");
   const[loading,setLoading]=useState(false);
@@ -2693,7 +2727,7 @@ DATOS COMPLETOS DEL PACIENTE
 
 IDENTIFICACIÓN:
 - Nombre: ${patient.nombre} ${patient.apellidos}
-- Fecha nacimiento: ${patient.fechaNacimiento||"No registrada"}
+- Edad: ${edadDe(patient.fechaNacimiento)??"No registrada"}
 - Estado: ${patient.estado}
 
 MOTIVO DE CONSULTA:
@@ -2736,26 +2770,15 @@ Usa toda esta información para dar respuestas precisas y contextualizadas. Si a
     const userMsg=msg||input.trim();
     if(!userMsg)return;
     setInput("");
-    if(isDemo||!IA_ACTIVA){setMessages(m=>[...m,{role:"user",content:userMsg},{role:"assistant",content:isDemo?"En la demo el asistente IA no está activo. Solicita acceso para usarlo con tus pacientes.":"El asistente IA estará disponible próximamente. Por privacidad, ahora mismo no se envía ningún dato a servicios de inteligencia artificial."}]);return;}
+    if(isDemo){setMessages(m=>[...m,{role:"user",content:userMsg},{role:"assistant",content:"En la demo el asistente IA no está activo. Solicita acceso para usarlo con tus pacientes."}]);return;}
     const newMessages=[...messages,{role:"user",content:userMsg}];
     setMessages(newMessages);
     setLoading(true);
     try{
-      const res=await fetch("https://api.anthropic.com/v1/messages",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          model:"claude-sonnet-4-6",
-          max_tokens:1000,
-          system:contexto,
-          messages:newMessages,
-        }),
-      });
-      const data=await res.json();
-      const reply=data.content?.[0]?.text||"Sin respuesta.";
+      const reply=await enviarIA({system:contexto,messages:newMessages,seud});
       setMessages(m=>[...m,{role:"assistant",content:reply}]);
     }catch(e){
-      setMessages(m=>[...m,{role:"assistant",content:"Error al conectar con la IA. Inténtalo de nuevo."}]);
+      setMessages(m=>[...m,{role:"assistant",content:e.message||"Error al conectar con la IA. Inténtalo de nuevo."}]);
     }
     setLoading(false);
   };
@@ -3175,6 +3198,7 @@ function DatosClinica({clinica,miembros,patients,citas,demo,bloquearDemo,onBorra
 // ══════════════════════════════════════════════════════════════════════════════
 function IAFacturasPanel({patients,onClose}){
   const isDemo=useContext(DemoCtx);
+  const seud=useMemo(()=>crearSeudonimos(patients.map((p,i)=>({nombre:p.nombre,apellidos:p.apellidos,alias:`Paciente ${i+1}`}))),[patients]);
   const[messages,setMessages]=useState([]);
   const[input,setInput]=useState("");
   const[loading,setLoading]=useState(false);
@@ -3242,26 +3266,15 @@ Usa estos datos para responder preguntas sobre ingresos, pendientes, seguimiento
     const userMsg=msg||input.trim();
     if(!userMsg)return;
     setInput("");
-    if(isDemo||!IA_ACTIVA){setMessages(m=>[...m,{role:"user",content:userMsg},{role:"assistant",content:isDemo?"En la demo el asistente IA no está activo. Solicita acceso para usarlo con tus pacientes.":"El asistente IA estará disponible próximamente. Por privacidad, ahora mismo no se envía ningún dato a servicios de inteligencia artificial."}]);return;}
+    if(isDemo){setMessages(m=>[...m,{role:"user",content:userMsg},{role:"assistant",content:"En la demo el asistente IA no está activo. Solicita acceso para usarlo con tus pacientes."}]);return;}
     const newMessages=[...messages,{role:"user",content:userMsg}];
     setMessages(newMessages);
     setLoading(true);
     try{
-      const res=await fetch("https://api.anthropic.com/v1/messages",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          model:"claude-sonnet-4-6",
-          max_tokens:1000,
-          system:contexto,
-          messages:newMessages,
-        }),
-      });
-      const data=await res.json();
-      const reply=data.content?.[0]?.text||"Sin respuesta.";
+      const reply=await enviarIA({system:contexto,messages:newMessages,seud});
       setMessages(m=>[...m,{role:"assistant",content:reply}]);
     }catch(e){
-      setMessages(m=>[...m,{role:"assistant",content:"Error al conectar con la IA. Inténtalo de nuevo."}]);
+      setMessages(m=>[...m,{role:"assistant",content:e.message||"Error al conectar con la IA. Inténtalo de nuevo."}]);
     }
     setLoading(false);
   };

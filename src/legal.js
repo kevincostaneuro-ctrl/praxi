@@ -30,12 +30,18 @@ export const SUBENCARGADOS = [
     nombre: "Vercel, Inc.",
     servicio: "Alojamiento y entrega de la página web y de la aplicación",
     ubicacion: "Red global; empresa con sede en EE. UU.",
-    datos: "Datos técnicos de conexión (dirección IP, navegador). No almacena datos clínicos",
+    datos: "Datos técnicos de conexión (dirección IP, navegador). Las consultas al asistente IA pasan por su servidor sin guardarse",
   },
   {
     nombre: "Sendinblue SAS (Brevo)",
     servicio: "Envío de emails del servicio (confirmación de cuenta, recuperación de contraseña, invitaciones, avisos)",
     ubicacion: "Francia (UE)",
     datos: "Nombre y email de usuarios y de personas en la lista de espera. No recibe datos clínicos",
+  },
+  {
+    nombre: "Anthropic, PBC",
+    servicio: "Asistente IA: genera las respuestas cuando un profesional lo usa",
+    ubicacion: "EE. UU.",
+    datos: "Solo cuando el profesional usa el asistente: el contenido clínico de la ficha consultada (o los datos de facturación), con el nombre y apellidos sustituidos por un alias y la edad en lugar de la fecha de nacimiento",
   },
 ];
