@@ -4,7 +4,7 @@
 // ═════════════════════════════════════════════════════════════════════════════
 export const TITULAR = "Kevin Costa";
 export const NIF = "72202218C";
-export const DOMICILIO = "Avenida Riomar 11"; // Añadir código postal y municipio
+export const DOMICILIO = "Avenida Riomar 11, 39700 Castro Urdiales (Cantabria)";
 export const EMAIL_CONTACTO = "contacto.praxiclinic@gmail.com";
 export const WEB = "www.praxiclinic.com";
 

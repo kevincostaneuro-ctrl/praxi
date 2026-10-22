@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback, createContext, useContext } from "react";
 import { supabase, leerTodo, sincronizar } from "./supabase.js";
-import { RECURSOS } from "./recursos";
+import { RECURSOS, PROFESIONES } from "./recursos";
 import { VERSION_TERMINOS } from "./legal.js";
 // ── Asistente IA ─────────────────────────────────────────────────────────────
 // Oculto hasta configurar la clave de Anthropic en Vercel. Para activarlo: true.
@@ -2789,49 +2789,63 @@ function Recursos(){
   return <BibliotecaRecursos/>;
 }
 function BibliotecaRecursos(){
+  const[prof,setProf]=useState("psicologia");
   const[cat,setCat]=useState("paciente");
   const[q,setQ]=useState("");
   const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-  const lista=RECURSOS.filter(r=>r.cat===cat&&(!q.trim()||norm(r.titulo+" "+r.desc+" "+r.tipo).includes(norm(q.trim()))));
-  const n=c=>RECURSOS.filter(r=>r.cat===c).length;
+  const deProf=RECURSOS.filter(r=>r.prof===prof);
+  const lista=deProf.filter(r=>r.cat===cat&&(!q.trim()||norm(`${r.titulo} ${r.desc} ${r.tipo} ${r.categoria}`).includes(norm(q.trim()))));
+  // Agrupar por categoría, en el orden en que aparecen
+  const grupos=[];lista.forEach(r=>{let g=grupos.find(x=>x.nombre===r.categoria);if(!g){g={nombre:r.categoria,items:[]};grupos.push(g);}g.items.push(r);});
+  const n=(pr,c)=>RECURSOS.filter(r=>r.prof===pr&&(!c||r.cat===c)).length;
   return(
     <div>
       <div style={{marginBottom:20}}>
         <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Recursos</div>
         <div style={{fontSize:13,color:C.muted,marginTop:2}}>{RECURSOS.length} materiales clínicos en PDF, listos para imprimir o enviar</div>
       </div>
+      <div style={{display:"flex",gap:3,background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,padding:3,marginBottom:14,width:"fit-content"}}>
+        {PROFESIONES.map(pr=>(
+          <button key={pr.id} onClick={()=>{setProf(pr.id);setQ("");}} style={{...st.btn("sm"),padding:"7px 18px",background:prof===pr.id?C.aD:"transparent",color:prof===pr.id?C.bone:C.muted,border:"none"}}>
+            {pr.label} <span style={{opacity:0.7}}>· {n(pr.id)}</span>
+          </button>
+        ))}
+      </div>
       <div style={{display:"flex",flexWrap:"wrap",alignItems:"center",justifyContent:"space-between",gap:12,borderBottom:`1px solid ${C.border}`,marginBottom:20}}>
         <div style={{display:"flex"}}>
           {[["paciente","Para el paciente"],["profesional","Para el profesional"]].map(([id,l])=>(
-            <button key={id} onClick={()=>setCat(id)} style={st.tab(cat===id)}>{l} <span style={{color:C.muted,fontWeight:400}}>· {n(id)}</span></button>
+            <button key={id} onClick={()=>setCat(id)} style={st.tab(cat===id)}>{l} <span style={{color:C.muted,fontWeight:400}}>· {n(prof,id)}</span></button>
           ))}
         </div>
         <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Buscar recurso…" aria-label="Buscar recurso"
           style={{...st.input,width:240,maxWidth:"100%",marginBottom:8,borderRadius:10}}/>
       </div>
-      <div style={{fontSize:12.5,color:C.muted,marginBottom:16,lineHeight:1.6}}>
-        {cat==="paciente"
-          ?"Hojas de registro, psicoeducación y ejercicios para entregar a tus pacientes. Incluyen al pie los teléfonos 024 y 112."
-          :"Escalas, protocolos y plantillas para tu práctica clínica. Las escalas reproducen la versión oficial en español e indican su fuente."}
-      </div>
-      {lista.length===0
+      {grupos.length===0
         ?<div style={{...st.card,padding:32,textAlign:"center",color:C.muted,fontSize:13}}>No hay recursos que coincidan con «{q}».</div>
-        :<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(250px,1fr))",gap:14}}>
-          {lista.map(r=>(
-            <div key={r.url} style={{...st.card,padding:"18px 20px",display:"flex",flexDirection:"column",gap:8}}>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
-                <span style={{...st.badge(C.walnut,C.sand)}}>{r.tipo}</span>
-                <span style={{fontSize:11,color:C.muted,letterSpacing:"0.05em"}}>{(r.cat==="paciente"?"PAC-":"PRO-")+r.num}</span>
-              </div>
-              <div style={{fontSize:15,fontWeight:600,lineHeight:1.35,color:C.text}}>{r.titulo}</div>
-              <div style={{fontSize:12.5,color:C.muted,lineHeight:1.55,flex:1}}>{r.desc}</div>
-              <div style={{display:"flex",gap:8,marginTop:4}}>
-                <a href={r.url} target="_blank" rel="noopener" style={{...st.btn("sm"),textDecoration:"none",display:"inline-flex",alignItems:"center"}}>Abrir PDF</a>
-                <a href={r.url} download style={{...st.btn("teal"),padding:"5px 14px",fontSize:12,textDecoration:"none",display:"inline-flex",alignItems:"center"}}>Descargar</a>
-              </div>
+        :grupos.map(g=>(
+          <div key={g.nombre} style={{marginBottom:24}}>
+            <div style={{display:"flex",alignItems:"baseline",gap:8,marginBottom:10}}>
+              <div style={{fontSize:20,fontFamily:"'Instrument Serif',serif",color:C.ink}}>{g.nombre}</div>
+              <div style={{fontSize:12,color:C.muted}}>{g.items.length}</div>
             </div>
-          ))}
-        </div>}
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(250px,1fr))",gap:14}}>
+              {g.items.map(r=>(
+                <div key={r.url} style={{...st.card,padding:"18px 20px",display:"flex",flexDirection:"column",gap:8}}>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+                    <span style={{...st.badge(C.walnut,C.sand)}}>{r.tipo}</span>
+                    <span style={{fontSize:11,color:C.muted,letterSpacing:"0.05em"}}>{r.codigo}</span>
+                  </div>
+                  <div style={{fontSize:15,fontWeight:600,lineHeight:1.35,color:C.text}}>{r.titulo}</div>
+                  <div style={{fontSize:12.5,color:C.muted,lineHeight:1.55,flex:1}}>{r.desc}</div>
+                  <div style={{display:"flex",gap:8,marginTop:4}}>
+                    <a href={r.url} target="_blank" rel="noopener" style={{...st.btn("sm"),textDecoration:"none",display:"inline-flex",alignItems:"center"}}>Abrir PDF</a>
+                    <a href={r.url} download style={{...st.btn("teal"),padding:"5px 14px",fontSize:12,textDecoration:"none",display:"inline-flex",alignItems:"center"}}>Descargar</a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
     </div>
   );
 }
