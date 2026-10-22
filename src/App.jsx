@@ -1960,6 +1960,14 @@ function CitaModal({cita,patients,tipos,onClose,onSave,onDelete,defaultFecha,def
           </div>
           {!form.zoomLink&&!enlaceDe(form.pacienteId)&&<div style={{fontSize:12,color:C.muted,marginTop:6}}>Guarda tu enlace fijo en «Mi videollamada» (abajo a la izquierda) y se pondrá solo en cada cita.</div>}
         </Field>
+        {(()=>{const pa=patients.find(x=>x.id==form.pacienteId);if(!pa)return null;const tel=telWhatsApp(pa.telefono);
+          return tel.length>=8
+            ?<a href={`https://wa.me/${tel}?text=${encodeURIComponent(mensajeCita(pa.nombre,form.fecha,form.hora,(form.zoomLink||"").trim()))}`} target="_blank" rel="noreferrer"
+                style={{...st.btn("sm"),background:"#E3EEDC",color:"#3F6B34",textDecoration:"none",display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"9px 14px",fontSize:13}}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+                Enviar por WhatsApp a {pa.nombre}</a>
+            :<div style={{fontSize:12,color:C.muted}}>Añade el teléfono de {pa.nombre} en su ficha para poder enviarle la cita por WhatsApp.</div>;
+        })()}
         {errCita&&<div style={{padding:"8px 12px",background:C.rD,borderRadius:8,fontSize:12.5,color:C.red}}>{errCita}</div>}
         {sendStatus==="ok"&&<div style={{padding:"8px 12px",background:C.gD,borderRadius:8,fontSize:12,color:C.green,fontWeight:600}}>✓ Enviado a Make</div>}
         {sendStatus==="error"&&<div style={{padding:"8px 12px",background:C.rD,borderRadius:8,fontSize:12,color:C.red}}>✗ Error Make — <button style={{...st.btn("sm"),color:C.red}} onClick={()=>onSave({...form,zoomLink:(form.zoomLink||"").trim(),tipo:tipoActual?.nombre||""})}>Guardar sin Make</button></div>}
@@ -2157,6 +2165,12 @@ function AgendaPersonalPanel({tareas,setTareas,onEditTarea,fechaDefault}){
   );
 }
 
+// WhatsApp: número en formato internacional (sin +). Móviles españoles de 9 cifras → 34…
+const telWhatsApp=t=>{let d=String(t||"").replace(/[^\d+]/g,"");if(d.startsWith("+"))return d.slice(1);if(d.startsWith("00"))return d.slice(2);if(d.length===9)return"34"+d;return d;};
+const mensajeCita=(nombre,fecha,hora,enlace)=>{
+  const dia=fecha?fechaDe(fecha).toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}).replace(",",""):"";
+  return `Hola ${(nombre||"").split(" ")[0]}, te confirmo tu sesión del ${dia} a las ${hora}.`+(enlace?`\n\nEnlace para la videollamada: ${enlace}`:"")+`\n\nSi necesitas cambiarla, avísame. Un saludo.`;
+};
 // ── Mi videollamada: cada profesional guarda su enlace fijo ───────────────────
 function MiVideollamadaModal({yo,demo,onClose,onGuardado,onDemo}){
   const[enlace,setEnlace]=useState(yo.enlace_videollamada||"");
