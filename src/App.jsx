@@ -3432,18 +3432,6 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,horario,onInforme,o
   const ultSes=pProx?[...(pProx.sesiones||[])].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""))[0]:null;
   const ultPrueba=pProx?[...(pProx.pruebasRealizadas||[])].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""))[0]:null;
 
-  // ── Pendientes clínicos
-  const hace30=toYMD(addDays(ahora,-30));
-  const sinNota=citas.filter(c=>c.origen!=="calendly"&&c.pacienteId&&yaPaso(c)&&c.fecha>=hace30)
-    .filter(c=>{const p=pac(c.pacienteId);return p&&!(p.sesiones||[]).some(s=>s.fecha===c.fecha);})
-    .sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  const escalas=activos.flatMap(p=>{
-    const ult={};(p.pruebasRealizadas||[]).forEach(x=>{if(x.prueba&&x.fecha&&(!ult[x.prueba]||x.fecha>ult[x.prueba]))ult[x.prueba]=x.fecha;});
-    return Object.entries(ult).map(([prueba,f])=>({p,prueba,dias:diasEntre(fechaDe(f),ahora)})).filter(x=>x.dias>=28);
-  }).sort((a,b)=>b.dias-a.dias);
-  const sinConsent=activos.filter(p=>!p.consentimiento);
-  const totalPend=sinNota.length+escalas.length+sinConsent.length;
-
   // ── Pacientes activos sin próxima cita
   const conCita=new Set(citas.filter(c=>c.fecha>=todayStr&&c.pacienteId).map(c=>String(c.pacienteId)));
   const sinCita=activos.filter(p=>!conCita.has(String(p.id))).map(p=>{
@@ -3473,8 +3461,6 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,horario,onInforme,o
       {n!=null&&<span style={st.badge(n?C.accent:C.green,n?C.sand:C.gD)}>{n}</span>}
     </div>
   );
-  const ddmm=f=>`${f.slice(8,10)}/${f.slice(5,7)}`;
-  const MAX=4;
 
   return(
     <div style={{maxWidth:1280,margin:"0 auto"}}>
@@ -3516,24 +3502,6 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,horario,onInforme,o
       )}
 
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))",gap:14,marginBottom:14,alignItems:"start"}}>
-        <div style={{...st.card,padding:"16px 20px"}}>
-          <Titulo n={totalPend}>Pendientes clínicos</Titulo>
-          {totalPend===0&&<div style={{fontSize:13,color:C.green,padding:"6px 0"}}>Todo al día.</div>}
-          {sinNota.slice(0,MAX).map(c=>(
-            <Fila key={"n"+c.id} icono color={C.amber} onClick={()=>onAbrirPaciente(c.pacienteId)}
-              texto={<><b>{nameOf(c)}</b> · sesión sin registrar</>} detalle={c.fecha===todayStr?`hoy ${c.hora}`:ddmm(c.fecha)}/>
-          ))}
-          {escalas.slice(0,MAX).map(x=>(
-            <Fila key={"e"+x.p.id+x.prueba} icono color={C.accent} onClick={()=>onAbrirPaciente(x.p.id)}
-              texto={<><b>{x.p.nombre} {x.p.apellidos}</b> · repetir {x.prueba}</>} detalle={`hace ${Math.round(x.dias/7)} sem`}/>
-          ))}
-          {sinConsent.slice(0,MAX).map(p=>(
-            <Fila key={"c"+p.id} icono color={C.red} onClick={()=>onAbrirPaciente(p.id)}
-              texto={<><b>{p.nombre} {p.apellidos}</b> · sin consentimiento firmado</>}/>
-          ))}
-          {(sinNota.length>MAX||escalas.length>MAX||sinConsent.length>MAX)&&<div style={{fontSize:12,color:C.muted,paddingTop:8,borderTop:`1px solid ${C.border}`}}>Se muestran los {MAX} más antiguos de cada tipo.</div>}
-        </div>
-
         <div style={{...st.card,padding:"16px 20px"}}>
           <Titulo n={sinCita.length}>Sin próxima cita</Titulo>
           {sinCita.length===0&&<div style={{fontSize:13,color:C.green,padding:"6px 0"}}>Todos tus pacientes activos tienen cita.</div>}
