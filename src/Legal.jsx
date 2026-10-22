@@ -101,7 +101,7 @@ export function Privacidad() {
       </L>
       <H3>Emails que nos envías</H3>
       <L>
-        <li><strong>Datos:</strong> los que incluyas en tu mensaje. <strong>Finalidad:</strong> responderte. <strong>Base legal:</strong> tu solicitud y nuestro interés legítimo en atenderla. <strong>Plazo:</strong> el necesario para resolverla.</li>
+        <li><strong>Datos:</strong> los que incluyas en tu mensaje. <strong>Finalidad:</strong> responderte. <strong>Base legal:</strong> tu solicitud y nuestro interés legítimo en atenderla. <strong>Plazo:</strong> el necesario para resolverla. Recibimos el correo en Gmail (Google, empresa con sede en EE. UU.).</li>
       </L>
 
       <H>4. Con quién compartimos los datos</H>
