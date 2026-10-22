@@ -504,7 +504,7 @@ function Acceso({recuperando,onPasswordCambiada}){
         </div>}
         {modo!=="recuperar"&&<div><label style={st.label}>{modo==="login"?"Contraseña":"Contraseña (mínimo 8 caracteres)"}</label>
           <div style={{position:"relative"}}>
-            <input style={{...st.input,paddingRight:40}} type={show?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} autoComplete={modo==="login"?"current-password":"new-password"} placeholder="••••••••" onKeyDown={enter} autoFocus={modo==="nueva"||(!!invInfo&&modo==="alta")}/>
+            <input style={{...st.input,paddingRight:40}} type={show?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} autoComplete={modo==="login"?"current-password":"new-password"} onKeyDown={enter} autoFocus={modo==="nueva"||(!!invInfo&&modo==="alta")}/>
             <button type="button" onClick={()=>setShow(v=>!v)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:14}}>{show?"🙈":"👁"}</button>
           </div>
         </div>}
@@ -549,10 +549,10 @@ function Onboarding({session,onListo}){
       <div style={{fontSize:22,fontFamily:"'Instrument Serif',serif",textAlign:"center",color:C.ink,marginBottom:8}}>{invInfo?`Únete a ${invInfo.clinica}`:"Crea tu clínica"}</div>
       <div style={{fontSize:13,color:C.muted,textAlign:"center",marginBottom:22,lineHeight:1.5}}>{invInfo?"Completa tu perfil para empezar.":"Serás el administrador. Después podrás invitar a tu equipo."}</div>
       <div style={{display:"flex",flexDirection:"column",gap:14}}>
-        {!invInfo&&<div><label style={st.label}>Nombre de la clínica o consulta</label><input style={st.input} value={form.clinica} onChange={f("clinica")} autoFocus placeholder="Ej. Centro de Psicología Costa"/></div>}
+        {!invInfo&&<div><label style={st.label}>Nombre de la clínica o consulta</label><input style={st.input} value={form.clinica} onChange={f("clinica")} autoFocus/></div>}
         <div><label style={st.label}>Tu nombre y apellidos</label><input style={st.input} value={form.nombre} onChange={f("nombre")} autoFocus={!!invInfo}/></div>
-        <div><label style={st.label}>Especialidad (opcional)</label><input style={st.input} value={form.especialidad} onChange={f("especialidad")} placeholder="Ej. Psicología clínica"/></div>
-        {!invInfo&&<div><label style={st.label}>Código de acceso</label><input style={{...st.input,textTransform:"uppercase"}} value={form.codigo} onChange={f("codigo")} placeholder="Ej. PRAXI-XXXX" onKeyDown={e=>e.key==="Enter"&&!cargando&&enviar()}/>
+        <div><label style={st.label}>Especialidad (opcional)</label><input style={st.input} value={form.especialidad} onChange={f("especialidad")}/></div>
+        {!invInfo&&<div><label style={st.label}>Código de acceso</label><input style={{...st.input,textTransform:"uppercase"}} value={form.codigo} onChange={f("codigo")} onKeyDown={e=>e.key==="Enter"&&!cargando&&enviar()}/>
           <div style={{fontSize:12,color:C.muted,marginTop:6,lineHeight:1.5}}>Praxi está en acceso anticipado. ¿No tienes código? <a href="/" style={{color:C.accent}}>Apúntate a la lista de espera</a>.</div></div>}
       </div>
       <Aviso>{err}</Aviso>

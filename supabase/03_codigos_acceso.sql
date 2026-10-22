@@ -9,7 +9,7 @@
 -- Gestionar códigos (en el SQL Editor):
 --   Crear uno:      insert into codigos_acceso (codigo, usos_max, nota) values ('PRAXI-ANA', 1, 'Ana, psicóloga');
 --   Ver su uso:     select * from codigos_acceso;
---   Desactivarlo:   update codigos_acceso set activo = false where codigo = 'PRAXI-BETA';
+--   Desactivarlo:   update codigos_acceso set activo = false where codigo = 'MICODIGO';
 -- ═════════════════════════════════════════════════════════════════════════════
 
 create table if not exists codigos_acceso (
@@ -56,7 +56,8 @@ end $$;
 revoke all on function crear_clinica(text,text,text,text) from public, anon;
 grant execute on function crear_clinica(text,text,text,text) to authenticated;
 
--- Primer código para tus beta testers (10 usos). Cámbialo o crea otros.
-insert into codigos_acceso (codigo, usos_max, nota)
-values ('PRAXI-BETA', 10, 'Beta testers lista de espera')
-on conflict (codigo) do nothing;
+-- Los códigos NO se escriben en este archivo (el repositorio es público).
+-- Créalos directamente en el SQL Editor de Supabase, por ejemplo:
+--   insert into codigos_acceso (codigo, usos_max, nota) values ('MICODIGO', 10, 'Beta testers');
+-- Si ejecutaste una versión anterior de este archivo, desactiva el código de ejemplo:
+update codigos_acceso set activo = false where codigo = 'PRAXI-BETA';
