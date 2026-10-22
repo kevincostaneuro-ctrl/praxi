@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "./supabase.js";
 
 const C = {
   bg: "#F5EFE4", bone: "#FBF8F1", sand: "#E2D9C8",
@@ -40,7 +41,20 @@ const Logo = ({ size = 22, textColor = C.ink }) => (
 function WaitlistModal({ open, onClose }) {
   const [enviado, setEnviado] = useState(false);
   const [form, setForm] = useState({ nombre: "", email: "", profesion: "" });
+  const [error, setError] = useState("");
+  const [enviando, setEnviando] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const apuntarse = async () => {
+    setError("");
+    if (!form.nombre.trim() || !form.profesion) { setError("Rellena todos los campos."); return; }
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) { setError("Escribe un email válido."); return; }
+    setEnviando(true);
+    const { error } = await supabase.from("lista_espera").insert({ nombre: form.nombre.trim(), email: form.email.trim().toLowerCase(), profesion: form.profesion });
+    setEnviando(false);
+    // 23505 = ese email ya estaba apuntado: para la persona es igual que apuntarse
+    if (error && error.code !== "23505") { setError("No se ha podido enviar. Inténtalo de nuevo en un momento."); return; }
+    setEnviado(true);
+  };
   const inputStyle = { width: "100%", border: `1px solid ${C.border}`, borderRadius: 10, padding: "10px 12px", fontSize: 13, background: C.bg, color: C.ink, outline: "none", fontFamily: "'Manrope',sans-serif", boxSizing: "border-box" };
   const labelStyle = { fontSize: 10, color: C.muted, textTransform: "uppercase", letterSpacing: "0.07em", display: "block", marginBottom: 5 };
 
@@ -75,8 +89,9 @@ function WaitlistModal({ open, onClose }) {
                 {["Psicólogo/a","Neuropsicólogo/a","Fisioterapeuta","Nutricionista","Logopeda","Terapeuta ocupacional","Médico/a","Otro profesional sanitario"].map(p => <option key={p}>{p}</option>)}
               </select>
             </div>
-            <button onClick={() => { if(form.nombre&&form.email&&form.profesion) setEnviado(true); }} style={{ width: "100%", background: C.accent, color: C.bone, border: "none", borderRadius: 12, padding: "14px 0", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Manrope',sans-serif", marginBottom: 14 }}>
-              Apuntarme a la lista
+            {error && <div style={{ fontSize: 12, color: "#B85040", background: "#FAEAE8", borderRadius: 8, padding: "8px 12px", marginBottom: 12 }}>{error}</div>}
+            <button disabled={enviando} onClick={apuntarse} style={{ opacity: enviando ? 0.6 : 1, width: "100%", background: C.accent, color: C.bone, border: "none", borderRadius: 12, padding: "14px 0", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "'Manrope',sans-serif", marginBottom: 14 }}>
+              {enviando ? "Enviando…" : "Apuntarme a la lista"}
             </button>
             <div style={{ textAlign: "center", fontSize: 12, color: C.muted }}>
               ¿Ya tienes cuenta? <span onClick={() => { onClose(); window.location.href = "/app"; }} style={{ color: C.accent, fontWeight: 500, cursor: "pointer" }}>Iniciar sesión</span>

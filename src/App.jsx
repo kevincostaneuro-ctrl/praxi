@@ -1,30 +1,24 @@
-import { useState, useMemo, useEffect, useRef, createContext, useContext } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback, createContext, useContext } from "react";
+import { supabase, leerTodo, sincronizar } from "./supabase.js";
 const DemoCtx=createContext(false);
+// Equipo: quién soy, si soy admin y los miembros de la clínica
+const EquipoCtx=createContext({esAdmin:true,miembros:[],miId:null});
 
 const PRAXI_LOGO="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATwAAAB2CAYAAABVsS+4AAAWfmNhQlgAABZ+anVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAAFlhqdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOjk3MDcyNzY0LWQ5MTItNDgxNS04NWIxLWZmZmEyZDEzZmI2YgAAAAOTanVtYgAAAClqdW1kYzJhcwARABCAAACqADibcQNjMnBhLmFzc2VydGlvbnMAAAAAuGp1bWIAAABEanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5pbmdyZWRpZW50LnYzAAAAABhjMnNodm2EDQbAWyJEphhpr9wNWQAAAGxjYm9yo2lkYzpmb3JtYXRpaW1hZ2UvcG5namluc3RhbmNlSUR4LHhtcDppaWQ6ZDJiMDg2ZjUtOTYxYy00YTc5LWI2MTYtNDY5YzEzNmFlOTA2bHJlbGF0aW9uc2hpcGhwYXJlbnRPZgAAAeJqdW1iAAAAQWp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuYWN0aW9ucy52MgAAAAAYYzJzaFJlJpPkAZPn9JcsJ67IxxoAAAGZY2JvcqJnYWN0aW9uc4KiZmFjdGlvbmtjMnBhLm9wZW5lZGpwYXJhbWV0ZXJzoWtpbmdyZWRpZW50c4GiY3VybHgtc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5pbmdyZWRpZW50LnYzZGhhc2hYILXaPaSAuJCQ1WTi+7TCkaDUgS4sQQalFvnE8b+Zo5QxpGZhY3Rpb254HWNvbS5hbnRocm9waWMuY2xhdWRlLnByb3ZpZGVkanBhcmFtZXRlcnOheB9jb20uYW50aHJvcGljLm9yaWdpbi1jb25maWRlbmNlZ3Vua25vd25rZGVzY3JpcHRpb254ZkNsYXVkZSBwcm92aWRlZCB0aGlzIGZpbGUgYXQgdGhlIHJlcXVlc3Qgb2YgYSB1c2VyIGFuZCBtYXkgaGF2ZSBjcmVhdGVkIG9yIG1vZGlmaWVkIHRoZSBmaWxlIGNvbnRlbnRzLm1zb2Z0d2FyZUFnZW50oWRuYW1lZkNsYXVkZXJhbGxBY3Rpb25zSW5jbHVkZWT1AAAAyGp1bWIAAABAanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5oYXNoLmRhdGEAAAAAGGMyc2gja813DQTaZ4aJmNqAP78jAAAAgGNib3KlY2FsZ2ZzaGEyNTZjcGFkTQAAAAAAAAAAAAAAAABkaGFzaFggZ4zxoi3wWvcJQGb7b4KBskCVjqpuHu49473ZGfSD1cVkbmFtZW5qdW1iZiBtYW5pZmVzdGpleGNsdXNpb25zgaJlc3RhcnQYIWZsZW5ndGgZFooAAAI+anVtYgAAACdqdW1kYzJjbAARABCAAACqADibcQNjMnBhLmNsYWltLnYyAAAAAg9jYm9ypWNhbGdmc2hhMjU2aXNpZ25hdHVyZXhNc2VsZiNqdW1iZj0vYzJwYS91cm46YzJwYTo5NzA3Mjc2NC1kOTEyLTQ4MTUtODViMS1mZmZhMmQxM2ZiNmIvYzJwYS5zaWduYXR1cmVqaW5zdGFuY2VJRHgseG1wOmlpZDoyYzEzODMwYi0wNmI4LTRiNTAtYmI0Yi03YWViMjFkODdlNjJyY3JlYXRlZF9hc3NlcnRpb25zg6JjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggtdo9pIC4kJDVZOL7tMKRoNSBLixBBqUW+cTxv5mjlDGiY3VybHgqc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5hY3Rpb25zLnYyZGhhc2hYINlbdVgZyIdwhgMoOp0vufUYAcgQA+f6eUtWloD8iD5WomN1cmx4KXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaGFzaC5kYXRhZGhhc2hYIJqflx0PdlCz9uKjS6yWHcGwB/VmIHBgu8X0guqLjojSdGNsYWltX2dlbmVyYXRvcl9pbmZvo2RuYW1lb0FudGhyb3BpYyBGaWxlc2d2ZXJzaW9uZTEuMC4wa3NwZWNWZXJzaW9uZTIuNC4wAAAQOGp1bWIAAAAoanVtZGMyY3MAEQAQgAAAqgA4m3EDYzJwYS5zaWduYXR1cmUAAAAQCGNib3LShFkCEqIBJhghWQIKMIICBjCCAY2gAwIBAgIUQOWgCu7COdC+uIP6BkIFPWdVEwAwCgYIKoZIzj0EAwMwSTEXMBUGA1UEChMOQW50aHJvcGljLCBQQkMxLjAsBgNVBAMTJUFudGhyb3BpYyBDb250ZW50IENyZWRlbnRpYWxzIFJvb3QgQ0EwHhcNMjYwODA3MTg0MzU2WhcNMjgwODA2MTk0MzU2WjBEMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEpMCcGA1UEAxMgQW50aHJvcGljIENsYXVkZSBDb250ZW50IFNpZ25pbmcwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASYegpry1AYBRTVNL1CpTlbROnY3dey+UrsF9C3phYrATN3ZHf93Mo8RQN0KOUuOn19P4oWNFWe5n2/She9N7eTo1gwVjAOBgNVHQ8BAf8EBAMCB4AwFQYDVR0lBA4wDAYKKwYBBAGD6F4CATAMBgNVHRMBAf8EAjAAMB8GA1UdIwQYMBaAFM5R4gSBTmRbI/jjxM+aPpzB11zCMAoGCCqGSM49BAMDA2cAMGQCMDFzHRSeAXrSy1WOzkbhPZ6Km2wGTmZ/2gK18k8BQGXyqz88Rdrz6CTX9flAnYNVxgIwcF9c3fVhqmJKpi+UhasNUMko69cyX6STPfta3Q8EjyzDjzoyrol46FP6VFHhvUcJoWNwYWRZDZ4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA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";
 
 // ── CONSTANTS ──────────────────────────────────────────────────────────────────
-// ── CLINICA + PROFESIONALES STORE ─────────────────────────────────────────────
-// En producción esto va en Supabase. Por ahora en memoria.
-const INITIAL_CLINICA={
-  id:"c1",
-  nombre:"Clínica Praxi",
-  email:"admin@praxi.com",
-  password:"praxi2026",
-  creadoEn:new Date().toISOString(),
-};
+// ── DATOS DE LA DEMO PÚBLICA (/demo) ─────────────────────────────────────────
+// La app real (/app) carga clínica, equipo y pacientes desde Supabase.
+const INITIAL_CLINICA={id:"c1",nombre:"Clínica Praxi (demo)"};
 
 const INITIAL_PROFESIONALES=[
-  {id:"u1",nombre:"Kevin Costa",usuario:"kevin",email:"kevin@praxi.com",password:"kevinpraxi",
-   especialidad:"Neuropsicología",color:"#A66B3F",rol:"admin",
-   clinicaId:"c1",activo:true,creadoEn:new Date().toISOString()},
-  {id:"u2",nombre:"María López",email:"maria@praxi.com",password:"psico2026",
-   especialidad:"Psicología Clínica",color:"#6B8C5A",rol:"profesional",
-   clinicaId:"c1",activo:true,creadoEn:new Date().toISOString()},
+  {id:"u1",nombre:"Kevin Costa",email:"kevin@praxi.com",
+   especialidad:"Neuropsicología",color:"#A66B3F",rol:"admin",activo:true},
+  {id:"u2",nombre:"María López",email:"maria@praxi.com",
+   especialidad:"Psicología Clínica",color:"#6B8C5A",rol:"profesional",activo:true},
 ];
 
-let CLINICA_STORE={...INITIAL_CLINICA};
-let PROF_STORE=[...INITIAL_PROFESIONALES];
+const CLINICA_STORE=INITIAL_CLINICA;
 const WORK_START = 8, WORK_END = 20;
 const HOURS = Array.from({ length: WORK_END - WORK_START }, (_, i) => WORK_START + i);
 const HALF_HOURS = HOURS.flatMap(h => [`${pad(h)}:00`, `${pad(h)}:30`]);
@@ -410,41 +404,166 @@ const SAMPLE_CITAS=[
 // ══════════════════════════════════════════════════════════════════════════════
 // LOGIN
 // ══════════════════════════════════════════════════════════════════════════════
-function Login({onLogin}){
-  const[usuario,setUsuario]=useState("");
-  const[password,setPassword]=useState("");
-  const[show,setShow]=useState(false);
-  const[err,setErr]=useState("");
+// ── Pantallas de acceso (Supabase Auth) ───────────────────────────────────────
+const leerInvitacion=()=>{
+  try{
+    const t=new URLSearchParams(window.location.search).get("inv");
+    if(t){localStorage.setItem("praxi_inv",t);return t;}
+    return localStorage.getItem("praxi_inv")||null;
+  }catch{return null;}
+};
+const olvidarInvitacion=()=>{try{localStorage.removeItem("praxi_inv");}catch{}};
+const traducirError=e=>{
+  const m=(e?.message||String(e||"")).toLowerCase();
+  if(m.includes("invalid login"))return "Email o contraseña incorrectos.";
+  if(m.includes("email not confirmed"))return "Todavía no has confirmado tu email. Revisa tu bandeja de entrada (y spam).";
+  if(m.includes("already registered")||m.includes("already been registered"))return "Ya existe una cuenta con ese email. Inicia sesión.";
+  if(m.includes("password should be")||m.includes("at least"))return "La contraseña debe tener al menos 8 caracteres.";
+  if(m.includes("rate limit")||m.includes("security purposes"))return "Demasiados intentos. Espera un minuto y vuelve a probar.";
+  if(m.includes("otro email"))return "Esta invitación es para otro email. Entra con el email al que te invitaron.";
+  if(m.includes("no válida")||m.includes("caducada"))return "La invitación no es válida o ha caducado. Pide una nueva al administrador.";
+  if(m.includes("ya pertenece"))return "Tu cuenta ya pertenece a una clínica.";
+  if(m.includes("failed to fetch")||m.includes("network"))return "No hay conexión con el servidor. Revisa tu internet.";
+  return e?.message||"Ha ocurrido un error.";
+};
 
-  const entrar=()=>{
-    setErr("");
-    const u=usuario.trim().toLowerCase();
-    const prof=PROF_STORE.find(p=>(p.usuario||"").toLowerCase()===u||p.email.toLowerCase()===u);
-    if(!prof||prof.password!==password){setErr("Usuario o contraseña incorrectos.");return;}
-    if(!prof.activo){setErr("Esta cuenta está desactivada.");return;}
-    onLogin(prof,CLINICA_STORE);
-  };
-
+function CajaAcceso({children,ancho=420}){
   return(
     <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Manrope',sans-serif",padding:16,boxSizing:"border-box"}}>
       <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
-      <div style={{width:"100%",maxWidth:400,background:C.bone,border:`1px solid ${C.border}`,borderRadius:18,padding:"44px 36px",boxSizing:"border-box",boxShadow:"0 1px 2px rgba(59,42,30,0.06),0 8px 24px -12px rgba(59,42,30,0.14)"}}>
-        <img src={PRAXI_LOGO} alt="praXi" style={{height:56,display:"block",margin:"0 auto 32px"}}/>
-        <div style={{display:"flex",flexDirection:"column",gap:14}}>
-          <div><label style={st.label}>Usuario</label>
-            <input style={st.input} value={usuario} onChange={e=>setUsuario(e.target.value)} autoFocus autoComplete="username" onKeyDown={e=>e.key==="Enter"&&entrar()}/>
-          </div>
-          <div><label style={st.label}>Contraseña</label>
-            <div style={{position:"relative"}}>
-              <input style={{...st.input,paddingRight:40}} type={show?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&entrar()}/>
-              <button type="button" onClick={()=>setShow(v=>!v)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:14}}>{show?"🙈":"👁"}</button>
-            </div>
-          </div>
-        </div>
-        {err&&<div style={{fontSize:12,color:C.red,marginTop:14,padding:"8px 12px",background:C.rD,borderRadius:8}}>{err}</div>}
-        <button style={{...st.btn(),width:"100%",padding:"12px 0",fontSize:14,marginTop:20}} onClick={entrar}>Entrar</button>
+      <div style={{width:"100%",maxWidth:ancho,background:C.bone,border:`1px solid ${C.border}`,borderRadius:18,padding:"40px 34px",boxSizing:"border-box",boxShadow:"0 1px 2px rgba(59,42,30,0.06),0 8px 24px -12px rgba(59,42,30,0.14)"}}>
+        <a href="/"><img src={PRAXI_LOGO} alt="praXi" style={{height:52,display:"block",margin:"0 auto 28px"}}/></a>
+        {children}
       </div>
     </div>
+  );
+}
+const Aviso=({tipo="error",children})=>children?<div style={{fontSize:13,marginTop:14,padding:"9px 12px",borderRadius:8,lineHeight:1.5,color:tipo==="ok"?C.green:C.red,background:tipo==="ok"?C.gD:C.rD}}>{children}</div>:null;
+const Enlace=({onClick,children})=><button type="button" onClick={onClick} style={{background:"none",border:"none",color:C.accent,cursor:"pointer",fontSize:13,padding:0,fontFamily:"'Manrope',sans-serif",textDecoration:"underline"}}>{children}</button>;
+
+function Acceso({recuperando,onPasswordCambiada}){
+  const inv=leerInvitacion();
+  const[modo,setModo]=useState(recuperando?"nueva":inv?"alta":"login");
+  const[invInfo,setInvInfo]=useState(null);
+  const[email,setEmail]=useState("");
+  const[password,setPassword]=useState("");
+  const[show,setShow]=useState(false);
+  const[err,setErr]=useState("");
+  const[ok,setOk]=useState("");
+  const[cargando,setCargando]=useState(false);
+
+  useEffect(()=>{if(recuperando)setModo("nueva");},[recuperando]);
+  useEffect(()=>{
+    if(!inv)return;
+    supabase.rpc("ver_invitacion",{p_token:inv}).then(({data})=>{
+      const i=data?.[0];
+      if(i){setInvInfo(i);setEmail(i.email);}else{setErr("La invitación no es válida o ha caducado. Pide una nueva al administrador.");olvidarInvitacion();}
+    });
+  },[inv]);
+
+  const volver=window.location.origin+"/app"+(inv?`?inv=${inv}`:"");
+  const ir=m=>{setModo(m);setErr("");setOk("");};
+  const ejecutar=async fn=>{setErr("");setOk("");setCargando(true);try{await fn();}catch(e){setErr(traducirError(e));}setCargando(false);};
+
+  const entrar=()=>ejecutar(async()=>{
+    const{error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
+    if(error)throw error;
+  });
+  const crearCuenta=()=>ejecutar(async()=>{
+    if(password.length<8)throw new Error("La contraseña debe tener al menos 8 caracteres.");
+    const{data,error}=await supabase.auth.signUp({email:email.trim(),password,options:{emailRedirectTo:volver}});
+    if(error)throw error;
+    if(!data.session)setOk(`Te hemos enviado un email a ${email.trim()}. Ábrelo y pulsa el enlace para confirmar tu cuenta.`);
+  });
+  const recuperar=()=>ejecutar(async()=>{
+    const{error}=await supabase.auth.resetPasswordForEmail(email.trim(),{redirectTo:window.location.origin+"/app"});
+    if(error)throw error;
+    setOk("Si existe una cuenta con ese email, te llegará un enlace para crear una contraseña nueva.");
+  });
+  const nuevaPassword=()=>ejecutar(async()=>{
+    if(password.length<8)throw new Error("La contraseña debe tener al menos 8 caracteres.");
+    const{error}=await supabase.auth.updateUser({password});
+    if(error)throw error;
+    onPasswordCambiada&&onPasswordCambiada();
+  });
+
+  const accion={login:entrar,alta:crearCuenta,recuperar,nueva:nuevaPassword}[modo];
+  const titulo={login:"Iniciar sesión",alta:invInfo?"Únete a tu clínica":"Crear cuenta",recuperar:"Recuperar contraseña",nueva:"Nueva contraseña"}[modo];
+  const boton={login:"Entrar",alta:"Crear cuenta",recuperar:"Enviar enlace",nueva:"Guardar contraseña"}[modo];
+  const enter=e=>e.key==="Enter"&&!cargando&&accion();
+
+  return(
+    <CajaAcceso>
+      <div style={{fontSize:22,fontFamily:"'Instrument Serif',serif",textAlign:"center",color:C.ink,marginBottom:invInfo&&modo==="alta"?8:22}}>{titulo}</div>
+      {invInfo&&modo==="alta"&&<div style={{fontSize:13,color:C.walnut,textAlign:"center",marginBottom:22,lineHeight:1.5}}>Te han invitado a <strong>{invInfo.clinica}</strong>. Crea tu contraseña para entrar.</div>}
+      <div style={{display:"flex",flexDirection:"column",gap:14}}>
+        {modo!=="nueva"&&<div><label style={st.label}>Email</label>
+          <input style={st.input} type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" autoFocus={!invInfo} readOnly={!!invInfo&&modo==="alta"} onKeyDown={enter}/>
+        </div>}
+        {modo!=="recuperar"&&<div><label style={st.label}>{modo==="login"?"Contraseña":"Contraseña (mínimo 8 caracteres)"}</label>
+          <div style={{position:"relative"}}>
+            <input style={{...st.input,paddingRight:40}} type={show?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} autoComplete={modo==="login"?"current-password":"new-password"} placeholder="••••••••" onKeyDown={enter} autoFocus={modo==="nueva"||(!!invInfo&&modo==="alta")}/>
+            <button type="button" onClick={()=>setShow(v=>!v)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:14}}>{show?"🙈":"👁"}</button>
+          </div>
+        </div>}
+      </div>
+      <Aviso>{err}</Aviso>
+      <Aviso tipo="ok">{ok}</Aviso>
+      <button disabled={cargando} style={{...st.btn(),width:"100%",padding:"12px 0",fontSize:14,marginTop:20,opacity:cargando?0.6:1}} onClick={accion}>{cargando?"Un momento…":boton}</button>
+      <div style={{display:"flex",justifyContent:"center",gap:16,flexWrap:"wrap",marginTop:18}}>
+        {modo==="login"&&<Enlace onClick={()=>ir("recuperar")}>¿Has olvidado tu contraseña?</Enlace>}
+        {modo==="login"&&<Enlace onClick={()=>ir("alta")}>Crear cuenta</Enlace>}
+        {(modo==="alta"||modo==="recuperar")&&<Enlace onClick={()=>ir("login")}>Ya tengo cuenta</Enlace>}
+      </div>
+    </CajaAcceso>
+  );
+}
+
+// Después de entrar, si el usuario aún no pertenece a ninguna clínica
+function Onboarding({session,onListo}){
+  const inv=leerInvitacion();
+  const[invInfo,setInvInfo]=useState(null);
+  const[form,setForm]=useState({clinica:"",nombre:"",especialidad:""});
+  const[err,setErr]=useState("");
+  const[cargando,setCargando]=useState(false);
+  const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
+  useEffect(()=>{if(inv)supabase.rpc("ver_invitacion",{p_token:inv}).then(({data})=>{const i=data?.[0];if(i)setInvInfo(i);else olvidarInvitacion();});},[inv]);
+  const enviar=async()=>{
+    setErr("");
+    if(!form.nombre.trim()){setErr("Escribe tu nombre.");return;}
+    if(!invInfo&&!form.clinica.trim()){setErr("Escribe el nombre de la clínica o consulta.");return;}
+    setCargando(true);
+    const{error}=invInfo
+      ?await supabase.rpc("aceptar_invitacion",{p_token:inv,p_nombre:form.nombre.trim(),p_especialidad:form.especialidad.trim()||null})
+      :await supabase.rpc("crear_clinica",{p_nombre:form.clinica.trim(),p_mi_nombre:form.nombre.trim(),p_especialidad:form.especialidad.trim()||null});
+    setCargando(false);
+    if(error){setErr(traducirError(error));return;}
+    olvidarInvitacion();
+    onListo();
+  };
+  return(
+    <CajaAcceso ancho={460}>
+      <div style={{fontSize:22,fontFamily:"'Instrument Serif',serif",textAlign:"center",color:C.ink,marginBottom:8}}>{invInfo?`Únete a ${invInfo.clinica}`:"Crea tu clínica"}</div>
+      <div style={{fontSize:13,color:C.muted,textAlign:"center",marginBottom:22,lineHeight:1.5}}>{invInfo?"Completa tu perfil para empezar.":"Serás el administrador. Después podrás invitar a tu equipo."}</div>
+      <div style={{display:"flex",flexDirection:"column",gap:14}}>
+        {!invInfo&&<div><label style={st.label}>Nombre de la clínica o consulta</label><input style={st.input} value={form.clinica} onChange={f("clinica")} autoFocus placeholder="Ej. Centro de Psicología Costa"/></div>}
+        <div><label style={st.label}>Tu nombre y apellidos</label><input style={st.input} value={form.nombre} onChange={f("nombre")} autoFocus={!!invInfo}/></div>
+        <div><label style={st.label}>Especialidad (opcional)</label><input style={st.input} value={form.especialidad} onChange={f("especialidad")} placeholder="Ej. Psicología clínica"/></div>
+      </div>
+      <Aviso>{err}</Aviso>
+      <button disabled={cargando} style={{...st.btn(),width:"100%",padding:"12px 0",fontSize:14,marginTop:20,opacity:cargando?0.6:1}} onClick={enviar}>{cargando?"Un momento…":invInfo?"Entrar en la clínica":"Crear clínica"}</button>
+      <div style={{textAlign:"center",marginTop:16,fontSize:12,color:C.muted}}>{session.user.email} · <Enlace onClick={()=>supabase.auth.signOut()}>Cerrar sesión</Enlace></div>
+    </CajaAcceso>
+  );
+}
+
+function PantallaEstado({titulo,texto,accion}){
+  return(
+    <CajaAcceso>
+      <div style={{fontSize:20,fontFamily:"'Instrument Serif',serif",textAlign:"center",color:C.ink,marginBottom:10}}>{titulo}</div>
+      {texto&&<div style={{fontSize:13,color:C.muted,textAlign:"center",lineHeight:1.6}}>{texto}</div>}
+      {accion&&<div style={{textAlign:"center",marginTop:20}}>{accion}</div>}
+    </CajaAcceso>
   );
 }
 
@@ -2159,17 +2278,19 @@ function Calendario({patients,citas,setCitas,config,setConfig,tipos,horario,tare
 // PACIENTES
 // ══════════════════════════════════════════════════════════════════════════════
 function Pacientes({patients,setPatients,onSelect,autoNew,onAutoNewDone}){
+  const{esAdmin,miembros,miId}=useContext(EquipoCtx);
+  const nombreProf=id=>miembros.find(m=>m.id===id)?.nombre||"Sin asignar";
   const[editP,setEditP]=useState(null);
   const[editForm,setEditForm]=useState({});
   const[showM,setShowM]=useState(false);const[form,setForm]=useState(mkPatient());const[editId,setEditId]=useState(null);const[filtro,setFiltro]=useState("todos");
-  const openNew=()=>{setForm(mkPatient());setEditId(null);setShowM(true);};
+  const openNew=()=>{setForm({...mkPatient(),profesionalId:miId});setEditId(null);setShowM(true);};
   useEffect(()=>{if(autoNew){openNew();onAutoNewDone&&onAutoNewDone();}},[autoNew]);
   const openEdit=(p,e)=>{e.stopPropagation();setForm({...p});setEditId(p.id);setShowM(true);};
-  const save=()=>{if(!form.nombre)return;if(editId)setPatients(ps=>ps.map(p=>p.id===editId?{...p,...form}:p));else setPatients(ps=>[...ps,{...mkPatient(),...form,id:Date.now()}]);setShowM(false);};
+  const save=()=>{if(!form.nombre)return;if(editId)setPatients(ps=>ps.map(p=>p.id===editId?{...p,...form}:p));else setPatients(ps=>[...ps,{...mkPatient(),...form,id:Date.now(),profesionalId:esAdmin?(form.profesionalId||miId):miId}]);setShowM(false);};
   const del=(id,e)=>{e.stopPropagation();if(confirm("¿Eliminar este paciente?\n\nSe eliminarán todas las sesiones, evolución clínica y facturas. No se puede deshacer."))setPatients(ps=>ps.filter(p=>p.id!==id));};
   const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
   const lista=filtro==="todos"?patients:patients.filter(p=>p.estado===filtro);
-  return(<div><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}><div><div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.5px"}}>Pacientes</div><div style={{color:C.muted,fontSize:13}}>{patients.length} registrados</div></div><div style={{display:"flex",gap:8}}><select style={{...st.input,width:130}} value={filtro} onChange={e=>setFiltro(e.target.value)}><option value="todos">Todos</option><option value="activo">Activos</option><option value="alta">Con alta</option><option value="inactivo">Inactivos</option></select><button style={st.btn()} onClick={openNew}>+ Nuevo paciente</button></div></div><div style={st.card}><table style={{width:"100%",borderCollapse:"collapse"}}><thead><tr><th style={st.th}>Paciente</th><th style={st.th}>Teléfono</th><th style={st.th}>Sesiones</th><th style={st.th}>Estado</th><th style={st.th}>Consentimiento</th><th style={st.th}>Docs</th><th style={st.th}>Acciones</th></tr></thead><tbody>{lista.map(p=>(<tr key={p.id} onClick={()=>onSelect(p.id)} style={{cursor:"pointer"}}><td style={st.td}><div style={{display:"flex",gap:10,alignItems:"center"}}><Avatar nombre={p.nombre} apellidos={p.apellidos} size={34}/><div><div style={{fontWeight:600}}>{p.nombre} {p.apellidos}</div><div style={{fontSize:11,color:C.muted}}>{p.email}</div></div></div></td><td style={st.td}>{p.telefono}</td><td style={st.td}><span style={st.badge(C.accent,C.sand)}>{p.sesiones.length}</span></td><td style={st.td}><span style={st.badge(p.estado==="activo"?C.green:p.estado==="alta"?C.walnut:C.muted,p.estado==="activo"?C.gD:p.estado==="alta"?C.sand:C.card)}>{p.estado}</span></td><td style={st.td}><span style={st.badge(p.consentimiento?C.green:C.amber,p.consentimiento?C.gD:C.amD)}>{p.consentimiento?"✓":"Pendiente"}</span></td><td style={st.td}><span style={st.badge(C.muted,C.card)}>{(p.documentos||[]).length}</span></td><td style={st.td}><div style={st.rowActions}><button style={st.btn("sm")} onClick={e=>{e.stopPropagation();onSelect(p.id);}}>Ver ficha</button><button style={st.btn("sm")} onClick={e=>openEdit(p,e)}>Editar</button><button style={{...st.btn("sm"),color:C.red,background:C.rD}} onClick={e=>del(p.id,e)}>Eliminar</button></div></td></tr>))}</tbody></table></div>{showM&&<Modal onClose={()=>setShowM(false)} title={editId?"Editar paciente":"Nuevo paciente"}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}><Field label="Nombre"><input style={st.input} value={form.nombre} onChange={f("nombre")}/></Field><Field label="Apellidos"><input style={st.input} value={form.apellidos} onChange={f("apellidos")}/></Field><Field label="Teléfono"><input style={st.input} value={form.telefono} onChange={f("telefono")}/></Field><Field label="Email"><input style={st.input} value={form.email} onChange={f("email")}/></Field><Field label="Fecha nacimiento"><input type="date" style={st.input} value={form.fechaNacimiento} onChange={f("fechaNacimiento")}/></Field><Field label="Estado"><select style={st.input} value={form.estado} onChange={f("estado")}><option value="activo">Activo</option><option value="alta">Alta</option><option value="inactivo">Inactivo</option></select></Field></div><MFooter onCancel={()=>setShowM(false)} onSave={save}/></Modal>}</div>);
+  return(<div><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}><div><div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.5px"}}>Pacientes</div><div style={{color:C.muted,fontSize:13}}>{patients.length} registrados</div></div><div style={{display:"flex",gap:8}}><select style={{...st.input,width:130}} value={filtro} onChange={e=>setFiltro(e.target.value)}><option value="todos">Todos</option><option value="activo">Activos</option><option value="alta">Con alta</option><option value="inactivo">Inactivos</option></select><button style={st.btn()} onClick={openNew}>+ Nuevo paciente</button></div></div><div style={st.card}><table style={{width:"100%",borderCollapse:"collapse"}}><thead><tr><th style={st.th}>Paciente</th><th style={st.th}>Teléfono</th><th style={st.th}>Sesiones</th><th style={st.th}>Estado</th><th style={st.th}>Consentimiento</th><th style={st.th}>Docs</th>{esAdmin&&<th style={st.th}>Profesional</th>}<th style={st.th}>Acciones</th></tr></thead><tbody>{lista.map(p=>(<tr key={p.id} onClick={()=>onSelect(p.id)} style={{cursor:"pointer"}}><td style={st.td}><div style={{display:"flex",gap:10,alignItems:"center"}}><Avatar nombre={p.nombre} apellidos={p.apellidos} size={34}/><div><div style={{fontWeight:600}}>{p.nombre} {p.apellidos}</div><div style={{fontSize:11,color:C.muted}}>{p.email}</div></div></div></td><td style={st.td}>{p.telefono}</td><td style={st.td}><span style={st.badge(C.accent,C.sand)}>{p.sesiones.length}</span></td><td style={st.td}><span style={st.badge(p.estado==="activo"?C.green:p.estado==="alta"?C.walnut:C.muted,p.estado==="activo"?C.gD:p.estado==="alta"?C.sand:C.card)}>{p.estado}</span></td><td style={st.td}><span style={st.badge(p.consentimiento?C.green:C.amber,p.consentimiento?C.gD:C.amD)}>{p.consentimiento?"✓":"Pendiente"}</span></td><td style={st.td}><span style={st.badge(C.muted,C.card)}>{(p.documentos||[]).length}</span></td>{esAdmin&&<td style={{...st.td,fontSize:12,color:C.walnut}}>{nombreProf(p.profesionalId)}</td>}<td style={st.td}><div style={st.rowActions}><button style={st.btn("sm")} onClick={e=>{e.stopPropagation();onSelect(p.id);}}>Ver ficha</button><button style={st.btn("sm")} onClick={e=>openEdit(p,e)}>Editar</button>{esAdmin&&<button style={{...st.btn("sm"),color:C.red,background:C.rD}} onClick={e=>del(p.id,e)}>Eliminar</button>}</div></td></tr>))}</tbody></table></div>{showM&&<Modal onClose={()=>setShowM(false)} title={editId?"Editar paciente":"Nuevo paciente"}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}><Field label="Nombre"><input style={st.input} value={form.nombre} onChange={f("nombre")}/></Field><Field label="Apellidos"><input style={st.input} value={form.apellidos} onChange={f("apellidos")}/></Field><Field label="Teléfono"><input style={st.input} value={form.telefono} onChange={f("telefono")}/></Field><Field label="Email"><input style={st.input} value={form.email} onChange={f("email")}/></Field><Field label="Fecha nacimiento"><input type="date" style={st.input} value={form.fechaNacimiento} onChange={f("fechaNacimiento")}/></Field><Field label="Estado"><select style={st.input} value={form.estado} onChange={f("estado")}><option value="activo">Activo</option><option value="alta">Alta</option><option value="inactivo">Inactivo</option></select></Field>{esAdmin&&<Field label="Profesional asignado"><select style={st.input} value={form.profesionalId||""} onChange={f("profesionalId")}>{miembros.filter(m=>m.activo||m.id===form.profesionalId).map(m=><option key={m.id} value={m.id}>{m.nombre}{m.id===miId?" (tú)":""}</option>)}</select></Field>}</div><MFooter onCancel={()=>setShowM(false)} onSave={save}/></Modal>}</div>);
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -2803,59 +2924,117 @@ function AgendaGlobal({citas,patients,profesionales}){
 // ══════════════════════════════════════════════════════════════════════════════
 // PANEL DE ADMINISTRACIÓN
 // ══════════════════════════════════════════════════════════════════════════════
-function AdminPanel({profesionales,setProfesionales,clinica}){
-  const[editP,setEditP]=useState(null);
-  const[form,setForm]=useState({});
-  const f=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
+// ══════════════════════════════════════════════════════════════════════════════
+// EQUIPO — miembros, roles e invitaciones (solo administrador)
+// ══════════════════════════════════════════════════════════════════════════════
+function EquipoPanel({clinica,miembros,yo,patients,demo,onCambio,bloquearDemo,setAviso}){
+  const[invs,setInvs]=useState([]);
+  const[email,setEmail]=useState("");
+  const[rol,setRol]=useState("profesional");
+  const[nuevo,setNuevo]=useState(null);
+  const[copiado,setCopiado]=useState(null);
+  const[err,setErr]=useState("");
+  const[enviando,setEnviando]=useState(false);
+  const enlace=t=>`${window.location.origin}/app?inv=${t}`;
+  const cargarInvs=useCallback(async()=>{
+    if(demo||!clinica?.id)return;
+    const{data}=await supabase.from("invitaciones").select("*").eq("clinica_id",clinica.id).eq("aceptada",false).order("creado_en",{ascending:false});
+    setInvs(data||[]);
+  },[demo,clinica?.id]);
+  useEffect(()=>{cargarInvs();},[cargarInvs]);
 
-  const toggleActivo=id=>setProfesionales(ps=>ps.map(p=>p.id===id?{...p,activo:!p.activo}:p));
-  const save=()=>{setProfesionales(ps=>ps.map(p=>p.id===editP?{...p,...form}:p));setEditP(null);};
+  const invitar=async()=>{
+    if(demo)return bloquearDemo();
+    setErr("");
+    const e=email.trim().toLowerCase();
+    if(!/^\S+@\S+\.\S+$/.test(e)){setErr("Escribe un email válido.");return;}
+    if(miembros.some(m=>m.email===e)){setErr("Esa persona ya forma parte de la clínica.");return;}
+    setEnviando(true);
+    const{data,error}=await supabase.from("invitaciones").insert({clinica_id:clinica.id,email:e,rol}).select().single();
+    setEnviando(false);
+    if(error){setErr(traducirError(error));return;}
+    setNuevo({email:e,url:enlace(data.token)});setEmail("");cargarInvs();
+  };
+  const copiar=async url=>{try{await navigator.clipboard.writeText(url);setCopiado(url);setTimeout(()=>setCopiado(null),2000);}catch{window.prompt("Copia este enlace:",url);}};
+  const anular=async id=>{if(demo)return bloquearDemo();await supabase.from("invitaciones").delete().eq("id",id);cargarInvs();};
+  const actualizar=async(m,cambios)=>{
+    if(demo)return bloquearDemo();
+    const{error}=await supabase.from("miembros").update(cambios).eq("id",m.id);
+    if(error)setAviso(/administrador activo/.test(error.message)?"La clínica debe tener al menos un administrador activo.":traducirError(error));
+    onCambio();
+  };
+  const mailto=(to,url)=>`mailto:${to}?subject=${encodeURIComponent(`Invitación a ${clinica.nombre} en Praxi`)}&body=${encodeURIComponent(`Hola,\n\nTe invito a unirte a ${clinica.nombre} en Praxi.\n\nEntra en este enlace y crea tu contraseña usando este mismo email (${to}):\n${url}\n\nEl enlace caduca en 7 días.`)}`;
+  const nPac=id=>patients.filter(p=>p.profesionalId===id).length;
+  const seccion={fontSize:12,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:500};
 
   return(
-    <div>
-      <div style={{marginBottom:24}}>
-        <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Administración</div>
-        <div style={{fontSize:13,color:C.muted,marginTop:2}}>{clinica?.nombre}</div>
-      </div>
+    <div style={{maxWidth:900}}>
+      <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Equipo</div>
+      <div style={{color:C.muted,fontSize:13,marginTop:2,marginBottom:20}}>{clinica?.nombre} · {miembros.filter(m=>m.activo).length} miembros activos</div>
 
-      <div style={{...st.card,padding:"20px 24px",marginBottom:16}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-          <div style={{fontSize:15,fontWeight:600}}>Profesionales</div>
-          <span style={st.badge(C.aL,C.sand)}>{profesionales.filter(p=>p.activo).length} activos</span>
+      <div style={{...st.card,padding:"18px 20px",marginBottom:16}}>
+        <div style={{...seccion,marginBottom:12}}>Invitar a un profesional</div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          <input style={{...st.input,flex:"1 1 240px",width:"auto"}} type="email" placeholder="email@ejemplo.com" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&invitar()}/>
+          <select style={{...st.input,width:160}} value={rol} onChange={e=>setRol(e.target.value)}>
+            <option value="profesional">Profesional</option>
+            <option value="admin">Administrador</option>
+          </select>
+          <button style={{...st.btn(),opacity:enviando?0.6:1}} disabled={enviando} onClick={invitar}>Crear invitación</button>
         </div>
-        {profesionales.map(p=>(
-          <div key={p.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:`1px solid ${C.border}`}}>
-            <div style={{width:36,height:36,borderRadius:"50%",background:p.color||C.sand,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:700,color:"#fff",flexShrink:0}}>{p.nombre[0]}</div>
-            <div style={{flex:1}}>
-              <div style={{fontSize:14,fontWeight:600,color:C.text}}>{p.nombre}
-                {p.rol==="admin"&&<span style={{...st.badge(C.accent,C.sand),fontSize:10,marginLeft:6}}>Admin</span>}
-              </div>
-              <div style={{fontSize:12,color:C.muted}}>{p.especialidad} · {p.email}</div>
-            </div>
-            <div style={{display:"flex",gap:6,alignItems:"center"}}>
-              <span style={st.badge(p.activo?C.green:C.muted,p.activo?C.gD:C.card)}>{p.activo?"Activo":"Inactivo"}</span>
-              <button style={st.btn("sm")} onClick={()=>{setEditP(p.id);setForm({nombre:p.nombre,especialidad:p.especialidad,color:p.color||C.accent});}}>Editar</button>
-              {p.rol!=="admin"&&<button style={{...st.btn("sm"),background:p.activo?C.rD:C.gD,color:p.activo?C.red:C.green}} onClick={()=>toggleActivo(p.id)}>{p.activo?"Desactivar":"Activar"}</button>}
+        <div style={{fontSize:12,color:C.muted,marginTop:8,lineHeight:1.5}}>Un <strong>profesional</strong> solo ve sus pacientes. Un <strong>administrador</strong> ve todos, gestiona el equipo y la configuración.</div>
+        {err&&<div style={{fontSize:12,color:C.red,marginTop:10}}>{err}</div>}
+        {nuevo&&(
+          <div style={{marginTop:14,padding:"12px 14px",background:C.gD,borderRadius:10}}>
+            <div style={{fontSize:13,color:C.green,fontWeight:600,marginBottom:6}}>Invitación creada para {nuevo.email}</div>
+            <div style={{fontSize:12,color:C.walnut,marginBottom:8}}>Envíale este enlace. Tendrá que registrarse con ese mismo email. Caduca en 7 días.</div>
+            <div style={{fontSize:12,background:C.bone,border:`1px solid ${C.border}`,borderRadius:6,padding:"6px 10px",wordBreak:"break-all",marginBottom:8}}>{nuevo.url}</div>
+            <div style={{display:"flex",gap:8}}>
+              <button style={st.btn("sm")} onClick={()=>copiar(nuevo.url)}>{copiado===nuevo.url?"✓ Copiado":"Copiar enlace"}</button>
+              <a href={mailto(nuevo.email,nuevo.url)} style={{...st.btn("sm"),textDecoration:"none",background:C.bone,color:C.accent,border:`1px solid ${C.accent}`}}>Enviar por email</a>
             </div>
           </div>
-        ))}
+        )}
       </div>
 
-      {editP&&(
-        <Modal onClose={()=>setEditP(null)} title="Editar profesional" width={440}>
-          <div style={{display:"flex",flexDirection:"column",gap:14}}>
-            <Field label="Nombre"><input style={st.input} value={form.nombre||""} onChange={f("nombre")}/></Field>
-            <Field label="Especialidad"><input style={st.input} value={form.especialidad||""} onChange={f("especialidad")}/></Field>
-            <Field label="Color identificativo">
-              <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                {["#A66B3F","#6B8C5A","#C48C2A","#7B6B8C","#8C4A3A","#4A7B6B","#6B8CAA","#AA6B6B"].map(col=>(
-                  <div key={col} onClick={()=>setForm(p=>({...p,color:col}))} style={{width:28,height:28,borderRadius:"50%",background:col,cursor:"pointer",border:form.color===col?`3px solid ${C.ink}`:"3px solid transparent"}}/>
-                ))}
+      <div style={{...st.card,marginBottom:16,overflow:"hidden"}}>
+        <div style={{...seccion,padding:"14px 20px",borderBottom:`1px solid ${C.border}`}}>Miembros</div>
+        {miembros.map(m=>{
+          const soyYo=m.id===yo?.id;
+          return(
+            <div key={m.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 20px",borderBottom:`1px solid ${C.border}`,opacity:m.activo?1:0.55,flexWrap:"wrap"}}>
+              <div style={{width:36,height:36,borderRadius:"50%",background:m.color||C.accent,color:C.bone,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,flexShrink:0}}>{(m.nombre||"?")[0].toUpperCase()}</div>
+              <div style={{flex:"1 1 200px",minWidth:0}}>
+                <div style={{fontSize:14,fontWeight:600,color:C.text}}>{m.nombre}{soyYo&&<span style={{color:C.muted,fontWeight:400}}> (tú)</span>}</div>
+                <div style={{fontSize:12,color:C.muted}}>{m.email}{m.especialidad?` · ${m.especialidad}`:""} · {nPac(m.id)} pacientes</div>
               </div>
-            </Field>
-          </div>
-          <MFooter onCancel={()=>setEditP(null)} onSave={save}/>
-        </Modal>
+              <span style={st.badge(m.rol==="admin"?C.accent:C.walnut,m.rol==="admin"?C.sand:C.card)}>{m.rol==="admin"?"Administrador":"Profesional"}</span>
+              {!m.activo&&<span style={st.badge(C.red,C.rD)}>Desactivado</span>}
+              {!soyYo&&(
+                <div style={{display:"flex",gap:6}}>
+                  {m.activo&&<button style={st.btn("sm")} onClick={()=>actualizar(m,{rol:m.rol==="admin"?"profesional":"admin"})}>{m.rol==="admin"?"Quitar admin":"Hacer admin"}</button>}
+                  <button style={{...st.btn("sm"),background:m.activo?C.rD:C.gD,color:m.activo?C.red:C.green}} onClick={()=>{if(!m.activo||confirm(`¿Desactivar a ${m.nombre}?\n\nPerderá el acceso al momento. Sus pacientes siguen en la clínica y puedes reasignarlos desde Pacientes → Editar.`))actualizar(m,{activo:!m.activo});}}>{m.activo?"Desactivar":"Reactivar"}</button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {invs.length>0&&(
+        <div style={{...st.card,overflow:"hidden"}}>
+          <div style={{...seccion,padding:"14px 20px",borderBottom:`1px solid ${C.border}`}}>Invitaciones pendientes</div>
+          {invs.map(i=>{
+            const caducada=new Date(i.expira_en)<new Date();
+            return(
+              <div key={i.id} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 20px",borderBottom:`1px solid ${C.border}`,flexWrap:"wrap"}}>
+                <div style={{flex:"1 1 200px",fontSize:13}}>{i.email} <span style={{color:C.muted}}>· {i.rol==="admin"?"Administrador":"Profesional"} · {caducada?"caducada":`caduca el ${new Date(i.expira_en).toLocaleDateString("es-ES")}`}</span></div>
+                {!caducada&&<button style={st.btn("sm")} onClick={()=>copiar(enlace(i.token))}>{copiado===enlace(i.token)?"✓ Copiado":"Copiar enlace"}</button>}
+                <button style={{...st.btn("sm"),background:C.rD,color:C.red}} onClick={()=>anular(i.id)}>Anular</button>
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );
@@ -3081,22 +3260,136 @@ function Dashboard({patients,citas,setCitas,tareas,setTareas,onInforme,onEditCit
 // ══════════════════════════════════════════════════════════════════════════════
 // APP ROOT
 // ══════════════════════════════════════════════════════════════════════════════
-const DEMO_USER={...INITIAL_PROFESIONALES[0],id:"demo",nombre:"Profesional demo",especialidad:"Psicología clínica",rol:"admin",password:""};
+const DEMO_USER={...INITIAL_PROFESIONALES[0],id:"demo",nombre:"Profesional demo",especialidad:"Psicología clínica",rol:"admin"};
+const DEMO_MIEMBROS=INITIAL_PROFESIONALES.map(p=>({...p,id:p.id==="u1"?"demo":p.id}));
+
+// Estado que avisa de cada cambio (prev → next) para guardarlo en Supabase
+function useEstadoSincronizado(inicial){
+  const[valor,setValor]=useState(inicial);
+  const ref=useRef(inicial);
+  const alCambiar=useRef(null);
+  const set=useCallback(upd=>{
+    const prev=ref.current;
+    const next=typeof upd==="function"?upd(prev):upd;
+    if(next===prev)return;
+    ref.current=next;setValor(next);
+    alCambiar.current&&alCambiar.current(prev,next);
+  },[]);
+  const cargar=useCallback(v=>{ref.current=v;setValor(v);},[]);
+  return[valor,set,cargar,alCambiar,ref];
+}
+
 export default function App({demo=false}){
-  const[currentUser,setCurrentUser]=useState(demo?DEMO_USER:null);
   const[demoToast,setDemoToast]=useState(false);
+  const[aviso,setAviso]=useState("");
   useEffect(()=>{if(!demoToast)return;const t=setTimeout(()=>setDemoToast(false),2600);return()=>clearTimeout(t);},[demoToast]);
+  useEffect(()=>{if(!aviso)return;const t=setTimeout(()=>setAviso(""),5000);return()=>clearTimeout(t);},[aviso]);
   // En la demo pública ningún cambio se guarda: los setters de datos no hacen nada y avisan
   const ro=setter=>demo?(()=>setDemoToast(true)):setter;
-  const[currentClinica,setCurrentClinica]=useState(CLINICA_STORE);
-  const[profesionales,_setProfesionales]=useState(INITIAL_PROFESIONALES);const setProfesionales=ro(_setProfesionales);
-  const[page,setPage]=useState("dashboard");
-  const[patients,_setPatients]=useState(SAMPLE_PATIENTS);const setPatients=ro(_setPatients);
-  const[citas,_setCitas]=useState(SAMPLE_CITAS);const setCitas=ro(_setCitas);
-  const[selectedId,setSelectedId]=useState(null);
+
+  // ── Sesión y clínica ──
+  const[session,setSession]=useState(null);
+  const[authListo,setAuthListo]=useState(demo);
+  const[recuperando,setRecuperando]=useState(false);
+  const[estado,setEstado]=useState(demo?"listo":"cargando");
+  const[currentUser,setCurrentUser]=useState(demo?DEMO_USER:null);
+  const[currentClinica,setCurrentClinica]=useState(demo?CLINICA_STORE:null);
+  const[profesionales,setProfesionales]=useState(demo?DEMO_MIEMBROS:[]);
+  const[pendientes,setPendientes]=useState(0);
+
+  // ── Datos ──
+  const[patients,setPatientsSync,cargarPatients,cambioPatients,patientsRef]=useEstadoSincronizado(demo?SAMPLE_PATIENTS.map((p,i)=>({...p,profesionalId:i%3===2?"u2":"demo"})):[]);
+  const[citas,setCitasSync,cargarCitas,cambioCitas]=useEstadoSincronizado(demo?SAMPLE_CITAS:[]);
+  const[tareas,setTareasSync,cargarTareas,cambioTareas]=useEstadoSincronizado([]);
+  const[tipos,setTiposSync,cargarTipos,cambioTipos,tiposRef]=useEstadoSincronizado(DEFAULT_TIPOS_CITA);
+  const[horario,setHorarioSync,cargarHorario,cambioHorario,horarioRef]=useEstadoSincronizado({start:WORK_START,end:WORK_END});
+  const setPatients=ro(setPatientsSync);
+  const setCitas=ro(setCitasSync);
+  const setTareas=ro(setTareasSync);
+  const setTipos=ro(setTiposSync);
+  const setHorario=ro(setHorarioSync);
   const[config,_setConfig]=useState({makeOut:""});const setConfig=ro(_setConfig);
-  const[tipos,_setTipos]=useState(DEFAULT_TIPOS_CITA);const setTipos=ro(_setTipos);
-  const[horario,_setHorario]=useState({start:WORK_START,end:WORK_END});const setHorario=ro(_setHorario);
+
+  const uid=session?.user?.id;
+  const cid=currentClinica?.id;
+  const esAdmin=currentUser?.rol==="admin";
+  const miId=currentUser?.id;
+
+  useEffect(()=>{
+    if(demo)return;
+    supabase.auth.getSession().then(({data})=>{setSession(data.session);setAuthListo(true);});
+    const{data:sub}=supabase.auth.onAuthStateChange((ev,s)=>{if(ev==="PASSWORD_RECOVERY")setRecuperando(true);setSession(s);});
+    return()=>sub.subscription.unsubscribe();
+  },[demo]);
+
+  const cargarTodo=useCallback(async()=>{
+    if(demo||!uid)return;
+    try{
+      const{data:mis,error}=await supabase.from("miembros").select("*").eq("user_id",uid);
+      if(error)throw error;
+      if(!mis.length){setEstado("sin-clinica");return;}
+      const yo=mis[0];
+      if(!yo.activo){setEstado("desactivado");return;}
+      const c=yo.clinica_id;
+      const[{data:cl,error:e1},{data:ms,error:e2},ps,cs,ts]=await Promise.all([
+        supabase.from("clinicas").select("*").eq("id",c).single(),
+        supabase.from("miembros").select("*").eq("clinica_id",c).order("creado_en"),
+        leerTodo("pacientes",c),leerTodo("citas",c),leerTodo("tareas",c),
+      ]);
+      if(e1||e2)throw(e1||e2);
+      setCurrentUser(yo);setCurrentClinica(cl);setProfesionales(ms);
+      cargarPatients(ps.map(r=>({...mkPatient(),...r.datos,id:Number(r.id),profesionalId:r.profesional_id})));
+      cargarCitas(cs.map(r=>({...r.datos,id:Number(r.id),profesionalId:r.profesional_id})));
+      cargarTareas(ts.map(r=>({...r.datos,id:Number(r.id)})));
+      cargarTipos(cl.config?.tipos||DEFAULT_TIPOS_CITA);
+      cargarHorario(cl.config?.horario||{start:WORK_START,end:WORK_END});
+      setEstado("listo");
+    }catch(e){console.error(e);setEstado("error");}
+  },[demo,uid]);
+
+  useEffect(()=>{
+    if(demo)return;
+    if(uid){setEstado("cargando");cargarTodo();}
+    else{setCurrentUser(null);setCurrentClinica(null);setProfesionales([]);cargarPatients([]);cargarCitas([]);cargarTareas([]);setEstado("cargando");}
+  },[uid]);
+
+  // Guardado automático de cada cambio
+  const guardar=async fn=>{
+    setPendientes(n=>n+1);
+    try{await fn();}
+    catch(e){
+      console.error(e);
+      const permiso=e?.code==="42501"||/permiso|row-level/i.test(e?.message||"");
+      setAviso(permiso?"No tienes permiso para hacer ese cambio. Se ha deshecho.":"No se ha podido guardar. Revisa tu conexión: se han recargado los datos.");
+      cargarTodo();
+    }finally{setPendientes(n=>n-1);}
+  };
+  if(!demo&&cid){
+    const ahora=()=>new Date().toISOString();
+    cambioPatients.current=(prev,next)=>guardar(()=>sincronizar("pacientes",cid,prev,next,p=>({clinica_id:cid,id:p.id,profesional_id:p.profesionalId||miId,datos:p,actualizado_en:ahora()})));
+    cambioCitas.current=(prev,next)=>guardar(()=>sincronizar("citas",cid,prev,next,ci=>{
+      const pac=patientsRef.current.find(p=>p.id==ci.pacienteId);
+      return{clinica_id:cid,id:ci.id,profesional_id:pac?.profesionalId||ci.profesionalId||miId,fecha:ci.fecha,datos:ci,actualizado_en:ahora()};
+    }));
+    cambioTareas.current=(prev,next)=>guardar(()=>sincronizar("tareas",cid,prev,next,t=>({clinica_id:cid,id:t.id,datos:t})));
+    const guardarConfig=()=>guardar(async()=>{
+      const nueva={...(currentClinica.config||{}),tipos:tiposRef.current,horario:horarioRef.current};
+      const{data,error}=await supabase.from("clinicas").update({config:nueva}).eq("id",cid).select("id");
+      if(error)throw error;
+      if(!data.length)throw new Error("Sin permiso");
+      setCurrentClinica(c=>({...c,config:nueva}));
+    });
+    const soloAdmin=(cargar)=>(prev)=>{if(!esAdmin){cargar(prev);setAviso("Solo el administrador puede cambiar la configuración de la clínica.");return;}guardarConfig();};
+    cambioTipos.current=soloAdmin(cargarTipos);
+    cambioHorario.current=soloAdmin(cargarHorario);
+  }
+  useEffect(()=>{
+    const h=e=>{if(pendientes>0){e.preventDefault();e.returnValue="";}};
+    window.addEventListener("beforeunload",h);return()=>window.removeEventListener("beforeunload",h);
+  },[pendientes]);
+  const cerrarSesion=async()=>{if(demo){window.location.href="/";return;}await supabase.auth.signOut();};
+  const[page,setPage]=useState("dashboard");
+  const[selectedId,setSelectedId]=useState(null);
   const[showInforme,setShowInforme]=useState(false);
   const[editCitaDash,setEditCitaDash]=useState(null);
   const[editTareaDash,setEditTareaDash]=useState(null);
@@ -3108,7 +3401,6 @@ export default function App({demo=false}){
   const dismissNotif=id=>setDismissedNotifs(s=>new Set([...s,id]));
   const dismissAll=()=>setDismissedNotifs(new Set(notifs.map(n=>n.id)));
 
-  const[tareas,_setTareas]=useState([]);const setTareas=ro(_setTareas);
   const[reminders,setReminders]=useReminders(citas,patients);
   const selectedPatient=patients.find(p=>p.id===selectedId);
   const selectPatient=id=>{setSelectedId(id);setPage("ficha");};
@@ -3120,10 +3412,21 @@ export default function App({demo=false}){
     ...tareas.filter(t=>!t.hecho&&t.fecha<hoyStr).map(t=>({id:`t-${t.id}`,tipo:"tarea",color:C.red,bg:C.rD,msg:`Tarea vencida: "${t.titulo||t.texto}"`})),
     ...patients.filter(p=>p.estado==="activo"&&!p.consentimiento).map(p=>({id:`c-${p.id}`,tipo:"consentimiento",color:C.amber,bg:C.amD,msg:`${p.nombre} ${p.apellidos} — consentimiento pendiente`})),
   ];
-  if(!currentUser)return <Login onLogin={(prof,clinica)=>{setCurrentUser(prof);setCurrentClinica(clinica);}}/>;
+  if(!demo){
+    if(!authListo)return <PantallaEstado titulo="Cargando…"/>;
+    if(recuperando&&session)return <Acceso recuperando onPasswordCambiada={()=>setRecuperando(false)}/>;
+    if(!session)return <Acceso/>;
+    if(estado==="sin-clinica")return <Onboarding session={session} onListo={()=>{setEstado("cargando");cargarTodo();}}/>;
+    if(estado==="desactivado")return <PantallaEstado titulo="Cuenta desactivada" texto="El administrador de tu clínica ha desactivado tu acceso. Si crees que es un error, contacta con él." accion={<Enlace onClick={cerrarSesion}>Cerrar sesión</Enlace>}/>;
+    if(estado==="error")return <PantallaEstado titulo="No se han podido cargar los datos" texto="Puede ser un problema de conexión o que la base de datos todavía no esté configurada." accion={<><button style={st.btn()} onClick={()=>{setEstado("cargando");cargarTodo();}}>Reintentar</button><div style={{marginTop:14}}><Enlace onClick={cerrarSesion}>Cerrar sesión</Enlace></div></>}/>;
+    if(estado!=="listo"||!currentUser)return <PantallaEstado titulo="Cargando tu clínica…"/>;
+  }
   return(
     <DemoCtx.Provider value={demo}>
+    <EquipoCtx.Provider value={{esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id}}>
     <div style={st.app}>
+      {aviso&&<div style={{position:"fixed",top:20,left:"50%",transform:"translateX(-50%)",zIndex:400,background:C.red,color:"#fff",padding:"10px 18px",borderRadius:10,fontSize:13,boxShadow:"0 8px 24px rgba(34,22,16,0.25)",maxWidth:"90vw"}}>{aviso}</div>}
+      {pendientes>0&&<div style={{position:"fixed",bottom:16,left:16,zIndex:300,background:C.bone,border:`1px solid ${C.border}`,color:C.muted,padding:"6px 12px",borderRadius:8,fontSize:12}}>Guardando…</div>}
       <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@300;400;500;700&display=swap" rel="stylesheet"/>
       {demoToast&&<div style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",zIndex:400,background:C.ink,color:C.bone,padding:"10px 18px",borderRadius:10,fontSize:13,boxShadow:"0 8px 24px rgba(34,22,16,0.25)"}}>Estás en la demo: los cambios no se guardan</div>}
       {reminders.length>0&&<div style={{position:"fixed",bottom:16,right:16,zIndex:200,display:"flex",flexDirection:"column",gap:8}}>{reminders.map(r=><div key={r.id} style={{background:r.type==="soon"?C.rD:C.amD,border:`1px solid ${r.type==="soon"?C.red:C.amber}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:r.type==="soon"?C.red:C.amber,display:"flex",gap:10,alignItems:"center",maxWidth:340,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"}}><span style={{flex:1}}>{r.msg}</span><button onClick={()=>setReminders(rs=>rs.filter(x=>x.id!==r.id))} style={{background:"none",border:"none",color:"inherit",cursor:"pointer",fontSize:14}}>✕</button></div>)}</div>}
@@ -3253,12 +3556,12 @@ export default function App({demo=false}){
           );
         })}
         {currentUser.rol==="admin"&&(
-          <div style={st.navItem(page==="admin")} onClick={()=>setPage("admin")}>▪ Administración</div>
+          <div style={st.navItem(page==="admin")} onClick={()=>setPage("admin")}>▪ Equipo</div>
         )}
         
-        <div style={{marginTop:16,borderTop:`1px solid ${C.border}`,paddingTop:8}}>
+        {currentUser.rol==="admin"&&<div style={{marginTop:16,borderTop:`1px solid ${C.border}`,paddingTop:8}}>
           <div style={st.navItem(page==="configuracion")} onClick={()=>setPage("configuracion")}>▪ Configuración</div>
-        </div>
+        </div>}
         <div style={{flex:1}}/>
         <div style={{padding:"12px 20px",borderTop:`1px solid ${C.border}`,display:"flex",flexDirection:"column",gap:5}}>
           <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:8}}>
@@ -3269,7 +3572,7 @@ export default function App({demo=false}){
             </div>
           </div>
           <div style={{fontSize:11,color:C.dim,marginBottom:6,padding:"4px 8px",background:C.sand,borderRadius:6}}>{currentClinica?.nombre}</div>
-          <button style={{...st.btn("ghost"),marginTop:4,fontSize:11,color:C.muted,textAlign:"left",padding:"4px 0"}} onClick={()=>{if(demo){window.location.href="/";return;}setCurrentUser(null);setCurrentClinica(null);}}>🔒 {demo?"Salir de la demo":"Cerrar sesión"}</button>
+          <button style={{...st.btn("ghost"),marginTop:4,fontSize:11,color:C.muted,textAlign:"left",padding:"4px 0"}} onClick={cerrarSesion}>🔒 {demo?"Salir de la demo":"Cerrar sesión"}</button>
         </div>
       </div>
       <div style={st.main}>
@@ -3283,14 +3586,15 @@ export default function App({demo=false}){
         {page==="ficha"&&selectedPatient&&<FichaPaciente patient={selectedPatient} setPatients={setPatients} onBack={goBack} citas={citas} setCitas={setCitas} profesionales={profesionales} tipos={tipos}/>}
         {page==="facturas"&&<Facturas patients={patients} setPatients={setPatients}/>}
         {page==="recursos"&&<Recursos currentUser={currentUser}/>}
-        {page==="admin"&&currentUser.rol==="admin"&&<AdminPanel profesionales={profesionales} setProfesionales={setProfesionales} clinica={currentClinica}/>}
-        {page==="configuracion"&&<Configuracion horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos}/>}
+        {page==="admin"&&currentUser.rol==="admin"&&<EquipoPanel clinica={currentClinica} miembros={profesionales} yo={currentUser} patients={patients} demo={demo} onCambio={cargarTodo} bloquearDemo={()=>setDemoToast(true)} setAviso={setAviso}/>}
+        {page==="configuracion"&&currentUser.rol==="admin"&&<Configuracion horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos}/>}
       </div>
       {showInforme&&<InformeMensual patients={patients} citas={citas} onClose={()=>setShowInforme(false)}/>}
       {editCitaDash&&<CitaModal cita={editCitaDash} patients={patients} tipos={tipos} defaultFecha={editCitaDash.fecha} defaultHora={editCitaDash.hora} defaultTipoId={editCitaDash.tipoId} makeUrl={config.makeOut} onClose={()=>setEditCitaDash(null)} onSave={form=>{setCitas(cs=>cs.map(c=>c.id===form.id?{...c,...form}:c));setEditCitaDash(null);}} onDelete={id=>{setCitas(cs=>cs.filter(c=>c.id!==id));setEditCitaDash(null);}}/>}
       {newCitaDash&&<CitaModal cita={null} patients={patients} tipos={tipos} defaultFecha={toYMD(today())} defaultHora="09:00" defaultTipoId={tipos[0]?.id} makeUrl={config.makeOut} onClose={()=>setNewCitaDash(false)} onSave={form=>{setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:form.pacienteId?Number(form.pacienteId):null}]);setNewCitaDash(false);}} onDelete={()=>setNewCitaDash(false)}/>}
       {editTareaDash&&<TareaModal tarea={editTareaDash} onClose={()=>setEditTareaDash(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTareaDash(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTareaDash(null);}}/>}
     </div>
+    </EquipoCtx.Provider>
     </DemoCtx.Provider>
   );
 }
