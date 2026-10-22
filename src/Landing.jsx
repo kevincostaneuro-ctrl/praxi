@@ -143,7 +143,7 @@ function Demo() {
         <div style={{background:"#1A0E08",padding:"10px 16px",display:"flex",gap:6,alignItems:"center"}}>
           {["#FF5F57","#FFBD2E","#28CA41"].map((c,i)=><div key={i} style={{width:11,height:11,borderRadius:"50%",background:c}}/>)}
           <div style={{flex:1,background:"#2A1E18",borderRadius:6,height:22,margin:"0 12px",display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <span style={{fontSize:10,color:"#6B4A30"}}>praxi-kevin-8beb.vercel.app/app</span>
+            <span style={{fontSize:10,color:"#6B4A30"}}>praxiclinic.com/app</span>
           </div>
         </div>
 
