@@ -1,6 +1,6 @@
 // Política de privacidad (lista de espera y web pública)
 export const VERSION_PRIVACIDAD = "2026-10-22";
-export const EMAIL_CONTACTO = "contacto@praxiclinic.com";
+export const EMAIL_CONTACTO = "contacto.praxiclinic@gmail.com";
 
 const C = {
   bg: "#F5EFE4", bone: "#FBF8F1", border: "#D9C9A8", accent: "#A66B3F",

@@ -26,7 +26,7 @@ drop trigger if exists lista_espera_fecha_consentimiento on lista_espera;
 create trigger lista_espera_fecha_consentimiento before insert on lista_espera
   for each row execute function fecha_consentimiento();
 
--- ── Aviso por email a contacto@praxiclinic.com en cada alta ───────────────────
+-- ── Aviso por email a contacto.praxiclinic@gmail.com en cada alta ───────────────────
 create extension if not exists pg_net;
 
 create or replace function public.avisar_nueva_espera() returns trigger
@@ -43,7 +43,7 @@ begin
     headers := jsonb_build_object('api-key', clave, 'content-type', 'application/json', 'accept', 'application/json'),
     body    := jsonb_build_object(
       'sender',  jsonb_build_object('name', 'Praxi', 'email', 'no-reply@praxiclinic.com'),
-      'to',      jsonb_build_array(jsonb_build_object('email', 'contacto@praxiclinic.com')),
+      'to',      jsonb_build_array(jsonb_build_object('email', 'contacto.praxiclinic@gmail.com')),
       'subject', 'Nueva persona en la lista de espera de Praxi',
       -- Solo texto (sin HTML): lo que escribe la persona no puede inyectar nada en el email
       'textContent',
