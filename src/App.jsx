@@ -606,7 +606,7 @@ function Onboarding({session,onListo}){
   return(
     <CajaAcceso ancho={460}>
       <div style={{fontSize:22,fontFamily:"'Instrument Serif',serif",textAlign:"center",color:C.ink,marginBottom:8}}>{invInfo?`Únete a ${invInfo.clinica}`:"Crea tu clínica"}</div>
-      <div style={{fontSize:13,color:C.muted,textAlign:"center",marginBottom:22,lineHeight:1.5}}>{invInfo?"Completa tu perfil para empezar.":"Serás el administrador. Después podrás invitar a tu equipo."}</div>
+      <div style={{fontSize:13,color:C.muted,textAlign:"center",marginBottom:22,lineHeight:1.5}}>{invInfo?"Completa tu perfil para empezar.":<>Has iniciado sesión como <b style={{color:C.text}}>{session.user.email}</b>, pero esta cuenta aún no pertenece a ninguna clínica. Crea la tuya (serás el administrador) o pide una invitación a tu clínica.</>}</div>
       <div style={{display:"flex",flexDirection:"column",gap:14}}>
         {!invInfo&&<div><label style={st.label}>Nombre de la clínica o consulta</label><input style={st.input} value={form.clinica} onChange={f("clinica")} autoFocus/></div>}
         <div><label style={st.label}>Tu nombre y apellidos</label><input style={st.input} value={form.nombre} onChange={f("nombre")} autoFocus={!!invInfo}/></div>
@@ -620,7 +620,7 @@ function Onboarding({session,onListo}){
       </div>
       <Aviso>{err}</Aviso>
       <button disabled={cargando} style={{...st.btn(),width:"100%",padding:"12px 0",fontSize:14,marginTop:20,opacity:cargando?0.6:1}} onClick={enviar}>{cargando?"Un momento…":invInfo?"Entrar en la clínica":"Crear clínica"}</button>
-      <div style={{textAlign:"center",marginTop:16,fontSize:12,color:C.muted}}>{session.user.email} · <Enlace onClick={()=>supabase.auth.signOut()}>Cerrar sesión</Enlace></div>
+      <div style={{textAlign:"center",marginTop:16,fontSize:12,color:C.muted}}>¿No es tu cuenta? <Enlace onClick={()=>supabase.auth.signOut()}>Cerrar sesión y entrar con otra</Enlace></div>
     </CajaAcceso>
   );
 }
