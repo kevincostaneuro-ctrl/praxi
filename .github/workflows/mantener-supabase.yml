@@ -1,0 +1,24 @@
+# Consulta la base de datos una vez al día para que el plan gratuito de Supabase
+# no pause el proyecto por inactividad (lo hace tras 7 días sin uso).
+# Ojo: GitHub desactiva las tareas programadas si el repositorio pasa 60 días sin cambios.
+name: Mantener Supabase activo
+
+on:
+  schedule:
+    - cron: "17 6 * * *"   # todos los días a las 06:17 UTC
+  workflow_dispatch: {}     # permite lanzarla a mano desde la pestaña Actions
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consulta ligera a la base de datos
+        env:
+          URL: https://dsujxycedqfvtkokhutd.supabase.co
+          # Clave pública (la misma que usa la web); la seguridad la ponen las políticas RLS
+          KEY: sb_publishable_Gxj5CCICnfUUOjWg3Gkp0A_3aaMKhCU
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$URL/rest/v1/clinicas?select=id&limit=1" \
+            -H "apikey: $KEY" -H "Authorization: Bearer $KEY")
+          echo "Respuesta de Supabase: $code"
+          test "$code" = "200"
