@@ -42,7 +42,7 @@ async function enviarIA({system,messages,seud}){
 const edadDe=f=>{if(!f)return null;const d=new Date(f);if(isNaN(d))return null;const h=new Date();let e=h.getFullYear()-d.getFullYear();if(h<new Date(h.getFullYear(),d.getMonth(),d.getDate()))e--;return e;};
 const DemoCtx=createContext(false);
 // Equipo: quién soy, si soy admin y los miembros de la clínica
-const EquipoCtx=createContext({esAdmin:true,miembros:[],miId:null,registrarVista:()=>{}});
+const EquipoCtx=createContext({esAdmin:true,miembros:[],miId:null,registrarVista:()=>{},guardarMisDatosFact:()=>{}});
 
 const PRAXI_LOGO="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAATwAAAB2CAYAAABVsS+4AAAWfmNhQlgAABZ+anVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAAFlhqdW1iAAAAR2p1bWRjMm1hABEAEIAAAKoAOJtxA3VybjpjMnBhOjk3MDcyNzY0LWQ5MTItNDgxNS04NWIxLWZmZmEyZDEzZmI2YgAAAAOTanVtYgAAAClqdW1kYzJhcwARABCAAACqADibcQNjMnBhLmFzc2VydGlvbnMAAAAAuGp1bWIAAABEanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5pbmdyZWRpZW50LnYzAAAAABhjMnNodm2EDQbAWyJEphhpr9wNWQAAAGxjYm9yo2lkYzpmb3JtYXRpaW1hZ2UvcG5namluc3RhbmNlSUR4LHhtcDppaWQ6ZDJiMDg2ZjUtOTYxYy00YTc5LWI2MTYtNDY5YzEzNmFlOTA2bHJlbGF0aW9uc2hpcGhwYXJlbnRPZgAAAeJqdW1iAAAAQWp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuYWN0aW9ucy52MgAAAAAYYzJzaFJlJpPkAZPn9JcsJ67IxxoAAAGZY2JvcqJnYWN0aW9uc4KiZmFjdGlvbmtjMnBhLm9wZW5lZGpwYXJhbWV0ZXJzoWtpbmdyZWRpZW50c4GiY3VybHgtc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5pbmdyZWRpZW50LnYzZGhhc2hYILXaPaSAuJCQ1WTi+7TCkaDUgS4sQQalFvnE8b+Zo5QxpGZhY3Rpb254HWNvbS5hbnRocm9waWMuY2xhdWRlLnByb3ZpZGVkanBhcmFtZXRlcnOheB9jb20uYW50aHJvcGljLm9yaWdpbi1jb25maWRlbmNlZ3Vua25vd25rZGVzY3JpcHRpb254ZkNsYXVkZSBwcm92aWRlZCB0aGlzIGZpbGUgYXQgdGhlIHJlcXVlc3Qgb2YgYSB1c2VyIGFuZCBtYXkgaGF2ZSBjcmVhdGVkIG9yIG1vZGlmaWVkIHRoZSBmaWxlIGNvbnRlbnRzLm1zb2Z0d2FyZUFnZW50oWRuYW1lZkNsYXVkZXJhbGxBY3Rpb25zSW5jbHVkZWT1AAAAyGp1bWIAAABAanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5oYXNoLmRhdGEAAAAAGGMyc2gja813DQTaZ4aJmNqAP78jAAAAgGNib3KlY2FsZ2ZzaGEyNTZjcGFkTQAAAAAAAAAAAAAAAABkaGFzaFggZ4zxoi3wWvcJQGb7b4KBskCVjqpuHu49473ZGfSD1cVkbmFtZW5qdW1iZiBtYW5pZmVzdGpleGNsdXNpb25zgaJlc3RhcnQYIWZsZW5ndGgZFooAAAI+anVtYgAAACdqdW1kYzJjbAARABCAAACqADibcQNjMnBhLmNsYWltLnYyAAAAAg9jYm9ypWNhbGdmc2hhMjU2aXNpZ25hdHVyZXhNc2VsZiNqdW1iZj0vYzJwYS91cm46YzJwYTo5NzA3Mjc2NC1kOTEyLTQ4MTUtODViMS1mZmZhMmQxM2ZiNmIvYzJwYS5zaWduYXR1cmVqaW5zdGFuY2VJRHgseG1wOmlpZDoyYzEzODMwYi0wNmI4LTRiNTAtYmI0Yi03YWViMjFkODdlNjJyY3JlYXRlZF9hc3NlcnRpb25zg6JjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggtdo9pIC4kJDVZOL7tMKRoNSBLixBBqUW+cTxv5mjlDGiY3VybHgqc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5hY3Rpb25zLnYyZGhhc2hYINlbdVgZyIdwhgMoOp0vufUYAcgQA+f6eUtWloD8iD5WomN1cmx4KXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaGFzaC5kYXRhZGhhc2hYIJqflx0PdlCz9uKjS6yWHcGwB/VmIHBgu8X0guqLjojSdGNsYWltX2dlbmVyYXRvcl9pbmZvo2RuYW1lb0FudGhyb3BpYyBGaWxlc2d2ZXJzaW9uZTEuMC4wa3NwZWNWZXJzaW9uZTIuNC4wAAAQOGp1bWIAAAAoanVtZGMyY3MAEQAQgAAAqgA4m3EDYzJwYS5zaWduYXR1cmUAAAAQCGNib3LShFkCEqIBJhghWQIKMIICBjCCAY2gAwIBAgIUQOWgCu7COdC+uIP6BkIFPWdVEwAwCgYIKoZIzj0EAwMwSTEXMBUGA1UEChMOQW50aHJvcGljLCBQQkMxLjAsBgNVBAMTJUFudGhyb3BpYyBDb250ZW50IENyZWRlbnRpYWxzIFJvb3QgQ0EwHhcNMjYwODA3MTg0MzU2WhcNMjgwODA2MTk0MzU2WjBEMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEpMCcGA1UEAxMgQW50aHJvcGljIENsYXVkZSBDb250ZW50IFNpZ25pbmcwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASYegpry1AYBRTVNL1CpTlbROnY3dey+UrsF9C3phYrATN3ZHf93Mo8RQN0KOUuOn19P4oWNFWe5n2/She9N7eTo1gwVjAOBgNVHQ8BAf8EBAMCB4AwFQYDVR0lBA4wDAYKKwYBBAGD6F4CATAMBgNVHRMBAf8EAjAAMB8GA1UdIwQYMBaAFM5R4gSBTmRbI/jjxM+aPpzB11zCMAoGCCqGSM49BAMDA2cAMGQCMDFzHRSeAXrSy1WOzkbhPZ6Km2wGTmZ/2gK18k8BQGXyqz88Rdrz6CTX9flAnYNVxgIwcF9c3fVhqmJKpi+UhasNUMko69cyX6STPfta3Q8EjyzDjzoyrol46FP6VFHhvUcJoWNwYWRZDZ4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2WED2RCGEzWQUg5Ols3f4puq9Hppn2tUsnfj+n3ogSSMzbKxpD2Dd6aQCfNsVnH9cbuaip2g/lFFQzH2heYo7iIp8XIQmewAAOxJJREFUeJztnXdgFNX2x793S7IJ2fRCegcCJAiBEHqVpqAiYgGlWB6ISrW3p8/2VFDEn/WpPAEFpEhTCEgvCZ0kEAjpvbfdbLLZnb2/P9bNSyDZubMlJLCf/yB3dmZ3Z8+ce873nEPqqwtgw4YNy9FQV4WStHO0LP0SakvyQHVcq79L7B3g6h8Knx53wSu8D7F3cr01F2pJKIWysgTFaedoRdYVKMoKWr1vib0D3IN6IPCu4fAI6UWISHRLLpPYDJ4NG+ZDdToUJJ+kV//aAlV1OfNxhBA4efmj5+j74dd38C0zBKaiVtYi89RemnvmIJpUSqZj5N4BGDhzEZy7BxErX95N2AyeDRtmUpGdRs9v+RoNtZVmvY7cOwADZiyAq19ohxsCoTTUVOJywq+0KDUJVKcTfLydoxMGz14B96DIDn2vNoNnw4aJUJ0O6Yd/p+lHdkDHaS3ymmKpHaLvnYPgAaMISOezezqtBtcObaeZJ/8Ep2kCAIjEErj4BqN7VCy8I6Jh382F1FeX8T4EvCNjMHjWMiKSSDvq8iHpsDPZsHEbodNqkLxrLc07fwSUUou9LqdpQvLOnwBKaXDs6E5l9JQVxTi78QtaW5IHAJDKHBE+dDLCh00mEnuH5nVNDUpcSdjI6/FW5lxDZW469Qrv02Fv0mbwbNgQCqW4emibxY2dAR2nRfKutSAiEQ0aMKpTWLzitLP0wtZvoWlUgRCC7r0GoP/0fxCpQ7fWCylF6h/raXV+Bu9rcho1yjNT4RXex0pXfTM2g2fDhkDyLhylmcf/sIqxM6DjtLj611a4B/WAk6ev1c7DC6XIStxHL+/9FTpOC7HUDr0nPoqwwXe36X2WXk+mRamnmV9eWV5osUvlOA61NbXgdBy6desGR0fHm9bYDJ4NGwJQlBXgyr6NFovZGaOhthIXd/xAhzz+IhHb2Vv9fDdBKdKP7KDXDm2HjtNCJndF7Mzn4Bka1abXyTWpcf3YLnAaNfMpGuqqoWlUQSq72TixkpmRSVd+vBInjh2HrkUCJTAoEIuXLcH4CeOJWCwGYDN4Nmwwo9NqkHbgN6qur2v1/2I7e/j1iUNY/ATIvQOIWGqn/wOlUNVWojAlkWYnJpiUxa3KTUdhahINGjCyY7e2lCLtry30+tGdoDodunn4YPCsZUTuHdDuIVX5GbSmIEvQaaQO3SCWmmbM1Y1qfPnFGrr2h7Vt/j0/Lx8rlizHzEcfpq++8SqRSCQ2g2fDBiul6Zdo6bWLzf8mhMA/eghips69OZalXwBHV09EjriXRAybgqzEfTRt/+bm7CYLVMch88Qf6B41AHYOThZ4Fywn1Xt2Gcd2g+p0kHv7I/7xF4mjm5fRw/IvHBXk3QGAzMkFor+9LyEoFUq8/cZbNGFvAu/azb9uQs9ePenMR2aSrqVytGHjFsE1qZF5am/zVpaIRIgcdR9iH3q2bWN3A0QkQvjQyWTwrGWCt2+KsgIUpSZZL2B4A3kXjjZvY1mNnbq+DjVF2YLOQwiBd0S04OvTarVY+fGnTMbOwPr/rkNlRSVsBs+GDQYqcq622q5FDJuCqHEzBMtGvCKiSdTdM0EEHEcpRcGlE4I8Q1MpTD5FU3b/DB2nhaOrJ+IeW8pr7ACgsa6KqhW1gs5lL3eFe3BPwVv1wwcP062/bRV0TE52Dq6np1ObwbNhgwcdxyE7MaF5u+biF4KIkVNN1sgF9R9J3AIjBR2jKC2EsqLIql5eRXYavbTzR2ibGuHo6okhc18h1swQ+0YNhKOrp6BjlAolfvrPj4Iz5JRSVFbaPDwbNnhRlOU368rEUntEjZ9pVjxNbGeP8GGTQUTssaumBiXKMlJNPicfyopiXNj6TXPGtP+DCwTJYeydXJm29s3ruzkjdPB4wQ+N9PR0evnyZUHHtMRm8GzY4KH02kU0NegL4z1Do+AV3tfsjKlnWG8i9/ITdEx5Zip0HMe/UCBNDUqc3/oNVdVUQCSWoO+U2e1KT9pD5uQCt8AIprWEEIQPmwJjGd/2SE1OAacV/hkQQuDh4WEzeDZsGINrUqM0/RIAvXcXPmyKSVnFG7FzcIJ/dLygYxRlBWisqzL73C3RcRySd62l1fkZekM0fAqC+psggSEEoXHjmRIyvn3iED50kkkPjcyMTFMOg6+vL8LCw7tellar1SL54iW6bcs2qtFobvXl2LjNUZQXUkWZvsGGi28w3AMjLKaH846MEZSxVSvrUFuSa9E4XsGl47T48hkAekPUa8x0k2OT7kGRpM/kWWjWId6AWGqHHqPuQ+yMhR3aMAAARo0ZBS9vr86nw6OUora2FhqNBrU1NTQrKxsF+QW4knoFyZcuobioGACwdMVSSKUd+6HZuPMounymuX40sP9wWLLioZtHd9LNozutKWQT61Idh+r8TPhGDbTI+Suy02jqH+uh47RwC4xAv/vmm2eICEFw7GjSvWd/FF0+Taty06HTcRBLpPCOjEH3XgNaNRkwhfCIcMHHuLm5YeajD4MQ0rkM3vlz5+n8J+bx7tHFEjHuGtC/g67Kxp2KplGF8kx9osBe7grviBiLVjtIZY5w8w8Dq8EDAEVpPkApzO2i0tSgROqf66FpVMHR1RMDHlxALCVstndyQejgu0no4Lst8notGTp8KOTOcijqFEzrRSIR3nznLURE6j3zTrWlvXj+AlNAMiQkBKFhnb9Joo2uTV1JPlWWFwEA3ALCBUsoWPAIjRKkyauvLoNaxfZjbw9D3K62KOfvJMXjt7ZBgQDCIyLIfQ/cx7x+2YvLMH7C+OYPuNMYPKVCib/2/8W0NjomGq6urta9IBt3PKXpF6FtagQhBH69B5ntVbWFk2d3SGXscg51vQJNZho8Q9zOkKTwjYrtMs4DIQSLnn+ODB8x3Og6JycnfPLZp3hi3hzS8oHSaQxe4qlEmpKcwrR27N3jBD0VbdgQyo3bWVMqAliQObsTe7kL83qdpglN9UqTExfKimJc/WsrdJwWrgHhiBxhuoD6VuEkd8LnX64mr77xKtzc3Vr9Te4sx/yn5mP/kQNk0pRJ5EY70SlieOpGNbZs/o1JPe3p6YnIyI7tg2/jzqMjtrMAIJV1g8zZHYoytr5w2qZGNNRWAOgp+Fw6rQYpe36mDbWVsHN0Qsy9c8xqy3QrsZfZ47HHZ5HHHp8FlUqF+vp6ODs7w97eeFKpUxi8q2lX6elEtqaBUX16w8ubv7bPhg1z6IjtLACIxGJIBWYuG+qqTTpX7rnDtDwjBYQQ9Bo3A67+YbeF4+Do6Nhms8+2uOVbWo7jsG3LVrBq6gYOiuW14jZsmENTgxKl1y4AsO521kA3j+6C1jfd0I+PBUVZAa4d3AZKKbpHxSI4dvRtYeyEcssNXnZWFt2fsJ9prU2OYqMjqC3KpfVVZQCsu501IDRDWl9ZImi9TqtB6p8bqLq+Dg4uHug94ZEOF/52Fm7plpZSiq2/bWXW1NjkKDY6AnsnFxJz7xwKAO7BPawe1Jc6OIKIxKA6thrRRmUttOpGSOxlTOvzLx6n5ZmXQQhB5MipXUaCYg1uqcHLz8un+/7Yx7zeJkex0RE4+wTA2Segwx6sdg5yiCVSaJvYDJ5W3QBO28Rk8FTV5Ug/sgNUx8EjNMq0OtnbiFu2paWUYufvO1BeXs58jE2OYuN2xNHVU1DJlaZBBR1LzJtSXD24laqqyyGVOaL3+JkWLY3ritwyg5efl0+3/baNeb1NjmLjdkUklULqwC4P0aoboKqp4NVwtRyZGDJoLNyDbL+fW2LwKKX4dcMvKC8vZ/bYbHIUG7crIrFE0OQuquPAaRqNrtE0qnDt0DZwGjXk3gEIHzalywmMrcEtMXiZGZl0z8498Pf3R3dftpS8TY5i43ZFKnOEg7Mb/8K/4bQaNKmURtcUXDpBawoyIRJL0GPkVNg7sVdz3M50uMHjOA7r1v6M6upqjB43BtXV/CJKmxzFxu2OTM5u8ACgrrSg3b+pqsuRcXwPKKXwDOsNv76Dba7d33S4wbt04SLdtWMXYvrFwMvLE40Nxl1zwCZHsXH7Y9dNLmh9u52PKUXG8T1UVV0OO0cnRI1/CHeq5q4tOlSWolKpsGb1Gmi1Wjw+9wkk7GWTpMQNjhMsR9FqtaiqrELG9QyqrFfCqZsTIiIjiLuHOySSjnvbhoam+Xn5tLi4GHZ2dujZsyfx8vay6HUYzlNRXk6zsrKtdh4+OI5DbU0tCgsLm99vVFQU8fTyhNjM1uharRYKhQJubsK8oa6AUG2cpqG+zb54NUXZtDDlFADAP3oIXP26tqNw4+9HIhYjPDICXl5ehLWcrCUdavB279xNz54+i1FjRqF3n9747JNVTMcNGT6UKbmh1Wpx/Nhx+v033yP54qW2llCRSIRhI4ZjwaIFiI6JvqmbgiXgOA4pySn0+2++w8njJ6HVatu8jrsnTsArb7xCPD1NU/JTSpGVmUXX/vATdu/c3e55Hpn1KJ5f8jxxcrLO5Pqamhrs2PY7/X3b78i4ntHmpbq5u+GV11/FxMkTCYvh02q1qK2pRVZWFk1JTsGBfftxOfUyPvj4A9wz9d4u/SNuC5mzO8R29uCa1EzrG5W10KgbWhX/6zgO14/uQpNKCQdXD4QPndwlExWG3/HGDb8i6VRSW/c1ANDAoEAsXrYE4yeMZ7qnAIDUV7cfC7Akebl5dO6sOWhUN+KH//6I2poaPDP/Gd4OKZ6enli3cT0JCGx/whHHcdj35z760fsforqKvbC6X/9++PfKj4m/vz/zMcaglOJ00mn6zpv/RH5ePtMxwSHB+O6n74mfn7AJVpkZmfSt199qz7DfREBgAP7v268QFm6ZgnFKKa6nX6effbIKx48dZz7u3mn34q133yYODv/Tne39Yy9dvepzaLVaqNXqdr9DFxcX/PzrOou9h85EbXEOPfnjh83T0fhwcPHAiH/8kzg4uzf/X2XONZr488fgNGpE3f0wIkdO7VKfk+F3/K+334VSyfY5AMDMRx/Gq2+8Slh2Mh0Sw9Nqtfj+m+9QXl6O+U/NR6+oXuR00mmmdlB8cpTSklIsePIf9OXlLwkydgBw6cIlPPrgIzQpMcnswSgNDQ344N336VNznmQ2dgCQm5OLb//vG8oxjt/TarX49utv6f333NfK2AUGBWLa/dMwIHZAm8cV5BfgnbfegVLBfiO1R2lJKZY+v4Q+OG36TcZu6n1TsWXHVly4fJGkXEslyVdTyN6D+8jMRx8GAOzeuRtffLaaGr57juOQsHcfCvILUFJcYvQ7jOwZie6+3bvUj5gVOwe5oPpWTquBVt3Q/G+dVoP0I79D29QIJy9/BA3oWhUVFRUVzb9jIcYOADb/ugkbfl7P9BvuEIN3IOEA3bF9B/pG98WMhx8iDQ0NuHD+AtOxxuQoSYlJ9KH7Z9DEU4n/Wx83EAsWLcSCRQvRK6oX7+tXV1dj6fNLkJKcYnpTRYUSy55fSjf+stGk448ePto8nIjvPC8vf4l++fkaAIBEIsHcJ+fiWNJx8sf+P8mrb75GYu6KaTdmd/7sORw7eszk98lxHLZv3U4njZtIb+xO3Te6L37fswMffPwh6dmrZ/PTlhACf39/vPH2G+STzz6FSCTCL+t+QeLJRAoANdU1SLuSxnT+/gP6M7cB6mpIZA6QCZCm3NgItDzrCq3MuQYiEiNi+D1dSoaSlZlFH39kdqvfsVC2/rYVlRWVvOusbvAKCwuxetXnIITghaWL4erqipLiEnr92nXeY43JUQ4kHKALnvxHs6xlyr1TcPD4IfLTurVk0QuLyKIXFpHN238j3/zwLeTOxjNgijoFXn/5NZSWlAp+f0qFEkufX0INno6vny/e+/A9HDl5lJxLOU9+WrcWxrbjgP7plpOdbdQQGc6TsDcBABAaFopN2zZj+UsriKurK5ISk+iU8ZPp2h/WthfzAADs2rELajVbnKgltbW1eGnZS/St19686fWfmPsE1q7/LwmPCG/XqyCEYOLkieTpBU9Dp9Nhw7r1UDeqkZubS4uL+Y09IQRxg+MEX3dXQSy1h9SBvdX7/xqB6r27rFN7wWnUcA/uAf8uJEMpKirCC88+j4J8fWitV1QvfPHVFzh55hRJunCavP/vDyBz4K8Zzs7KRtqVK7wPc6saPHWjGh/+6wNakF+Apxc8jfih8QQA0q5cQW1tLe/x7clR9u/bT5cvXgatVguJRIL3//0BPvr038TLq/XWlxCCYcOHkXfeexcikfG3mp2VjbU//kRZttkGOI7DZys/a34yTZl6D7bt2k7um34/cfdwh52dHQbGDSSvv/0Gb9LF2OehVCjx4tIVzecZOnwo1m1cT3r07EGAm42/MYoKC6FSqZjfI/C/J3BbWfXFyxZj2UvLib2MXxROCMEDD04n3j7eOH/uPPLz8yjr4Kaw8DD0jOrVZX7IQhGJxZC0M8+1PTSN+u/R4N2JxBKED5nUZepllQol3n7tLZqbkwtA/+Bcv3EDGTNuLJE7y+Ho6Ihp908jCxctZHq99GvpvGusZvAopdiwfgM9cugIBgyMxdz58wghBJRSJJ5kc13bkqOkJKfQt994CzqdDnJnOb7+/mtMu3+a0Wzr2PFjycTJE3nPt2fnHmRmZDJbvKNHjtItm34DAMQPicebb7/ZZibU3d0dfAahPe9Sq9Vi5cefNnuQ8UPisfLzVcTFRb9lKSoqwucrPzPq1bVEpVIxrwWAxJOn6OxHZiE7K/umvy1ethjznprPnCEDAP8Af4yfcDcUdQpcTrmM1JRUpuPuhE45Tl7CkmcNtVWtvDu3oEh4R0R3iYcCpRT/t+bL5of4jJkzsPTFZW0+OMMYZ9GWlpbxrrGawUs8mUhXr/wccmc5Vry8Ak5yvSGoqakB67CeG+UoRUVFePXFV6CoU0DuLMeq1asQP3QI7xcsFosx7YH7eL2s6upqGLaMfNTU1OC7r76FTqdDQGAA/vn+O8TwHk1BLm97230g4QDd+ttWAPoHwKerV7Y6z+9bf29+QrLg6OjIrMs7kHCALnx6YZv9CmfMnIG5T84TZOwMjBk7GoQQ/HXgIC6nXGY6Jn5o/G3fKcfBxZ1/UQuU5YWozE2nlTnXIJbaI3LE1C7j3V04d55u+mUTAH38d/HyJUxZVmMoFfx9Na1i8IqKivD+u+9Bp9PhtTdfR3TM/54619Ku0qxM/sHDN3ZHaen+ikQivPPeu0zGzkCPHj2Iry+/uPPEseNMmcyEvQnU4J0seuE5GJO2VFVW8laUePl43/R/aVfS6LtvvwNKKQICA/Duh/9q9uwAg4Fm7ycIAH7+/kyB/wMJB+iLS1e06Q3GD4nH8pdWmHyDBgQGEg8PD5w9cwalZfxxUxcXF0T17m3SuboSdo5yQUa9UVmL9CO/g9Oo4RHSE15hvbvEE0Gr1WLDul+g0WggEomaY/vtUc+YtQ0JDeVdY3GD19IwzZg5A5OmTGr1JZgiR6GUYvOmzc3u7+LlS1oN12XBxdUF4ZERvOtyc3JRVlbGm0DYse13APqs8NjxY41eC5+BF0vEcHZ2bvV/KpUKn326Coo6BUQiEZa9uPwmo1pWWkZLioW1+x4xcjhvE4ajh4/SV196pU1jFxwSjHc+eNcsb9bZxRk+3X2gqFMwxe9uZzlKS2RyN0FdU+pK8mCI3YUMGtdlSsgup1ymh/46CAAYP+FuDBo8yOh3m3yJbUdob88fA7WowVM3qvHJRx/TxFOJbXoBKpXKJDlKSnIK/frLrwAAo8aMwqzZswRXSNjb28PLi7+ioba2ltdAXbx4kaYk66c/zXp8tlGPieM4XLxw0ejrubm6wdvbu9Ub2r1zNz11Ql8i9PSCp9s08BzHgWNsCw4AQcFBGDPOuHFOSU6hr7z4cpseqUgkwvKXV0CoSPpGJBIJHBzZG17eznKUlji4uBOxHVvbdgDgNE2gOq7Lxe727NoNjUYDmYMMTz7zpNEQS11dHS7x/H4AfUKsR88evOssZvC0Wi0+ev9Dum3Ltna9AFPkKEqFEis/XonGhkYEhwTjtbdeZ8oItkVwSDDTurYC9AY4jsPO7TtAKUV0TDTih8QbvdEqKyp541Q+3X3g7PI/Dy8vN49+8+XXAPTxjdlzHje7BE4kEmHJ8qVG23G1jJG2xWOPP4bRY8yfdmVvb89cD3u7y1FaIpJIIREYgyMiMcLiJ3SZ2F1RYRH+OqDXcI4ZOwY9exmfCJedmU1Zsq8eHh4ICAzkvTctYvA4jsPaH36iWzZvgdxZjg8/+ahNL8AUOcofe/6g58+eg0gkwuJlS8z2LljIyW7f4BUXFeNM0hkA+jIpvq1dVmYmr84sODSkOWnRsjkqX3zDz9+PBAUFGX1tA3xhgBslAjcSGhbanGk3F5FIBKkdmwTD19cXYeHt6/tuJ8RSO0FaPABw8Q2GV3jfLvP5JF9KpmWlZZBKpZj1+GzehhJHDh9mGuEaEhYCdw/+pI/ZBo9Siv/+9F+6etVqSCQSvPv+v1olKVquY5WjDB4SDzc3t1aezvQZ0zFm3JgO+WLLSsvQ0NDQ5t9OnThJKyoq4O3jjZGjR/FeD0vMsk+f3s3B6rQraXTL5i0AgBkPP4S4+Lh2z+Hq6ooFixYa1RhKJBK88vqrmDNvTrvGilKKjb/82q7SnRCCZ59fBJ/uPkbfBysNDQ0oK2UTefeJ7gMPTw+LnLezI7QRKAAEDRjZqoFAZ4bjOOzfp1dBxMXHoRePrrKurg4nj59kem3WsIdZBo9Sio0bfqWrV34OkUiEj1d90q4XIUSOEj80vpWnExAYgKcWPG122poVLadt00ip1WocOngYADBu/Dj4+Rv3Nllili1jD1qtFj989wMaGxrh5eWFOfPm8D4B7554N9m2azti7urX6v/lznI8MW8OEg7vJ7OemGVUPnL40GG65u9ytbbPMUFwkshSDBk6xOy2Ul0JoY1A1Ur+HVNnITcnl55O1M/YuO+B+3m1qVdSL9Mrl6/wvq6QsIfJFoRSip3bd9CP3v8IOp0OK15eYfRHkZ2VTXNycnhf1yBHaenp8Mk+OorCgkKafPESxBIxJt0zmVdCwBKz9PL2QmiYvvtH8sVLzdmrBc8tRFBwEJORCY8IJxs2bQDHcairq4NcLmfW2hUVFWHlvz+FTqdr8+8sgWWhKBVKFBUU8a6TOcjQJ7qvxc7bFZAI9Naa6tlmOncGkk4lora2FqFhoYgb3P7OBdDbl4MHDjIpOoSEPUzy8Cil2PfnPvrW6/qKh6UvLsMTRrZMAMBaQhTVpzfcPdyx9oef0NjQiCHDhvDKPjqKc2fOora2Fn369EGPHj14r4klZtmzVy+4urm20ib1je6LCZMmCH7PYrEYbm5uzMZJq9Xi6zVfGRUuz5g5A1G9oyz6+bPENQF9wiYkNKRTfPcdhbOP8brrG2lUCOsQdKtQN6px5PARAMCkKZN5wxRVlVVgbSYQFx/HPODLJIN3IOEAfXn5S9DpdFi8bLHR+BCg3wqePXOO6bUHDorF1Stp9EDCAUilUix4doHFJAkc17YXw4K6Ud2cXRo2YjhvsoI1ZmmQ37TUJj0xb06HlFEZuti0h5ubGx58aIbFKxxSklOZntx3ihylJXaOThAL0NM11FU319R2ZjIzM+m5s+cglUoxbPgw3vXJycnUmFrCACEEE6dMYr5HBRu8/fv20xVLlkOn02Hhc88ylReVl5UjjWEvLpaI0Se6b7OnM/W+qejX/y6L/dqMZV/5yM/Po8mXkiFzkGH02NG861liloQQ9O7TGxzHYcO69dBoNBgYNxCjxvAnQ8yltKQUX635P6OG555p98BYBxRTUKvVTFrMO0mO0hKJvSOImD18oGmoB6dpsuIVWYbDBw+jsaGRKVlBKcXBG9qPtUdIaAiioth3IMwGj1KKvX/sbWXsnln4DFMi4fr167SiooJ3XUhICFT19Tj010G4ubnh8blPWCxgzXFcu5lXFs4knYGiToHYgbEIZ4gXsMQsDbGH7KwsevzYcSYhsyWglGLtjz8ZfYJay7urqa7BtatXedfdSXKUljg4uxOJAPGxtkkNnZZftnErUSqUOPF384tRo0fxJiuKCotw8gRbdnbIsKGCsvjMBo/jOCSdShRs7AAwy1FiBw3En3v+hEajsbh3oVarmdonAYCfn18ro6PRaJB25Sq6+3bHxMmTeL8wADh+9BhvzDI8MgIuLi7Y+ttWvTEdFIuhw4da/UfeMiHUHpOmTLK4dwcA2VlZtLysnHfdnSRHaYlE5iCoeSfX1IiG2iqzO3Zbk7y8PKpQKBAdE41RY/mF6watHh9iiRgsXZBawuw7SyQSLF6+hIwaO5qOGDmCuUsGa2kIAHh5eeLPPX/Ay8sLj856zKLeRX19PQoLCpnW3mjIpVIp3v3gXeaLYS2hGzgoFhUVFUjYm9Bh3p26UY2v1vyf0WYGUqkU90y91yrdSVhrqe80OYqBmsJsqqzgT+gY4DTqTp+46N2nN9n55y6mtS21enywJg9bIiiG5+rqitFjRgtqCVSQX0AzMzN517m5uzVvG6c/NB2BQfxlIkKoqqyidbV1TGtZS9Dag0WOYiifO3r4CC0rLWMqU7MEZ86coUcPHzW6ZvyE8egbY3n1vlqtxtW0a7zr7kQ5CqCfOpZz+gA4DXtHakopmlRdR5rCR0utHh8sycMbsXqL98spqUzDth1kDkhLS4OXlxem3c/fu04o5WVlqK+vZ1rL2nCwPVjkKD7ePnBxccHunbsBAI/OfkzwlycUlUqFH777j1EPixCCaQ/cZxXvijV5FR4ejoDAgDsufledn0HLricLPq6htp2h3F0Qg/SLD9Zs741Y1eBxHIdTJ08xrS0vL7eadwfwt2gyIJPJYOqcWIBdjtInug8K8guQkpyC0LBQDBHQ289UTh4/Sc/xyIOiY6Jx112Wy4y3hDV51a//XTe1y7rd0XEcsk7thbaJ3zm4kfpKYS3COistpV989OvfD5E9IwXfp1Y1eCXFJbjEODdVo9HAzc0Nk6bwVzCYQmYG/7Ya0G+tfbr7mHwBrCV0vaKisGfXblBKcf/0+60eoFepVNiwbj1v/Gzc3eOs4mkKkRrED423+Pk7O5U5V2lpuv63IrFnz9ICgEbdAB3jmM/OjEH6xcKEiRNMindb1eClp6czZVsMWCszWF9fj5zsHKa1wcHBaGsuBSsschSxRAxXN1ecPH4S3j7emDh5ktW9u/PnzvN6d3JnOUaOHmmV81dVVjE9/G7sdH0noNNqkHF8NziNGhI7GXqMuh9CpCl6LZ7wSXSdjaOHj7bbmqwlcmc5Bg0eZNI5rGrwWOUogHUzg9VV1cjLzWNaGxYRDgcH9uaUN8JSQufj7YOC/HzU1tYyNSEwF3WjGuv/u47Xu7urf38EBrHV7wolLS2Nsjx0+sf2h68ffyv+2wnD1DEA8I6MgU+PfhAJmGDWWFcNbaPpGtPOgFKhxI2zjtvDnPvUagZPiBwFsF5mEAAK8vNpZSX/kF4AiOkXbfJ5WEvo/AP9kXgy0apGviVX064yZb7umTqFt/27KVBKse+PvTY5ShtwTWpcP7ar2bsLGzIJUkcnIqS8TKfVoKlB0am1eHxkZmRS1oHs5tynVjN4rHIUwLqZQYC9drNbt26IiIw0+TysWUgAuJp2lanMxlxattQ2hqenJ/pZKVnBqpy/E+UohalJtCpX39HXOzIGboERRGInEyY+5jTQdHEPj7XRp7n3qdUazLHKUQDrZgZZazcBfV2er5+vydfBkoUUi8UoKigCpZSpJ5i5tGypbQxrbiVZlfN3mhxFraxFxvE9oDoOdo5OiBw5FSKxGCKRA2SCqi3UaKzrutIUIY0+Bw0eZNZ9ahUPT4gcBWBrlW4qQrwuc+UQLDFLjuNQVFTE1BPMEhiEzXxYayupblRjx/bfmdbeaXKUvPNHqbJcX/3jHz0Ern76sQYgRHCrdyHVGZ0N1kafADBm3Fiz7lOrGDyWwTUGWFulmwqr9gswTw4hJGZJKUX8kHimHvzmoFKpkMBQpuPi4oLYQQOtcg2GtkAs3ElyFEVZATJP/AFKKRxcPRA+dDJBi1iuzFnYvdGVGoG2REijTz8/P8QOjDXLVljF4LE2eATYWqWbA2um2M/PD3369DH5wxQSs+yoZMX1a9fppQv8UhBrzn01tAXi406So+g4DtcO/07V9XUghCA07m5082g9L+R2bQR6I0IafY4aM4q50Wd7WMXgsRaIs7ZKNxUhXpeQrqltISRm2RHJCgA4cfwEUyDYWo02KysqsfePP5nWthy8frtTnplKS9LOAwBc/EIREjfupntBaCPQRmUttGrhVRq3GiGNPkeOGWW2rbC4wRMybNuUbgdCyLieQa8y9F4DgLF3jzP5wxQas2TpCWYuLXuQ8TEgdoBVruGvA38x3cxA68HrtzNNDUqkHdgMTqOGWGqPXuNmtDl1TCyVgYjYY1VadQM4bedvBNoSazb6bA+LGzzWYduAdZMVAFtPOkA/czUmJsbkD1NIzNLT0xMjRo20uneXl5dH09P5Bxh7enoiJDTU4tejVCixY9vvTGtbDl6/raEUGcf30Lpi/QwRv75x8Ils+75zdPUkEnt2AbymQQUdgzffmbBmo8/2sLjBYx227eLigsFDrBekFpLqZhkqYgwhMUtz0+qssG6xWQcYC+XixYuUdSxny8HrtzNVeddpTtIBUErh6OaFXmMfbJWoaIlIKoXUgT3MoFU3QFVT0aXEx9Zs9NkeFjV4QoZtx8XHITgk2Go3OWuq29Q2My1hjVkCwOR7p1i9kkDIFrtHz54Wj9+xlrIZMAxev53RNKqQuncDNI0qiMQS9BzzABzd2o9ZiiV2EOLhcfpqC0tcaodg7Uaf7WFRgydk2PbdEydY7YcvJNU9dPhQsxIIQmKW5maCWRGyxTanlK49zp87T0+dOMUcE70T5CgZx/fQmgJ9Fr97VCwCYoy38pfYywSJj6mOg6ah808vM2DtRp/tYVGDxzps29vHGzH9TI+Z8cFaXUAIwSOzHjUrgSAkZmmJtDoLBQUFtLSslHedTCZDcEiIRc+t1WqxZfMW6HQ6DB85gnf9nSBHqcpNp9mJCfqtrKsnosY/REQMGdhuHt0FnacriY9ZG32yTglkxaIGj3XY9tBhQ62qvWONDViipI01ZmmptDoLmdczmL4HZxdneHl5WfSCziSdoQcS9iM0LBT29vwdP253OcqNW9mo8Q/ByZMthmvXTVjVSVdpBCqk0aelh7FbzOAJGbZtjgSE9zoElDLNnvO4Wa6ykJhlWHgY+vS1/nYWAFJTUpnWBQQEWDRLrm5UY8O69dDpdBg2YhiqKvnrO29rOQqluH5sV/NW1j9mCAL6DWO+BxychcU1u0oj0I5o9NkeFmseUFhQSJM7QYPHM2fOUJbsbEy/GIwYOcKs6xASs+yowLxKpUJeHlvvv+5+vha9mY4dPUaPHj4Kbx9vDBk6FLt+Nz6pilWOoqhT4D/f/YcqFAo88tgj6NHTetpNS1KRnUazT+m3si5+Ieg7ZXa7Wdm2cHDxhMROxtz23dAIVCS24uQ7SqGur4VOy4GIRLB3cgERCfObLN3os6y0DBcvXqSODg4YFBdHjIWoLObhsW7trLmF4TgOO7fv4E1WEEIw76n5Zns3rDFLQgjGWDAOYQwh4yhdXV0t5mnX1NQ0Dwh64MEHoFaree8HVjnK5dRU+tN/fsSJo8fh6uraJYxdY101Lu74D7RNjZDKHNF38mzYOQi73yT29hCJ2X0StbLWpJkYQlBWFOPQl6/ThE9foEkbVlGh57NGo88tm7fQ5S8sw7Yt2yCRGv+8LGLwhGztrLmFSU1OpQcSDvCuGzl6pNneHcAeswwLD0PPDiglA4SNo/Tx8bbYeRP2JtDUlNTmqXNnz5zlPSY6Jhqurq686wyyH3PL/zoKnVaDlD/W0frKUhBCEDlyGjxDhVcJ2DnImZIbBjitBlq1dfviVeSk0aZ6/YPMNyq2zSoRY1i60WfL8kUW5YdFDB7r1k4qlSJ2oHW6cnAch21btvLWjkqlUsx/ar7ZpV3qRjVOJ7Gl1TtSZ1ZfX49GxppKc8dRGigsLMRP//kRADD9oelwdnEmLDXM8UPjeT3MlgJya8Z+LUnuucO0+LL+3vDtE4fwoabNLJHIHCATEMfTaZrQVK+0mvhYx3EoSTsPSimkMkd4R8YIfg3W+m5vH2/c1b8/7+dmGB3AqvywiMFj3dr16NkDoeHWUdSnJqfSXTv4p5s//NjD6B87wOxrKCwspKnJ/MkBQghGjOKXZ1iKuro6Jq/TUnAchx+//5EW5BfA28cbDzw4nVRVVtGC/AKjx7m4uCCqd2/e1zfUQ5tb/tdRVGSn0bT9m0Ephdw7ADH3zhHkpbVELLUX1BdP29SIhlq2VmimoKoqRU1RDgBA7h0AuZe/oO+jrq4ORw8fYVobOzAW3X2Ny3JahrBYlR8WMXisWztrNXjUarX4ee3PvE+O0LBQzJ0/j1jCS2CNWVqq6NnSmDt/18DpxNN0y6bfAACzHp8F/wB/ps+GtSWVoR66I/oHmouyohgXtn4DTaMKUpkjYqbOFdSq/UZEYrEg8TEA1JUaf9CYQ8vtrE+PfhDbCdslWbrRZ3FRMc4knQEhBBOnTGLy/s02eELkKNZS1Bu0X8YQiUR4fskL8OnuY3QdC0Jilv3u6tehP9R6pZJtIdF/JuZQVVmFjz/8N3Q6HSIiI3D/9AcIACRf4g9vjBg5gjdDbNjOdqSG0VSaGpQ4v/UbqqqpgEgsQd8ps02K292I3CdQ0HpFaT7AWNInBEtsZw8dPGzRRp/HjhylFRUVgpwKsw0eawt1a8lRampq8MVnq6HT6Yyum/HwQxg7fqxFzi9EjtLRcSdVfceUF1FK8f2339GM6xkghGDRC8/B3cMd9fX1uMoTlGaVoxg8gs7qJRvQaTW4tONHWp2v/yzCh09BUH/LdMRx6R4oqC9efXUZ1CrL19RaYjvL2puSpSJJqVBi987dAIR1UjHb4LG2ULeGHIVSim1btlE+oe2AgbFYunwpsVTtLmvM8laUTXlZMPNqjAMJB+gv634BoM+OjR47mgBAaUkpzcww3vmZRY7Ssh66U29nKcXVQ9taJSl6jZkuSG9nDAdXTyIW0ERArahFY12VxV08c7ezrB3BWb15QzceoZ1UzBYe30o5SmpKKv3Pt98bXSN3lmPFyyssWlHAGrO8XYdKFxUVYfWqz6HT6eDm5oaFzy2ERKK/lYoKC3njdyxyFEM9NCEEY8ePFewl67Qa1JXm08qcq6gpzIaDmyfcg3rAK6wPEQsYcs1H3oWjNPO4fjaFW2AE+t033+QkRVvI5G5wdPVEUz2b1KipQYmqvOtw8Q2x2DVwmiYUXDph1naWtV0ZS0WSVqvF9i3bQSkV3EnFLIPH6qZaQ46iVCjxxarVRhXbIpEI77z3LqJjoi3mZQmJWd6KodKenp6QyWRobLSOAFWpUOLt196iuTn6JpbPLXkeEZERzZ9v2hX+DtMx/WJ4Ddi+P/fSstIyxPSLQd9oAd8fpcg9d5he3vsLNI03b+/FUjvae+KjCBt8t9leWEV2Gk39Yz10nBaOrp4Y8OACIlRczIdU5gi5lx9qCrOYjym9dhHBA8dCZKF7T1FWQOtK8gEAzt0DIfcWPkqTtdyRRcJ1OeUyPfTXQQDCO6mYtaVldVMtLUfhOA6frfyM8g3/WLx8CcZPGG/RLSVrzPJWDZX28vIizi78mXCNRiPYKGq1Wqz8+NPmz33CpImYPmN68+fLcRzSrhj/bGQyGaL6GJejlBSXYOtvWwEI64ptEPxe2vFDm8YO0Hsrl//cgOK0c2Zt+yqy0+jpDauaM7L9H1zA3BRAKN4R0YI83JqiHKiq+LvlMEEpMk/ubf48fXoOgFAPub6+HjnZOUxr+RKbLRUZbm5umDBpgqBrMcvgsbqpmZmZKMgvsFhc4eCBg81SiPZYvGwx5sybYxEJSktYY5a3aqi03FmOoOAg3nWclkNdHds2CdDH1H5e+zPdsnkLACA4JBjLX15ODFtZQO/xZ2Ua90T8A/zhH9B+wJtSit07d9G83DzBIzwLkk/SnNN/8WYCdZwWmSf/AKcxbQZEVV46Pbf5y2ZjN+iRFyySkW0PF/9QInWUM69XK2tQdPm0RX5vNUXZtOy6vkbezsEJ3hHCH+IqlQosHcFdXFwQHBxsdE1LRcY90+5BeES4oM/dZIMnpKtuY0MjNv2yEZwFOjns37efrliy3GhWduFzz2Luk/MslqRoCWvMMrJHJORy9pvUUjg6OqI/43wI1j5+lFLs3L6Drl75OQC9Uf3wk4/g59da6KnVaqFSGc8Su7m7GY3lpqak0h//rtow6PpYaKyrRvqRHdBxWqb1ivJiqGrKmda2pLY4h57d9CUaFTXN8hOvCMuFTNrC0dULci9h3mNhSiKaGhglSu1BKbISE9Ck0r+OW2AE5N6Bgt9reVk5ra7mHyPp2M0Rcmd5u6/fUpHh5uaGBx+aITi2a7LBE9JVFwB27diFSxcumvXUSTx5ir79xltGjd3SF5fhH8/+o5XnYSmEpNZZyqasxajRoyGV8gfOL5y/ALVabXSNwdi99br+czcWF1XV11PWUZVtUVpSinfe/CcUdYpWuj4WshITaH0l+zbOlDKs2uIcmrR+FRpqKyESS9DvvvkIGmC9IfIGxFI7+PQUNllOUVaAotQks35vpdeTaVGqPvtMRGIExY6yWFxQKFqtFqtXft6syJj71DzB3h1ghsFjHVwzZNgQjBk3FhqNBqs/+wJKhfCnDqUUCXv30YVPL2w3SSFzkOGLr9dgnpU8O4A9ZilzkCE0LMwq18BCr6heJC4+jnfdxQsXkJ+X1+6PQqvV4rtvvqNvvPpG80Nm2YvL2o2LOnbrRmQOMqPnbFA1QKu92QurqKjAS8tfoteuXoNIJMILyxYzS1EaFTUoSk1iWmsqVXnpNPHnT5qNXczUuRbT2rHgHdFXULcVSimuH90FVbVwLxbQV40k7/wRnEb/QJR7+cEzrLdV369SqURtTc1N9yPHcVj7w0/N4ZT4IfGY+fBMk8JVJhs81sE18UPi8eisRyESiXD+7Dm8/+57tKGBvaODulGNb7/6hi5fvLzNHwqgLxnbtHUzxowdY/GYXUtYY5a3Kn5nwF5mjznz5vJWUijqFPhqzVdQN97s5ZWWlGLZ80vpl5+vAaDPeL/25mt4wkhctFu3brxb0Mupl7H5103UEN7QarXYs2s3nTrxXnr+rD77vXj5EoweM5r586suyKCqGmE1pBJ7Bzi6ejKdozzzMk1av7J5GxszdS6CY0dbTGvHgtw7kLgFRgg6RlVdjpQ9P1OhHVRaVo0Aem1caPzdgttbGfDx8SEsZYyKOgXWrV3X6n4sLSnF8sXL6OpVqwHoY8fvfPAuMVVmZtK+T6lQIukU/xPVIEfpG9OXzHj4Ibr5103YvXM3Ksor6HsfvU+MlXlRSnH+7Dn60fsf4Wpa+1KHuU/OxXMvPG+06Z8lEBKz7Nmrp1VqhoUwaPAgMn3G9OanYnvs37cfjY1quljvUZHCgkL628bN2L1zd7NXJ3OQ4eNVn2D0mNFGHyiOjo4YFBeHs6eNt4ZavWo11ny+hrq4uODG2M7MRx/GE3OfEPTgqspNB9UJiw938/CGXTeeGCulKLh0gl7a+RO0TY2Q2Mlw1/1PwT9mSIc/zERiMYIHjkF5ZipznBIASq6eR9L6lfSuB54m3dz5yyrrSvLomU1roCwvav4/F79Q+Eeb/p5d3VwRHRMNvoYSALBtyzbs/H0n9fTyhFqtRnXV/+4PNzc3/HvlxzfFjoVgksFjHfJskKOIxWIsXb6U5OXk0sRTiUg8lYjxo8bRqfdNxbT7p6FHz57ExdUFqnoVqqqr6F/7/8KWTb8hPy+/3dfuG90X7330vkn7eFMQErNk2U5aG4lEguUvrSAF+QW88p1jR47i2JGjAHCTy94rqhc+/fxTBIewzRW4d9q92LLpN5SXG99K6XS6m4zdnPlzsWT5EsHxV1NmOfDJK6hOh7S/fqMZx3aD6nSwc3TCwIdfgFd4x7TpbwvviGjiFhRJK7PZ+skZqMhOw6E1r1D/6CGIHDmVOHl0R0vvVKfVoLY4l6Yf2YnS9AugLWLkIrEEPUbdJ7jvXUvEYjEeeHA69v25j7cEFNB7/SXFrb/T0LBQfP7laoSFh5n1+Ztk8Fi3di27ozjJnfDF12vIB+++T3//eyL9rh278HdLJ+bgasxd/fDyay8jOibaqtvXG0lPT2eKWXbr1g0RkZEdcEX8OMmd8OGnH5FXV7zCa/RuRCaT4dnnF+Gx2Y8J8p6DgoPIa2+9Tl9cuqLdEMRN1+nkhLf/9U9MnDyxQ75TB1cP+PUe1O6J1PV1OL/la1qekdI8NDvusSVw8bXcMBlTENvZo/f4mUhc90m7OsP24DRNyDt/BHnnj1BCCKQO3SASS8BpNdA01Ld7nG+fQfDpyd+Xjo/4ofFk8fIl9LNPVgk+9tHZj+GFpS8QJyfzRd2kvlpYOxmO4/Di0hV0/z7j3UkA4Iuv12DM2DGtPixKKU4nnabvv/MesrOymc4ZEhqKB2Y8gCn3TCF8PbJs3IxWq8Wenbvpyk9WttoitIWbuxvmPjkPMx+ZadYNdvb0WfrW628a9dJlMhkem/0Ynl74jFnnOr1hFS1OY6t+IYQgctR9iBr/UJs/4orsNHp+y9doqK0EAHiF90XszEXEXuAEMatBKa4c2Ewzju5iHnRuKo5uXhg2/3VibGC4EDiOw74/99F/vf0ulDxdfUQiEe6ddi+eXvCMRaeWCTZ4ZaVlePyR2bSoqMjoOk9PT6zbuJ4EBAa0+XdKKYqKinDy2ImbemTZ2dsjpl80evbqicCgIHLbTrXqYDiOQ25OLj186DDyc/836Ecs1ncviYuPI15eXhaT07R3vsDgIIwcNRIhoSEWkQ9dSdhErx/dybTWLTAC8U+8eFMJmKahHsl7fqaFySdBdTqIxBKED5+CXmOmW7Q21hLotBqc2/I1tWZmWipzRNysZVYRVBvui9NJp3Hthvi8pe+NGxFs8BJPnqLPzH+G9+kyYtRIfLbmM5uxsmF1DFlUg4SiPRxdPTFk7iukZQmYVt2A3LOH6LVD25u3iQ4uHhgwY6FVqyfMpalBicSfP6HV+RkWf21D9Yi1BdW3AsEmlFWOclvPG7XRqXAPjCCuAWFGg/kyuStiZy6CnaMcdaX5KE2/RIsvn0ZtcW5z1pOIRPCPGYqYe54gQlqr3wrsHJwQ/8SLJGn9SlqVy59AZEUmd8WgRxfDPahrjMIUiiAPT6VSYdE/nqV8sgOZgwz/3fAzevexrlDRhg0DLYv5hUIIgdwnEP2nPwNXP+vMXLEWXJMa1w5vp5kn/hQkV7kRQgi8IqIxYMbCzhOvtAKCPLyS4hLKUn95q4W3Nu48PEOjSNysZa0SDnyIxBL49OiHHmMegKtvSIcKiS2F2M4evSc8QoIHjsHlvb/S0msXBBk+QghcA8IRfc/jcPMP75KfgRAEGTzWwTXWGtZjw4YxPEOjyPilK1F0+TTNu3AMtUXZ0DTUN4dgJPYy2DnK4RHSC769B8I7IsaizUBvJd3cfRD32BLCaZpQlpFMS9LOoyovHer6ulayEyISwc7BCc6+wfCNioVfnzhizqChrgazwRMyuMZaw3ps2OBDJJEioN8wEtBv2K2+lFuCWGoH36iBxDfKOvOfuzrMtbSsg2tuxRwHGzZs2GCB2eCxDq6xxrAeGzZs2LAEzAaPdXCNTY5iw4aNzgqTwWMdXMM6b9SGDRs2bgVMBq+woJAmX7zEu87DwwP+/sIG9NqwYcNGR8Fk8JJOJTLJUcRiMURis2d727Bhw4ZV4LVOSoUSu3fuZnoxjuOg4/j7XdmwYcPGrYDX4B0/dpyyyFEA/czW69evW7dnjQ0bNmyYiFGDV1RUhC9Xr2Huu0Upxfdff8e0/bVhw4aNjqZdg1daUopXX3yV5ubkCnrB8+fO4/FHZtOraVeptRsU2rBhw4YQWnVL4TgORYVFdOMvG7H5101obDR9xigABAYF4ol5czBk2BD4+/tbpaGfDRs2bLBC9u3cSN958583TQiyBhKJBJ5ennB3d8cnn32KoOAgm4TFhg0bHcb/A4Gzk8d1W27SAAAAAElFTkSuQmCC";
 
@@ -53,7 +53,8 @@ const INITIAL_CLINICA={id:"c1",nombre:"Clínica Praxi (demo)"};
 
 const INITIAL_PROFESIONALES=[
   {id:"u1",nombre:"Profesional demo",email:"demo@praxiclinic.com",
-   especialidad:"Psicología clínica",color:"#A66B3F",rol:"admin",activo:true,enlace_videollamada:"https://meet.google.com/abc-defg-hij"},
+   especialidad:"Psicología clínica",color:"#A66B3F",rol:"admin",activo:true,enlace_videollamada:"https://meet.google.com/abc-defg-hij",
+   datos_facturacion:{nombre:"Profesional Demo",nif:"00000000T",direccion:"Calle Ejemplo 1",cp:"28001",ciudad:"Madrid",colegiado:"M-00000",email:"demo@ejemplo.com",telefono:""}},
   {id:"u2",nombre:"María López",email:"maria@ejemplo.com",
    especialidad:"Psicología Clínica",color:"#6B8C5A",rol:"profesional",activo:true,enlace_videollamada:"https://zoom.us/j/1234567890"},
 ];
@@ -480,6 +481,7 @@ const traducirError=e=>{
   if(m.includes("ya pertenece"))return "Tu cuenta ya pertenece a una clínica.";
   if(m.includes("aceptar los términos"))return "Para crear la clínica tienes que aceptar los Términos y el Contrato de encargo.";
   if(m.includes("código de acceso"))return "El código de acceso no es válido o ya se ha usado todas las veces permitidas.";
+  if(m.includes("guardar_mis_datos_facturacion")||m.includes("datos_facturacion"))return "Falta preparar la base de datos: ejecuta supabase/07_datos_facturacion.sql en Supabase.";
   if(m.includes("guardar_mi_enlace")||m.includes("enlace_videollamada"))return "Falta preparar la base de datos: ejecuta supabase/06_videollamada.sql en Supabase.";
   if(m.includes("debe empezar por https"))return "El enlace debe empezar por https://";
   if(m.includes("failed to fetch")||m.includes("network"))return "No hay conexión con el servidor. Revisa tu internet.";
@@ -1336,7 +1338,7 @@ function TabSesiones({patient,update}){
         </div>
       ))}
       {show&&<Modal onClose={()=>setShow(false)} title={form.id?`Editar sesión ${form.numero}`:`Sesión ${nextNum}`} width={520}><div style={{display:"flex",flexDirection:"column",gap:14}}><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><Field label="Fecha"><input type="date" style={st.input} value={form.fecha} onChange={f("fecha")}/></Field><Field label="Importe €"><input type="number" style={st.input} value={form.pago} onChange={f("pago")}/></Field></div><Field label="Estado"><select style={st.input} value={form.pagado} onChange={e=>setForm(p=>({...p,pagado:e.target.value==="true"}))}><option value="false">Pendiente</option><option value="true">Pagado</option></select></Field><Field label="Lo trabajado en esta sesión"><textarea style={{...st.textarea,minHeight:100}} value={form.trabajado} onChange={f("trabajado")}/></Field><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}><Field label={`Estado emocional: ${form.estadoEmocional??5}/10`}><input type="range" min="0" max="10" step="1" style={{width:"100%",accentColor:C.accent}} value={form.estadoEmocional??5} onChange={e=>setForm(p=>({...p,estadoEmocional:Number(e.target.value)}))}/></Field><Field label={`Alianza terapéutica: ${form.alianza??5}/10`}><input type="range" min="0" max="10" step="1" style={{width:"100%",accentColor:C.accent}} value={form.alianza??5} onChange={e=>setForm(p=>({...p,alianza:Number(e.target.value)}))}/></Field></div><Field label="Observaciones adicionales"><textarea style={{...st.textarea,minHeight:70}} value={form.observacionesAdicionales||""} onChange={f("observacionesAdicionales")}/></Field></div><MFooter onCancel={()=>setShow(false)} onSave={save}/></Modal>}
-      {viewF&&<Modal onClose={()=>setViewF(null)} title="Factura" width={400}><div style={{border:`1px solid ${C.border}`,borderRadius:10,padding:20}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:16}}><div><div style={{fontSize:18,fontWeight:800,color:C.aL}}>FACTURA</div><div style={{fontSize:12,color:C.muted}}>{viewF.factura}</div></div><div style={{textAlign:"right"}}><div style={{fontSize:12,color:C.muted}}>Fecha</div><div style={{fontWeight:600}}>{viewF.fecha}</div></div></div><div style={{borderTop:`1px solid ${C.border}`,borderBottom:`1px solid ${C.border}`,padding:"12px 0",margin:"12px 0"}}><div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:6}}><span style={{color:C.muted}}>Paciente</span><span style={{fontWeight:600}}>{patient.nombre} {patient.apellidos}</span></div><div style={{display:"flex",justifyContent:"space-between",fontSize:13}}><span style={{color:C.muted}}>Sesión nº {viewF.numero} — Psicología</span><span style={{fontWeight:600}}>{viewF.pago}€</span></div></div><div style={{display:"flex",justifyContent:"space-between",fontSize:16,fontWeight:800}}><span>Total</span><span style={{color:C.aL}}>{viewF.pago}€</span></div><div style={{marginTop:14,padding:"8px 12px",background:viewF.pagado?C.gD:C.amD,borderRadius:7,textAlign:"center",fontSize:13,fontWeight:600,color:viewF.pagado?C.green:C.amber}}>{viewF.pagado?"✓ Pagado":"⏳ Pendiente de pago"}</div></div></Modal>}
+      {viewF&&<GenerarFacturaModal patient={patient} sesion={viewF} onClose={()=>setViewF(null)} onGuardarNumero={n=>update(p=>({...p,sesiones:p.sesiones.map(s=>s.id===viewF.id?{...s,factura:n}:s)}))}/>}
     </div>
   );
 }
@@ -2171,6 +2173,181 @@ const mensajeCita=(nombre,fecha,hora,enlace)=>{
   const dia=fecha?fechaDe(fecha).toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"}).replace(",",""):"";
   return `Hola ${(nombre||"").split(" ")[0]}, te confirmo tu sesión del ${dia} a las ${hora}.`+(enlace?`\n\nEnlace para la videollamada: ${enlace}`:"")+`\n\nSi necesitas cambiarla, avísame. Un saludo.`;
 };
+// ══════════════════════════════════════════════════════════════════════════════
+// FACTURA EN PDF — solo con los datos del profesional (Praxi no aparece)
+// ══════════════════════════════════════════════════════════════════════════════
+const EXENCION_IVA="Operación exenta de IVA según el artículo 20.Uno.3º de la Ley 37/1992, del Impuesto sobre el Valor Añadido.";
+const DATOS_FACT_VACIOS={nombre:"",nif:"",direccion:"",cp:"",ciudad:"",colegiado:"",email:"",telefono:""};
+const fechaES=f=>{if(!f)return"";const[y,m,d]=f.split("-");return`${d}/${m}/${y}`;};
+const eur2=n=>`${(Math.round((Number(n)||0)*100)/100).toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})} €`;
+
+async function descargarFacturaPDF(d){
+  const{jsPDF}=await import("jspdf");
+  const doc=new jsPDF({unit:"mm",format:"a4"});
+  doc.setProperties({title:`Factura ${d.numero}`,author:d.emisor.nombre,creator:d.emisor.nombre});
+  const M=20,W=210;let y=24;
+  const tinta=[34,22,16],gris=[110,96,86],linea=[205,195,180];
+  const txt=(t,x,yy,o={})=>{doc.setFont("helvetica",o.b?"bold":"normal");doc.setFontSize(o.s||10);doc.setTextColor(...(o.c||tinta));doc.text(String(t),x,yy,o.align?{align:o.align}:undefined);};
+  const lineas=(arr,x,yy,o={})=>{arr.filter(Boolean).forEach((l,i)=>txt(l,x,yy+i*(o.lh||5),o));return yy+arr.filter(Boolean).length*(o.lh||5);};
+  // Emisor
+  txt(d.emisor.nombre||"",M,y,{b:true,s:13});
+  const yEm=lineas([d.emisor.nif&&`NIF: ${d.emisor.nif}`,d.emisor.direccion,[d.emisor.cp,d.emisor.ciudad].filter(Boolean).join(" "),
+    d.emisor.colegiado&&`Nº de colegiado/a: ${d.emisor.colegiado}`,[d.emisor.telefono,d.emisor.email].filter(Boolean).join(" · ")],M,y+6,{c:gris,s:9.5});
+  // Título y número
+  txt("FACTURA",W-M,y,{b:true,s:20,align:"right"});
+  txt(`Nº ${d.numero}`,W-M,y+8,{s:10.5,align:"right"});
+  txt(`Fecha: ${fechaES(d.fecha)}`,W-M,y+13.5,{s:10,c:gris,align:"right"});
+  y=Math.max(yEm,y+18)+8;
+  doc.setDrawColor(...linea);doc.setLineWidth(0.3);doc.line(M,y,W-M,y);y+=8;
+  // Cliente
+  txt("CLIENTE",M,y,{b:true,s:8.5,c:gris});y+=5.5;
+  txt(d.cliente.nombre||"",M,y,{b:true,s:11});
+  y=lineas([d.cliente.nif&&`NIF: ${d.cliente.nif}`,d.cliente.direccion,[d.cliente.cp,d.cliente.ciudad].filter(Boolean).join(" ")],M,y+5.5,{c:gris,s:9.5})+8;
+  // Tabla de conceptos
+  doc.setFillColor(240,234,224);doc.rect(M,y,W-2*M,8,"F");
+  txt("CONCEPTO",M+3,y+5.4,{b:true,s:8.5,c:gris});txt("IMPORTE",W-M-3,y+5.4,{b:true,s:8.5,c:gris,align:"right"});y+=8;
+  const concepto=doc.splitTextToSize(d.concepto||"",W-2*M-45);
+  doc.setFont("helvetica","normal");doc.setFontSize(10);doc.setTextColor(...tinta);
+  doc.text(concepto,M+3,y+6.5);txt(eur2(d.base),W-M-3,y+6.5,{align:"right"});
+  y+=Math.max(10,concepto.length*5+5);doc.line(M,y,W-M,y);y+=7;
+  // Totales
+  const tot=(l,v,b)=>{txt(l,W-M-55,y,{s:b?11:10,b,c:b?tinta:gris});txt(v,W-M-3,y,{s:b?11:10,b,align:"right"});y+=b?0:6;};
+  tot("Base imponible",eur2(d.base));
+  if(d.ivaPct>0)tot(`IVA (${d.ivaPct} %)`,eur2(d.cuotaIva));else tot("IVA","Exento");
+  if(d.irpfPct>0)tot(`Retención IRPF (${d.irpfPct} %)`,`- ${eur2(d.cuotaIrpf)}`);
+  doc.line(W-M-58,y-2,W-M,y-2);y+=4;tot("TOTAL",eur2(d.total),true);y+=12;
+  // Notas
+  const notas=[d.ivaPct>0?"":d.exencion,d.notas].filter(Boolean);
+  if(notas.length){doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(...gris);
+    notas.forEach(n=>{const l=doc.splitTextToSize(n,W-2*M);doc.text(l,M,y);y+=l.length*4.2+2;});}
+  doc.save(`Factura ${d.numero.replace(/[\\/:*?"<>|]/g,"-")}.pdf`);
+}
+
+// Datos de facturación del propio profesional
+function MisDatosFacturacionModal({yo,demo,onClose,onGuardado,onDemo}){
+  const[form,setForm]=useState({...DATOS_FACT_VACIOS,...(yo.datos_facturacion||{})});
+  const[err,setErr]=useState("");const[guardando,setGuardando]=useState(false);
+  const f=k=>e=>{setForm(p=>({...p,[k]:e.target.value}));setErr("");};
+  const guardar=async()=>{
+    if(demo){onDemo();return;}
+    if(!form.nombre.trim()||!form.nif.trim()){setErr("El nombre fiscal y el NIF son obligatorios en una factura.");return;}
+    setGuardando(true);
+    const limpio=Object.fromEntries(Object.entries(form).map(([k,v])=>[k,String(v||"").trim()]));
+    const{error}=await supabase.rpc("guardar_mis_datos_facturacion",{p_datos:limpio});
+    setGuardando(false);
+    if(error){setErr(traducirError(error));return;}
+    onGuardado(limpio);
+  };
+  return(
+    <Modal onClose={onClose} title="Mis datos de facturación" width={560}>
+      <div style={{fontSize:13,color:C.muted,lineHeight:1.6,marginBottom:14}}>Son los datos que aparecerán como emisor en tus facturas. Praxi no aparece en ellas.</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+        <div style={{gridColumn:"1/-1"}}><Field label="Nombre y apellidos o razón social *"><input style={st.input} value={form.nombre} onChange={f("nombre")}/></Field></div>
+        <Field label="NIF *"><input style={st.input} value={form.nif} onChange={f("nif")}/></Field>
+        <Field label="Nº de colegiado/a"><input style={st.input} value={form.colegiado} onChange={f("colegiado")}/></Field>
+        <div style={{gridColumn:"1/-1"}}><Field label="Dirección"><input style={st.input} value={form.direccion} onChange={f("direccion")}/></Field></div>
+        <Field label="Código postal"><input style={st.input} value={form.cp} onChange={f("cp")}/></Field>
+        <Field label="Ciudad"><input style={st.input} value={form.ciudad} onChange={f("ciudad")}/></Field>
+        <Field label="Teléfono"><input style={st.input} value={form.telefono} onChange={f("telefono")}/></Field>
+        <Field label="Email"><input style={st.input} value={form.email} onChange={f("email")}/></Field>
+      </div>
+      <Aviso>{err}</Aviso>
+      <MFooter onCancel={onClose} onSave={guardar} saving={guardando}/>
+    </Modal>
+  );
+}
+
+// Generar la factura de una sesión
+function GenerarFacturaModal({patient,sesion,onClose,onGuardarNumero}){
+  const demo=useContext(DemoCtx);
+  const{miembros,miId,guardarMisDatosFact}=useContext(EquipoCtx);
+  const prof=miembros.find(m=>m.id===(patient.profesionalId||miId))||miembros.find(m=>m.id===miId)||{};
+  const yo=miembros.find(m=>m.id===miId)||{};
+  const esMio=prof.id===miId;
+  const[emisor,setEmisor]=useState({...DATOS_FACT_VACIOS,...(prof.datos_facturacion||{})});
+  const[editarDatos,setEditarDatos]=useState(false);
+  const esp=(prof.especialidad||"").toLowerCase().includes("nutri")?"nutrición":"psicología";
+  const[form,setForm]=useState({
+    numero:sesion.factura||"",fecha:sesion.fecha||toYMD(today()),
+    clienteNombre:`${patient.nombre||""} ${patient.apellidos||""}`.trim(),clienteNif:patient.dni||"",
+    clienteDireccion:patient.direccion||"",clienteCp:patient.codigoPostal||"",clienteCiudad:patient.ciudad||"",
+    concepto:`Sesión de ${esp} (${fechaES(sesion.fecha)})`,importe:String(sesion.pago??""),
+    conIva:false,ivaPct:"21",irpfPct:"0",exencion:EXENCION_IVA,notas:"",
+  });
+  const[err,setErr]=useState("");const[generando,setGenerando]=useState(false);
+  const f=k=>e=>{setForm(p=>({...p,[k]:e.type==="change"&&e.target.type==="checkbox"?e.target.checked:e.target.value}));setErr("");};
+  const base=Number(String(form.importe).replace(",","."))||0;
+  const ivaPct=form.conIva?(Number(form.ivaPct)||0):0;const irpfPct=Number(form.irpfPct)||0;
+  const cuotaIva=base*ivaPct/100,cuotaIrpf=base*irpfPct/100,total=base+cuotaIva-cuotaIrpf;
+  const faltan=!emisor.nombre||!emisor.nif;
+  const generar=async()=>{
+    if(faltan){setErr("Faltan tus datos de facturación (nombre fiscal y NIF).");return;}
+    if(!form.numero.trim()){setErr("Indica el número de factura.");return;}
+    if(!form.clienteNombre.trim()){setErr("Indica el nombre del cliente.");return;}
+    setGenerando(true);
+    try{
+      await descargarFacturaPDF({emisor,numero:form.numero.trim(),fecha:form.fecha,
+        cliente:{nombre:form.clienteNombre.trim(),nif:form.clienteNif.trim(),direccion:form.clienteDireccion.trim(),cp:form.clienteCp.trim(),ciudad:form.clienteCiudad.trim()},
+        concepto:form.concepto,base,ivaPct,cuotaIva,irpfPct,cuotaIrpf,total,exencion:form.exencion,notas:form.notas.trim()});
+      if(!demo&&form.numero.trim()!==sesion.factura)onGuardarNumero(form.numero.trim());
+    }catch(e){setErr("No se ha podido generar el PDF. Inténtalo de nuevo.");}
+    setGenerando(false);
+  };
+  const g2={display:"grid",gridTemplateColumns:"1fr 1fr",gap:12};
+  const sub={fontSize:11,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600,margin:"16px 0 8px"};
+  return(
+    <Modal onClose={onClose} title="Generar factura en PDF" width={620}>
+      <div style={{...sub,marginTop:0}}>Emisor</div>
+      {faltan
+        ?<div style={{padding:"10px 14px",background:C.amD,borderRadius:10,fontSize:13,color:C.text,lineHeight:1.5}}>
+            {esMio?<>Aún no has guardado tus datos de facturación. <button style={{...st.btn("sm"),marginLeft:6}} onClick={()=>setEditarDatos(true)}>Añadir mis datos</button></>
+              :<>{prof.nombre||"El profesional"} aún no ha guardado sus datos de facturación. Debe hacerlo desde Facturas › «Mis datos de facturación».</>}
+          </div>
+        :<div style={{padding:"10px 14px",background:C.bone,border:`1px solid ${C.border}`,borderRadius:10,fontSize:13,lineHeight:1.55,display:"flex",justifyContent:"space-between",gap:10}}>
+            <div><b>{emisor.nombre}</b> · NIF {emisor.nif}<div style={{color:C.muted}}>{[emisor.direccion,emisor.cp,emisor.ciudad].filter(Boolean).join(", ")}</div></div>
+            {esMio&&<button style={{...st.btn("sm"),alignSelf:"flex-start"}} onClick={()=>setEditarDatos(true)}>Editar</button>}
+          </div>}
+      <div style={sub}>Factura</div>
+      <div style={g2}>
+        <Field label="Número de factura"><input style={st.input} value={form.numero} onChange={f("numero")}/></Field>
+        <Field label="Fecha"><input type="date" style={st.input} value={form.fecha} onChange={f("fecha")}/></Field>
+      </div>
+      <div style={sub}>Cliente</div>
+      <div style={g2}>
+        <Field label="Nombre"><input style={st.input} value={form.clienteNombre} onChange={f("clienteNombre")}/></Field>
+        <Field label="NIF (opcional)"><input style={st.input} value={form.clienteNif} onChange={f("clienteNif")}/></Field>
+        <div style={{gridColumn:"1/-1"}}><Field label="Dirección (opcional)"><input style={st.input} value={form.clienteDireccion} onChange={f("clienteDireccion")}/></Field></div>
+        <Field label="Código postal"><input style={st.input} value={form.clienteCp} onChange={f("clienteCp")}/></Field>
+        <Field label="Ciudad"><input style={st.input} value={form.clienteCiudad} onChange={f("clienteCiudad")}/></Field>
+      </div>
+      <div style={sub}>Importe</div>
+      <Field label="Concepto"><input style={st.input} value={form.concepto} onChange={f("concepto")}/></Field>
+      <div style={{...g2,gridTemplateColumns:"1fr 1fr 1fr",marginTop:12,alignItems:"end"}}>
+        <Field label="Importe (€)"><input style={st.input} inputMode="decimal" value={form.importe} onChange={f("importe")}/></Field>
+        <Field label="Retención IRPF (%)"><input style={st.input} inputMode="decimal" value={form.irpfPct} onChange={f("irpfPct")}/></Field>
+        <label style={{display:"flex",alignItems:"center",gap:8,fontSize:13,color:C.text,paddingBottom:10}}>
+          <input type="checkbox" checked={form.conIva} onChange={f("conIva")}/> Aplicar IVA
+          {form.conIva&&<input style={{...st.input,width:60,padding:"5px 8px"}} value={form.ivaPct} onChange={f("ivaPct")}/>}{form.conIva&&"%"}
+        </label>
+      </div>
+      {!form.conIva&&<div style={{marginTop:12}}><Field label="Texto de exención de IVA"><textarea style={{...st.input,minHeight:52,fontSize:12}} value={form.exencion} onChange={f("exencion")}/></Field></div>}
+      <div style={{marginTop:12}}><Field label="Notas (opcional; p. ej., forma de pago)"><input style={st.input} value={form.notas} onChange={f("notas")}/></Field></div>
+      <div style={{display:"flex",justifyContent:"flex-end",gap:18,fontSize:14,marginTop:14,color:C.text}}>
+        <span>Base {eur2(base)}</span>{form.conIva&&<span>IVA {eur2(cuotaIva)}</span>}{irpfPct>0&&<span>IRPF −{eur2(cuotaIrpf)}</span>}<b>Total {eur2(total)}</b>
+      </div>
+      <div style={{fontSize:11.5,color:C.muted,marginTop:12,lineHeight:1.5}}>La factura se genera con los datos que indicas. Comprueba la numeración, el tratamiento del IVA y tus obligaciones fiscales con tu asesor.</div>
+      <Aviso>{err}</Aviso>
+      <div style={{display:"flex",gap:10,marginTop:16,justifyContent:"flex-end"}}>
+        <button style={st.btn("ghost")} onClick={onClose}>Cerrar</button>
+        <button style={{...st.btn(),background:C.accent,color:C.bone,opacity:generando?0.6:1}} disabled={generando} onClick={generar}>{generando?"Generando…":"Descargar PDF"}</button>
+      </div>
+      {editarDatos&&<MisDatosFacturacionModal yo={yo} demo={demo} onClose={()=>setEditarDatos(false)}
+        onDemo={()=>{setEditarDatos(false);setErr("En la demo no se guardan datos.");}}
+        onGuardado={d=>{guardarMisDatosFact(d);setEmisor({...DATOS_FACT_VACIOS,...d});setEditarDatos(false);}}/>}
+    </Modal>
+  );
+}
+
 // ── Mi videollamada: cada profesional guarda su enlace fijo ───────────────────
 function MiVideollamadaModal({yo,demo,onClose,onGuardado,onDemo}){
   const[enlace,setEnlace]=useState(yo.enlace_videollamada||"");
@@ -2569,54 +2746,11 @@ function Facturas({patients,setPatients}){
   const totalCobrado=todasFacturas.filter(f=>f.pagado).reduce((a,f)=>a+f.pago,0);
   const totalPendiente=todasFacturas.filter(f=>!f.pagado).reduce((a,f)=>a+f.pago,0);
 
-  const printFactura=f=>{
-    const paciente=patients.find(p=>p.sesiones.some(s=>s.id===f.id));
-    const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${f.factura}</title>
-    <style>
-      body{font-family:Arial,sans-serif;font-size:13px;color:#3B2A1E;background:#F5EFE4;padding:40px;max-width:600px;margin:0 auto;}
-      .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;}
-      .brand{font-size:28px;font-weight:300;color:#A66B3F;letter-spacing:-1px;}
-      .brand-sub{font-size:10px;color:#9A7E68;letter-spacing:3px;text-transform:uppercase;margin-top:3px;}
-      .fac-num{text-align:right;}
-      .fac-num .num{font-size:20px;font-weight:700;color:#3B2A1E;}
-      .fac-num .date{font-size:12px;color:#9A7E68;margin-top:4px;}
-      .divider{border:none;border-top:1px solid #D9C9A8;margin:20px 0;}
-      .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;}
-      .block .lbl{font-size:10px;color:#9A7E68;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;}
-      .block .val{font-size:13px;color:#3B2A1E;line-height:1.6;}
-      table{width:100%;border-collapse:collapse;margin-bottom:24px;}
-      th{background:#EBE3D2;padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:#6B4A30;}
-      td{padding:12px 14px;border-bottom:1px solid #D9C9A8;font-size:13px;}
-      .total-row{background:#EBE3D2;}
-      .total-row td{font-weight:700;font-size:15px;padding:14px;}
-      .badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
-      .pagado{background:#E8EFE2;color:#4A6438;}
-      .pendiente{background:#FDF3DC;color:#8A5F1B;}
-      footer{margin-top:40px;font-size:10px;color:#B89271;border-top:1px solid #D9C9A8;padding-top:12px;text-align:center;}
-      @media print{body{padding:20px;background:white;}}
-    </style></head><body>
-    <div class="header">
-      <div><img src="${PRAXI_LOGO}" alt="praXi" style="height:44px;display:block"/></div>
-      <div class="fac-num"><div class="num">${f.factura}</div><div class="date">Fecha: ${f.fecha}</div></div>
-    </div>
-    <hr class="divider"/>
-    <div class="grid">
-      <div class="block"><div class="lbl">Facturado a</div><div class="val"><strong>${f.pacienteNombre}</strong><br/>${f.email||""}<br/>${f.telefono||""}</div></div>
-      <div class="block"><div class="lbl">Profesional</div><div class="val">Consulta psicológica</div></div>
-    </div>
-    <table>
-      <thead><tr><th>Descripción</th><th style="text-align:right">Importe</th></tr></thead>
-      <tbody>
-        <tr><td>Sesión nº ${f.numero} de psicología / atención clínica<br/><span style="font-size:11px;color:#9A7E68">Fecha: ${f.fecha}</span></td><td style="text-align:right">${f.pago.toFixed(2)} €</td></tr>
-        <tr class="total-row"><td>Total</td><td style="text-align:right">${f.pago.toFixed(2)} €</td></tr>
-      </tbody>
-    </table>
-    <div style="text-align:center;margin-bottom:24px"><span class="badge ${f.pagado?"pagado":"pendiente"}">${f.pagado?"✓ Pagado":"⏳ Pendiente de pago"}</span></div>
-    <footer>Praxi · Gestión Clínica · ${f.factura} · Generada el ${toYMD(new Date())}</footer>
-    </body></html>`;
-    const win=window.open("","_blank");win.document.write(html);win.document.close();setTimeout(()=>win.print(),400);
-  };
-
+  const[genF,setGenF]=useState(null);
+  const[misDatos,setMisDatos]=useState(false);
+  const demo=useContext(DemoCtx);
+  const{miembros,miId,guardarMisDatosFact}=useContext(EquipoCtx);
+  const yo=miembros.find(m=>m.id===miId)||{};
   return(
     <div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
@@ -2624,7 +2758,10 @@ function Facturas({patients,setPatients}){
           <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Facturas</div>
           <div style={{fontSize:13,color:C.muted,marginTop:2}}>{todasFacturas.length} facturas emitidas</div>
         </div>
-        {IA_VISIBLE&&<button style={{...st.btn("sm"),background:C.accent,color:C.bone}} onClick={()=>setShowIA(v=>!v)}>✦ IA</button>}
+        <div style={{display:"flex",gap:8}}>
+          <button style={{...st.btn("sm"),background:C.bone,color:C.walnut}} onClick={()=>setMisDatos(true)}>{yo.datos_facturacion?.nif?"Mis datos de facturación":"⚠ Añadir mis datos de facturación"}</button>
+          {IA_VISIBLE&&<button style={{...st.btn("sm"),background:C.accent,color:C.bone}} onClick={()=>setShowIA(v=>!v)}>✦ IA</button>}
+        </div>
       </div>
 
       {/* Stats */}
@@ -2683,8 +2820,7 @@ function Facturas({patients,setPatients}){
                 <td style={st.td}><span style={st.badge(f.pagado?C.green:C.amber,f.pagado?C.gD:C.amD)}>{f.pagado?"Pagado":"Pendiente"}</span></td>
                 <td style={st.td}>
                   <div style={st.rowActions}>
-                    <button style={st.btn("sm")} onClick={()=>printFactura(f)}>🖨 PDF</button>
-                    <button style={st.btn("sm")} onClick={()=>setViewF(f)}>Ver</button>
+                    <button style={st.btn("sm")} onClick={()=>setGenF(f)}>Factura PDF</button>
                   </div>
                 </td>
               </tr>
@@ -2694,40 +2830,10 @@ function Facturas({patients,setPatients}){
       </div>
 
       {/* Modal vista previa factura */}
-      {viewF&&(
-        <Modal onClose={()=>setViewF(null)} title={`Factura ${viewF.factura}`} width={440}>
-          <div style={{border:`1px solid ${C.border}`,borderRadius:12,padding:24}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20}}>
-              <div>
-                <img src={PRAXI_LOGO} alt="praXi" style={{height:34,display:"block"}}/>
-              </div>
-              <div style={{textAlign:"right"}}>
-                <div style={{fontSize:16,fontWeight:700,color:C.text}}>{viewF.factura}</div>
-                <div style={{fontSize:12,color:C.muted,marginTop:2}}>{viewF.fecha}</div>
-              </div>
-            </div>
-            <div style={{borderTop:`1px solid ${C.border}`,borderBottom:`1px solid ${C.border}`,padding:"14px 0",margin:"0 0 16px"}}>
-              <div style={{fontSize:11,color:C.muted,textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:4}}>Facturado a</div>
-              <div style={{fontWeight:600}}>{viewF.pacienteNombre}</div>
-            </div>
-            <div style={{display:"flex",justifyContent:"space-between",fontSize:13,marginBottom:8,padding:"8px 0",borderBottom:`1px solid ${C.border}`}}>
-              <span style={{color:C.muted}}>Sesión nº {viewF.numero} — Atención clínica</span>
-              <span style={{fontWeight:600}}>{viewF.pago}€</span>
-            </div>
-            <div style={{display:"flex",justifyContent:"space-between",fontSize:16,fontWeight:700,padding:"10px 0"}}>
-              <span>Total</span>
-              <span style={{color:C.accent}}>{viewF.pago}€</span>
-            </div>
-            <div style={{marginTop:16,padding:"8px 14px",background:viewF.pagado?C.gD:C.amD,borderRadius:20,textAlign:"center",fontSize:13,fontWeight:600,color:viewF.pagado?C.green:C.amber}}>
-              {viewF.pagado?"✓ Pagado":"⏳ Pendiente de pago"}
-            </div>
-          </div>
-          <div style={{display:"flex",gap:10,marginTop:16,justifyContent:"flex-end"}}>
-            <button style={st.btn("ghost")} onClick={()=>setViewF(null)}>Cerrar</button>
-            <button style={{...st.btn(),background:C.accent,color:C.bone}} onClick={()=>printFactura(viewF)}>🖨 Imprimir PDF</button>
-          </div>
-        </Modal>
-      )}
+      {genF&&(()=>{const pa=patients.find(x=>x.id===genF.pacienteId);return pa&&<GenerarFacturaModal patient={pa} sesion={genF} onClose={()=>setGenF(null)}
+        onGuardarNumero={n=>setPatients(ps=>ps.map(x=>x.id===pa.id?{...x,sesiones:x.sesiones.map(s=>s.id===genF.id?{...s,factura:n}:s)}:x))}/>;})()}
+      {misDatos&&<MisDatosFacturacionModal yo={yo} demo={demo} onClose={()=>setMisDatos(false)} onDemo={()=>setMisDatos(false)}
+        onGuardado={d=>{guardarMisDatosFact(d);setMisDatos(false);}}/>}
       {IA_VISIBLE&&showIA&&<IAFacturasPanel patients={patients} onClose={()=>setShowIA(false)}/>}
     </div>
   );
@@ -3819,7 +3925,7 @@ export default function App({demo=false}){
   }
   return(
     <DemoCtx.Provider value={demo}>
-    <EquipoCtx.Provider value={{esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id,registrarVista}}>
+    <EquipoCtx.Provider value={{esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id,registrarVista,guardarMisDatosFact:d=>{setCurrentUser(u=>({...u,datos_facturacion:d}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,datos_facturacion:d}:m));}}}>
     <div style={st.app}>
       {aviso&&<div style={{position:"fixed",top:20,left:"50%",transform:"translateX(-50%)",zIndex:400,background:C.red,color:"#fff",padding:"10px 18px",borderRadius:10,fontSize:13,boxShadow:"0 8px 24px rgba(34,22,16,0.25)",maxWidth:"90vw"}}>{aviso}</div>}
       {pendientes>0&&<div style={{position:"fixed",bottom:16,left:16,zIndex:300,background:C.bone,border:`1px solid ${C.border}`,color:C.muted,padding:"6px 12px",borderRadius:8,fontSize:12}}>Guardando…</div>}

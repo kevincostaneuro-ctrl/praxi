@@ -156,6 +156,7 @@ export function Terminos() {
         <li>Respecto a los datos de sus pacientes, el Cliente es el <strong>responsable del tratamiento</strong>: le corresponde tener una base legal para tratarlos, informar a los pacientes, recabar los consentimientos necesarios y atender sus derechos.</li>
         <li>Cumplir las obligaciones de conservación de la historia clínica (Ley 41/2002). Antes de borrar pacientes o la clínica, el Cliente debe exportar lo que tenga obligación de conservar.</li>
         <li>No usar Praxi para fines distintos a la gestión de su actividad profesional.</li>
+        <li><strong>Facturas:</strong> Praxi genera un documento PDF con los datos que introduce el Cliente (emisor, cliente, número, importes e impuestos). El Cliente es el único responsable de su contenido y de cumplir sus obligaciones de facturación, fiscales y de registro, incluidas, cuando le sean exigibles, las del sistema Verifactu.</li>
       </L>
 
       <H>5. Precio</H>
