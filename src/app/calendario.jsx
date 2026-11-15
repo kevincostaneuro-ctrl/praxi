@@ -200,7 +200,7 @@ export function Calendario({patients,citas,setCitas,config,setConfig,tipos,horar
   };
 
   return(
-    <div>
+    <div style={{maxWidth:1280}}>{/* ancho máximo: en pantallas grandes la vista día quedaba demasiado ancha */}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
         <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Calendario</div>
         <button style={st.btn()} onClick={()=>openNew(date,"09:00",tipos[0]?.id)}>+ Añadir</button>
