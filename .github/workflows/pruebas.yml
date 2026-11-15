@@ -1,0 +1,24 @@
+# Cada vez que se sube un cambio, comprueba que la app compila y que la demo
+# abre todas sus pantallas sin errores. Si algo falla, GitHub lo marca en rojo
+# y te avisa por correo (Vercel publica igualmente: revisa el aviso).
+name: Pruebas
+
+on:
+  push:
+    branches: [main]
+  pull_request: {}
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Pruebas automáticas
+        run: npm test
+      - name: Compilación
+        run: npm run build
