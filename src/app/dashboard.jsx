@@ -3,7 +3,7 @@ import { AgendaPersonalPanel } from "./citas.jsx";
 import { CITA_BG, DAYS_ES, MONTHS_ES, WORK_END, WORK_START } from "./constantes.js";
 import { C, PRIORIDAD_T, st } from "./estilos.js";
 import { Avatar } from "./ui.jsx";
-import { CitasHoy, CobrosPendientes, PrimerosPasos, TuPlan } from "./dashboardBloques.jsx";
+import { CitasHoy, CobrosPendientes, PrimerosPasos } from "./dashboardBloques.jsx";
 import { addDays, diasEntre, etiquetaDia, etiquetaSemana, fechaDe, startOfWeek, timeToMins, toYMD, today } from "./utilidades.js";
 
 export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,horario,onInforme,onEditCita,onEditTarea,onNuevaCita,onAgendar,onAbrirPaciente,onNuevoPaciente,onVerCalendario,clinica,yo,esAdmin,demo,onIr,onVideo}){
@@ -127,7 +127,6 @@ export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,
           ))}
           {sinCita.length>6&&<div style={{fontSize:12,color:C.muted,paddingTop:8,borderTop:`1px solid ${C.border}`}}>Y {sinCita.length-6} más.</div>}
         </div>
-        <TuPlan clinica={clinica} patients={patients} citas={citas} demo={demo}/>
       </div>
 
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 300px",gap:14,alignItems:"start"}}>

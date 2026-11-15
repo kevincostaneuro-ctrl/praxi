@@ -5,6 +5,7 @@ import { DatosClinica } from "./configuracion.jsx";
 import { C, st } from "./estilos.js";
 import { Field, MFooter, Modal } from "./ui.jsx";
 import { traducirError } from "./utilidades.js";
+import { TuPlan } from "./dashboardBloques.jsx";
 
 // ── Mi videollamada: cada profesional guarda su enlace fijo ───────────────────
 export function MiVideollamadaModal({yo,demo,onClose,onGuardado,onDemo}){
@@ -87,6 +88,8 @@ export function EquipoPanel({clinica,miembros,yo,patients,citas,demo,onCambio,bl
     <div style={{maxWidth:900}}>
       <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Equipo</div>
       <div style={{color:C.muted,fontSize:13,marginTop:2,marginBottom:20}}>{clinica?.nombre} · {miembros.filter(m=>m.activo).length} miembros activos</div>
+
+      <div style={{marginBottom:16}}><TuPlan clinica={clinica} patients={patients} citas={citas} demo={demo}/></div>
 
       <div style={{...st.card,padding:"18px 20px",marginBottom:16}}>
         <div style={{...seccion,marginBottom:12}}>Invitar a un profesional</div>

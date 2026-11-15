@@ -30,6 +30,7 @@ const btnSuave = { ...st.btn("sm"), background: C.bone, color: C.walnut };
 export function PrimerosPasos({ clinica, yo, esAdmin, demo, patients, citas, onIr, onVideo, onNuevoPaciente, onNuevaCita }) {
   const clave = `praxi_pasos_ocultos_${clinica?.id || "x"}`;
   const [oculto, setOculto] = useState(() => leerMarca(clave));
+  const [abierto, setAbierto] = useState(false);
   const [, refrescar] = useState(0);
   const df = yo?.datos_facturacion || {};
   const pasos = [
@@ -48,9 +49,22 @@ export function PrimerosPasos({ clinica, yo, esAdmin, demo, patients, citas, onI
   if (oculto || hechos === pasos.length) return null;
   const pct = Math.round(hechos / pasos.length * 100);
   const siguiente = pasos.find(p => !p.hecho);
+  // Plegado: un botón pequeño con el progreso; al pulsarlo se despliega la lista
+  if (!abierto) return (
+    <button onClick={() => setAbierto(true)} style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: 14, padding: "7px 14px", borderRadius: 999,
+      background: C.card, border: `1px solid ${C.border}`, color: C.walnut, fontSize: 12.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+      <span>🚀 Primeros pasos</span>
+      <span style={{ width: 60, height: 5, background: C.sand, borderRadius: 3, display: "inline-block" }}><span style={{ display: "block", width: `${pct}%`, height: 5, background: C.accent, borderRadius: 3 }} /></span>
+      <span style={{ color: C.muted, fontWeight: 500 }}>{hechos}/{pasos.length}</span>
+      <span style={{ color: C.muted }}>▾</span>
+    </button>
+  );
   return (
     <div style={{ ...st.card, padding: "16px 20px", marginBottom: 14 }}>
-      <Titulo extra={<button style={{ ...st.btn("ghost"), fontSize: 12, color: C.muted, padding: "2px 4px" }} onClick={() => { ponerMarca(clave); setOculto(true); }}>Ocultar</button>}>
+      <Titulo extra={<div style={{ display: "flex", gap: 4 }}>
+        <button style={{ ...st.btn("ghost"), fontSize: 12, color: C.muted, padding: "2px 6px" }} onClick={() => setAbierto(false)}>Plegar ▴</button>
+        <button style={{ ...st.btn("ghost"), fontSize: 12, color: C.muted, padding: "2px 6px" }} onClick={() => { ponerMarca(clave); setOculto(true); }}>No volver a mostrar</button>
+      </div>}>
         Primeros pasos · {hechos} de {pasos.length}
       </Titulo>
       <div style={{ height: 5, background: C.sand, borderRadius: 3, marginBottom: 10 }}><div style={{ width: `${pct}%`, height: 5, background: C.accent, borderRadius: 3 }} /></div>
