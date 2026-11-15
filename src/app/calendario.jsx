@@ -14,7 +14,7 @@ export function TimeGrid({days,citas,patients,horario,onNew,onEdit,showHeader}){
   const nameOf=c=>{const p=patients.find(p=>p.id==c.pacienteId);return c.origen==="calendly"||!p?(c.nombreExterno||"Primera llamada"):`${p.nombre} ${p.apellidos}`;};
   return(
     <div>
-      <div style={{overflowY:"auto",maxHeight:"68vh"}}>
+      <div>
       {showHeader&&(
         <div style={{display:"grid",gridTemplateColumns:cols,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,zIndex:3,background:C.card}}>
           <div/>
@@ -130,7 +130,7 @@ export function Calendario({patients,citas,setCitas,config,setConfig,tipos,horar
     const dc=[...citas.filter(c=>c.fecha===ds)].sort((a,b)=>a.hora.localeCompare(b.hora));
     return(
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:16,alignItems:"start"}}>
-        <div style={{...st.card,overflow:"hidden",maxWidth:860,width:"100%",margin:"0 auto"}}>
+        <div style={{...st.card,overflow:"clip"}}>
           <TimeGrid days={[date]} citas={citas} patients={patients} horario={horario} onNew={openNew} onEdit={openEdit}/>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
@@ -150,7 +150,7 @@ export function Calendario({patients,citas,setCitas,config,setConfig,tipos,horar
     const cw=[...citas.filter(c=>keys.includes(c.fecha))].sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
     return(
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:16,alignItems:"start"}}>
-        <div style={{...st.card,overflow:"hidden"}}>
+        <div style={{...st.card,overflow:"clip"}}>
           <TimeGrid days={days} citas={citas} patients={patients} horario={horario} onNew={openNew} onEdit={openEdit} showHeader/>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>

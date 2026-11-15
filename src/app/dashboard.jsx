@@ -72,7 +72,7 @@ export function Dashboard({patients,citas,setCitas,tareas,setTareas,horario,onIn
   );
 
   return(
-    <div style={{maxWidth:1280,margin:"0 auto"}}>
+    <div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20,gap:12,flexWrap:"wrap"}}>
         <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Dashboard</div>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>

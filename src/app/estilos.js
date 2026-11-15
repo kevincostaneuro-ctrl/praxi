@@ -32,9 +32,10 @@ export const C = {
 // ── STYLES ─────────────────────────────────────────────────────────────────────
 export const st={
   app:{minHeight:"100vh",background:C.bg,color:C.text,fontFamily:"'Manrope',sans-serif",display:"flex"},
-  sidebar:{width:240,background:C.bone,borderRight:`1px solid ${C.border}`,padding:"24px 0",display:"flex",flexDirection:"column",gap:2,flexShrink:0},
+  // El menú lateral se queda fijo al deslizar la página; el contenido usa el scroll de la página
+  sidebar:{width:240,background:C.bone,borderRight:`1px solid ${C.border}`,padding:"24px 0",display:"flex",flexDirection:"column",gap:2,flexShrink:0,position:"sticky",top:0,height:"100vh",overflowY:"auto",boxSizing:"border-box"},
   sidebarBrand:{padding:"0 24px 20px",borderBottom:`1px solid ${C.border}`,marginBottom:8},
-  main:{flex:1,padding:32,overflowY:"auto"},
+  main:{flex:1,padding:32,minWidth:0},
   card:{background:C.card,border:`1px solid ${C.border}`,borderRadius:18},
   input:{background:C.bone,border:`1px solid ${C.border}`,borderRadius:4,padding:"9px 12px",color:C.text,fontSize:14,width:"100%",outline:"none",boxSizing:"border-box",fontFamily:"'Manrope',sans-serif"},
   textarea:{background:C.bone,border:`1px solid ${C.border}`,borderRadius:4,padding:"9px 12px",color:C.text,fontSize:14,width:"100%",outline:"none",boxSizing:"border-box",fontFamily:"'Manrope',sans-serif",resize:"vertical",minHeight:80},
