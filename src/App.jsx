@@ -2908,7 +2908,7 @@ function BibliotecaRecursos(){
     <div>
       <div style={{marginBottom:20}}>
         <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Recursos</div>
-        <div style={{fontSize:13,color:C.muted,marginTop:2}}>{RECURSOS.length} materiales clínicos en PDF, listos para imprimir o enviar</div>
+        <div style={{fontSize:13,color:C.muted,marginTop:2}}>{new Set(RECURSOS.map(r=>r.url)).size} materiales clínicos en PDF, listos para imprimir o enviar</div>
       </div>
       <div style={{display:"flex",gap:3,background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,padding:3,marginBottom:14,width:"fit-content"}}>
         {PROFESIONES.map(pr=>(
