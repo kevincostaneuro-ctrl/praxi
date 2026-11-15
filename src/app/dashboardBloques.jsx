@@ -28,8 +28,6 @@ const btnSuave = { ...st.btn("sm"), background: C.bone, color: C.walnut };
 
 // ── 1 · Primeros pasos (cuentas nuevas) ─────────────────────────────────────
 export function PrimerosPasos({ clinica, yo, esAdmin, demo, patients, citas, onIr, onVideo, onNuevoPaciente, onNuevaCita }) {
-  const clave = `praxi_pasos_ocultos_${clinica?.id || "x"}`;
-  const [oculto, setOculto] = useState(() => leerMarca(clave));
   const [abierto, setAbierto] = useState(false);
   const [, refrescar] = useState(0);
   const df = yo?.datos_facturacion || {};
@@ -46,7 +44,7 @@ export function PrimerosPasos({ clinica, yo, esAdmin, demo, patients, citas, onI
     { t: "Lee la guía «Cómo abrir tu consulta»", hecho: leerMarca(MARCA_GUIA), accion: "Abrir guía", ir: () => { ponerMarca(MARCA_GUIA); window.open(URL_GUIA, "_blank", "noopener"); refrescar(n => n + 1); } },
   ].filter(Boolean);
   const hechos = pasos.filter(p => p.hecho).length;
-  if (oculto || hechos === pasos.length) return null;
+  if (hechos === pasos.length) return null;
   const pct = Math.round(hechos / pasos.length * 100);
   const siguiente = pasos.find(p => !p.hecho);
   // Plegado: un botón pequeño con el progreso; al pulsarlo se despliega la lista
@@ -61,10 +59,7 @@ export function PrimerosPasos({ clinica, yo, esAdmin, demo, patients, citas, onI
   );
   return (
     <div style={{ ...st.card, padding: "16px 20px", marginBottom: 14 }}>
-      <Titulo extra={<div style={{ display: "flex", gap: 4 }}>
-        <button style={{ ...st.btn("ghost"), fontSize: 12, color: C.muted, padding: "2px 6px" }} onClick={() => setAbierto(false)}>Plegar ▴</button>
-        <button style={{ ...st.btn("ghost"), fontSize: 12, color: C.muted, padding: "2px 6px" }} onClick={() => { ponerMarca(clave); setOculto(true); }}>No volver a mostrar</button>
-      </div>}>
+      <Titulo extra={<button style={{ ...st.btn("ghost"), fontSize: 12, color: C.muted, padding: "2px 6px" }} onClick={() => setAbierto(false)}>Plegar ▴</button>}>
         Primeros pasos · {hechos} de {pasos.length}
       </Titulo>
       <div style={{ height: 5, background: C.sand, borderRadius: 3, marginBottom: 10 }}><div style={{ width: `${pct}%`, height: 5, background: C.accent, borderRadius: 3 }} /></div>
