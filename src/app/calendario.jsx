@@ -1,77 +1,117 @@
 import { useState } from "react";
 import { AgendaPersonalPanel, CitaModal, TareaModal } from "./citas.jsx";
-import { CITA_BG, DAYS_ES, MONTHS_ES, SLOT_H, pad } from "./constantes.js";
+import { DAYS_ES, MONTHS_ES, SLOT_H, pad } from "./constantes.js";
 import { C, st } from "./estilos.js";
-import { Avatar } from "./ui.jsx";
 import { addDays, etiquetaDia, etiquetaMes, etiquetaSemana, startOfWeek, timeToMins, toYMD, today } from "./utilidades.js";
 
-export function TimeGrid({days,citas,patients,horario,onNew,onEdit,showHeader}){
-  const todayStr=toYMD(today());
+// Colores por tipo de cita (en el orden de los tipos configurados)
+export const PALETA_TIPOS=[
+  {c:"#6B8C5A",bg:"#E6EDDF"}, // salvia
+  {c:"#A66B3F",bg:"#F4E6D8"}, // terracota
+  {c:"#5C7A8C",bg:"#E1E9EE"}, // pizarra
+  {c:"#8C5A6E",bg:"#F0E2E8"}, // ciruela
+  {c:"#B08A3E",bg:"#F4EBD6"}, // ocre
+  {c:"#7D6E62",bg:"#ECE6E0"}, // topo
+];
+export const colorTipo=(c,tipos=[])=>{
+  let i=tipos.findIndex(t=>t.id===c.tipoId);
+  if(i<0)i=tipos.findIndex(t=>t.nombre===c.tipo);
+  return PALETA_TIPOS[(i<0?1:i)%PALETA_TIPOS.length];
+};
+export function LeyendaTipos({tipos}){
+  return(
+    <div style={{display:"flex",gap:14,flexWrap:"wrap",fontSize:12,color:C.muted}}>
+      {tipos.map((t,i)=>{const col=PALETA_TIPOS[i%PALETA_TIPOS.length];return(
+        <span key={t.id} style={{display:"inline-flex",alignItems:"center",gap:6}}><span style={{width:10,height:10,borderRadius:3,background:col.bg,border:`2px solid ${col.c}`}}/>{t.nombre}</span>
+      );})}
+    </div>
+  );
+}
+
+const FONDO_REJILLA="#FBF8F2";
+const LINEA_HORA="#E3D6BF";
+const LINEA_MEDIA="#EFE6D6";
+const finDe=(c)=>{const m=timeToMins(c.hora)+(Number(c.duracion)||60);return`${pad(Math.floor(m/60))}:${pad(m%60)}`;};
+
+export function TimeGrid({days,citas,patients,horario,onNew,onEdit,showHeader,tipos=[]}){
+  const ahora=today();
+  const todayStr=toYMD(ahora);
+  const ahoraMin=ahora.getHours()*60+ahora.getMinutes();
   const slots=[];
   for(let h=horario.start;h<horario.end;h++){slots.push(`${pad(h)}:00`);slots.push(`${pad(h)}:30`);}
   const totalH=slots.length*SLOT_H;
-  const cols=`64px repeat(${days.length},1fr)`;
+  const varios=days.length>1;
+  const cols=`60px repeat(${days.length},minmax(0,1fr))`;
   const nameOf=c=>{const p=patients.find(p=>p.id==c.pacienteId);return c.origen==="calendly"||!p?(c.nombreExterno||"Primera llamada"):`${p.nombre} ${p.apellidos}`;};
+  const yaPaso=c=>c.fecha<todayStr||(c.fecha===todayStr&&timeToMins(c.hora)+(Number(c.duracion)||60)<=ahoraMin);
+  const topAhora=(ahoraMin-horario.start*60)/30*SLOT_H;
   return(
-    <div>
-      <div>
+    <div style={{background:FONDO_REJILLA}}>
       {showHeader&&(
-        <div style={{display:"grid",gridTemplateColumns:cols,borderBottom:`1px solid ${C.border}`,position:"sticky",top:0,zIndex:3,background:C.card}}>
+        <div style={{display:"grid",gridTemplateColumns:cols,borderBottom:`1px solid ${LINEA_HORA}`,position:"sticky",top:0,zIndex:4,background:C.card}}>
           <div/>
-          {days.map((d,i)=>{const ds=toYMD(d);const isT=ds===todayStr;return(
-            <div key={i} style={{padding:"10px 6px",textAlign:"center",borderLeft:`1px solid ${C.border}`,background:isT?"rgba(166,107,63,0.09)":"transparent"}}>
-              <div style={{fontSize:12,color:isT?C.accent:C.walnut,textTransform:"uppercase",letterSpacing:"0.05em",fontWeight:600}}>{DAYS_ES[(d.getDay()+6)%7]}</div>
-              <div style={{fontSize:16,fontWeight:isT?700:400,color:isT?C.accent:C.text,marginTop:2}}>{d.getDate()}</div>
+          {days.map((d,i)=>{const ds=toYMD(d);const isT=ds===todayStr;const finde=d.getDay()===0||d.getDay()===6;const n=citas.filter(c=>c.fecha===ds).length;return(
+            <div key={i} style={{padding:"10px 6px 9px",textAlign:"center",borderLeft:`1px solid ${LINEA_HORA}`,opacity:finde&&!isT?0.75:1}}>
+              <div style={{fontSize:11,color:isT?C.accent:C.muted,textTransform:"uppercase",letterSpacing:"0.08em",fontWeight:600}}>{DAYS_ES[(d.getDay()+6)%7]}</div>
+              <div style={{margin:"4px auto 0",width:34,height:34,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,fontWeight:isT?700:500,
+                background:isT?C.accent:"transparent",color:isT?"#fff":C.ink}}>{d.getDate()}</div>
+              <div style={{fontSize:11,color:C.dim,marginTop:3,height:14}}>{n?`${n} ${n===1?"cita":"citas"}`:""}</div>
             </div>
           );})}
         </div>
       )}
-        <div style={{display:"grid",gridTemplateColumns:cols,position:"relative"}}>
-          {/* Columna de horas */}
-          <div>
-            {slots.map(t=>(
-              <div key={t} style={{height:SLOT_H,boxSizing:"border-box",borderBottom:`1px solid ${C.border}`,fontSize:13,color:t.endsWith(":00")?C.walnut:C.dim,fontWeight:t.endsWith(":00")?600:400,display:"flex",alignItems:"center",justifyContent:"center"}}>{t}</div>
-            ))}
-          </div>
-          {/* Columnas de días */}
-          {days.map((d,i)=>{
-            const ds=toYMD(d);const isT=ds===todayStr;
-            const dc=citas.filter(c=>c.fecha===ds);
-            return(
-              <div key={i} style={{position:"relative",height:totalH,borderLeft:`1px solid ${C.border}`,background:isT&&days.length>1?"rgba(166,107,63,0.03)":"transparent"}}>
-                {slots.map(t=>(
-                  <div key={t} onClick={()=>onNew(d,t)} style={{height:SLOT_H,boxSizing:"border-box",borderBottom:`1px solid ${C.border}`,cursor:"pointer"}}
-                    onMouseEnter={e=>e.currentTarget.style.background="rgba(166,107,63,0.06)"}
-                    onMouseLeave={e=>e.currentTarget.style.background="transparent"}/>
-                ))}
-                {dc.map(c=>{
-                  const top=(timeToMins(c.hora)-horario.start*60)/30*SLOT_H;
-                  const h=Math.max(SLOT_H,(c.duracion||60)/30*SLOT_H);
-                  if(top<0||top>=totalH)return null;
-                  const compact=h<SLOT_H*2;
-                  const caja={position:"absolute",top:top+2,left:3,right:3,height:h-4,background:CITA_BG,border:`1px solid ${C.border}`,borderLeft:`3px solid ${C.accent}`,borderRadius:6,boxSizing:"border-box",overflow:"hidden",cursor:"pointer",boxShadow:"0 1px 2px rgba(59,42,30,0.06)"};
-                  // Citas cortas (≤45 min): todo en una línea para que no se corte
-                  if(compact)return(
-                    <div key={c.id} title={`${c.hora} · ${nameOf(c)} · ${c.tipo||"Cita"}`} onClick={e=>{e.stopPropagation();onEdit(c);}}
-                      style={{...caja,padding:"0 10px",display:"flex",alignItems:"center",justifyContent:days.length>1?"flex-start":"center",gap:8,whiteSpace:"nowrap"}}>
-                      {days.length===1&&<span style={{fontSize:12,color:C.muted,fontWeight:600,flexShrink:0}}>{c.hora}</span>}
-                      <span style={{fontSize:days.length>1?13:14,fontWeight:700,color:C.ink,overflow:"hidden",textOverflow:"ellipsis",minWidth:0}}>{nameOf(c)}</span>
-                      {days.length===1&&<span style={{fontSize:13,color:C.walnut,flexShrink:0}}>· {c.tipo||"Cita"}</span>}
-                    </div>
-                  );
-                  return(
-                    <div key={c.id} onClick={e=>{e.stopPropagation();onEdit(c);}}
-                      style={{...caja,padding:"8px 10px",display:"flex",flexDirection:"column",justifyContent:"center",textAlign:"center"}}>
-                      <div style={{fontSize:14,fontWeight:700,color:C.ink,lineHeight:1.25,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:days.length>1?"nowrap":"normal"}}>{nameOf(c)}</div>
-                      <div style={{fontSize:13,color:C.walnut,marginTop:2}}>{c.tipo||"Cita"}</div>
-                      <div style={{fontSize:12,color:C.muted,marginTop:2}}>{c.hora}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })}
+      <div style={{display:"grid",gridTemplateColumns:cols,position:"relative"}}>
+        {/* Horas: etiqueta pegada a la línea de cada hora */}
+        <div style={{position:"relative",height:totalH}}>
+          {slots.map((t,k)=>t.endsWith(":00")&&(
+            <div key={t} style={{position:"absolute",top:k*SLOT_H-7,right:10,fontSize:11.5,fontWeight:600,color:C.walnut,background:FONDO_REJILLA,padding:"0 2px",display:k===0?"none":"block"}}>{t}</div>
+          ))}
+          <div style={{position:"absolute",top:5,right:12,fontSize:11.5,fontWeight:600,color:C.walnut}}>{slots[0]}</div>
         </div>
+        {days.map((d,i)=>{
+          const ds=toYMD(d);const isT=ds===todayStr;const finde=d.getDay()===0||d.getDay()===6;
+          const dc=citas.filter(c=>c.fecha===ds);
+          return(
+            <div key={i} style={{position:"relative",height:totalH,borderLeft:`1px solid ${LINEA_HORA}`,background:isT&&varios?"rgba(166,107,63,0.045)":finde&&varios?"rgba(125,110,98,0.05)":"transparent"}}>
+              {slots.map(t=>(
+                <div key={t} onClick={()=>onNew(d,t)} className="praxi-hueco" style={{height:SLOT_H,boxSizing:"border-box",cursor:"pointer",
+                  borderBottom:t.endsWith(":00")?`1px dashed ${LINEA_MEDIA}`:`1px solid ${LINEA_HORA}`}}/>
+              ))}
+              {isT&&topAhora>=0&&topAhora<=totalH&&(
+                <div style={{position:"absolute",left:0,right:0,top:topAhora,zIndex:3,pointerEvents:"none"}}>
+                  <div style={{height:2,background:"#C0503A"}}/>
+                  <div style={{position:"absolute",left:-5,top:-4,width:10,height:10,borderRadius:"50%",background:"#C0503A"}}/>
+                </div>
+              )}
+              {dc.map(c=>{
+                const top=(timeToMins(c.hora)-horario.start*60)/30*SLOT_H;
+                const h=Math.max(SLOT_H,(Number(c.duracion)||60)/30*SLOT_H);
+                if(top<0||top>=totalH)return null;
+                const col=colorTipo(c,tipos);
+                const pasada=yaPaso(c);
+                const compacta=h<SLOT_H*2;
+                const video=!!(c.zoomLink||"").trim();
+                return(
+                  <div key={c.id} title={`${c.hora}–${finDe(c)} · ${nameOf(c)} · ${c.tipo||"Cita"}`} onClick={e=>{e.stopPropagation();onEdit(c);}}
+                    style={{position:"absolute",top:top+2,left:4,right:6,height:h-4,zIndex:2,boxSizing:"border-box",overflow:"hidden",cursor:"pointer",
+                      background:col.bg,borderLeft:`4px solid ${col.c}`,borderRadius:8,padding:compacta?"0 10px":"7px 10px",
+                      opacity:pasada?0.55:1,boxShadow:"0 1px 3px rgba(59,42,30,0.08)",
+                      display:"flex",flexDirection:compacta?"row":"column",alignItems:compacta?"center":"stretch",gap:compacta?8:1,whiteSpace:compacta?"nowrap":"normal"}}>
+                    {compacta?<>
+                      <span style={{fontSize:11.5,fontWeight:700,color:col.c,flexShrink:0}}>{c.hora}</span>
+                      <span style={{fontSize:13,fontWeight:700,color:C.ink,overflow:"hidden",textOverflow:"ellipsis",minWidth:0}}>{nameOf(c)}</span>
+                      {!varios&&<span style={{fontSize:12.5,color:C.walnut,flexShrink:0}}>· {c.tipo||"Cita"}</span>}
+                    </>:<>
+                      <div style={{fontSize:11.5,fontWeight:700,color:col.c,display:"flex",justifyContent:"space-between",gap:4}}><span>{varios?c.hora:`${c.hora} – ${finDe(c)}`}</span>{video&&<span title="Videollamada">🎥</span>}</div>
+                      <div style={{fontSize:13.5,fontWeight:700,color:C.ink,lineHeight:1.25,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:varios?2:1,WebkitBoxOrient:"vertical",wordBreak:"break-word"}}>{nameOf(c)}</div>
+                      <div style={{fontSize:12,color:C.walnut,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.tipo||"Cita"}</div>
+                    </>}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -107,7 +147,7 @@ export function Calendario({patients,citas,setCitas,config,setConfig,tipos,horar
       {lista.length===0&&<div style={{fontSize:13,color:C.muted,fontStyle:"italic"}}>Sin citas</div>}
       {lista.map(c=>(
         <div key={c.id} onClick={()=>openEdit(c)} style={{display:"flex",gap:10,alignItems:"center",marginBottom:10,cursor:"pointer"}}>
-          <Avatar nombre={nameOf(c)} apellidos="" size={28}/>
+          <span style={{width:4,alignSelf:"stretch",borderRadius:2,background:colorTipo(c,tipos).c,flexShrink:0}}/>
           <div style={{minWidth:0}}>
             <div style={{fontSize:13,fontWeight:600,color:C.text,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{nameOf(c)}</div>
             <div style={{fontSize:11,color:C.muted}}>{conFecha?`${c.fecha.slice(8,10)}/${c.fecha.slice(5,7)} · `:""}{c.hora} · {c.duracion}min</div>
@@ -131,7 +171,7 @@ export function Calendario({patients,citas,setCitas,config,setConfig,tipos,horar
     return(
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:16,alignItems:"start"}}>
         <div style={{...st.card,overflow:"clip"}}>
-          <TimeGrid days={[date]} citas={citas} patients={patients} horario={horario} onNew={openNew} onEdit={openEdit}/>
+          <TimeGrid days={[date]} citas={citas} patients={patients} horario={horario} onNew={openNew} onEdit={openEdit} tipos={tipos}/>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
           <Stat val={dc.length} label={["Hoy","Mañana","Ayer"].includes(etiquetaDia(date))?`Citas ${etiquetaDia(date).toLowerCase()}`:`Citas el ${etiquetaDia(date).toLowerCase()}`}/>
@@ -151,7 +191,7 @@ export function Calendario({patients,citas,setCitas,config,setConfig,tipos,horar
     return(
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:16,alignItems:"start"}}>
         <div style={{...st.card,overflow:"clip"}}>
-          <TimeGrid days={days} citas={citas} patients={patients} horario={horario} onNew={openNew} onEdit={openEdit} showHeader/>
+          <TimeGrid days={days} citas={citas} patients={patients} horario={horario} onNew={openNew} onEdit={openEdit} showHeader tipos={tipos}/>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
           <Stat val={cw.length} label={{"Esta semana":"Citas esta semana","Siguiente":"Citas la semana siguiente","Anterior":"Citas la semana anterior"}[etiquetaSemana(date)]||`Citas · ${etiquetaSemana(date).toLowerCase()}`}/>
@@ -175,17 +215,25 @@ export function Calendario({patients,citas,setCitas,config,setConfig,tipos,horar
           <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",borderBottom:`1px solid ${C.border}`}}>
             {DAYS_ES.map(d=><div key={d} style={{padding:"10px 0",textAlign:"center",fontSize:12,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.05em",fontWeight:600}}>{d}</div>)}
           </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)"}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(7,minmax(0,1fr))",background:FONDO_REJILLA}}>
             {cells.map((d,i)=>{
               const ds=toYMD(d);const inMonth=d.getMonth()===date.getMonth();const isT=ds===todayStr;
-              const n=citas.filter(c=>c.fecha===ds).length;
+              const dc=citas.filter(c=>c.fecha===ds).sort((a,b)=>a.hora.localeCompare(b.hora));
+              const finde=d.getDay()===0||d.getDay()===6;
+              const fondo=finde?"rgba(125,110,98,0.05)":"transparent";
               return(
                 <div key={i} onClick={()=>{setDate(d);setView("day");}}
-                  style={{minHeight:84,padding:"8px 10px",borderLeft:i%7?`1px solid ${C.border}`:"none",borderTop:i>=7?`1px solid ${C.border}`:"none",cursor:"pointer",background:isT?"rgba(166,107,63,0.09)":"transparent",opacity:inMonth?1:0.4}}
-                  onMouseEnter={e=>{if(!isT)e.currentTarget.style.background="rgba(166,107,63,0.05)";}}
-                  onMouseLeave={e=>{if(!isT)e.currentTarget.style.background="transparent";}}>
-                  <div style={{fontSize:14,fontWeight:isT?700:500,color:isT?C.accent:C.text}}>{d.getDate()}</div>
-                  {n>0&&<div style={{marginTop:8,display:"inline-block",fontSize:11,fontWeight:600,color:C.accent,background:C.sand,borderRadius:999,padding:"2px 8px"}}>{n} {n===1?"cita":"citas"}</div>}
+                  style={{minHeight:108,padding:"6px 6px 8px",borderLeft:i%7?`1px solid ${C.border}`:"none",borderTop:i>=7?`1px solid ${C.border}`:"none",cursor:"pointer",background:fondo,opacity:inMonth?1:0.45,minWidth:0}}
+                  onMouseEnter={e=>{e.currentTarget.style.background="rgba(166,107,63,0.06)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.background=fondo;}}>
+                  <div style={{width:26,height:26,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:isT?700:500,background:isT?C.accent:"transparent",color:isT?"#fff":C.text,marginBottom:4}}>{d.getDate()}</div>
+                  {dc.slice(0,3).map(c=>{const col=colorTipo(c,tipos);return(
+                    <div key={c.id} onClick={e=>{e.stopPropagation();openEdit(c);}} title={`${c.hora} · ${nameOf(c)}`}
+                      style={{fontSize:11.5,lineHeight:"18px",padding:"0 6px",marginBottom:3,borderRadius:5,background:col.bg,borderLeft:`3px solid ${col.c}`,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",color:C.ink}}>
+                      <b style={{color:col.c,fontWeight:700}}>{c.hora}</b> {nameOf(c).split(" ")[0]}
+                    </div>
+                  );})}
+                  {dc.length>3&&<div style={{fontSize:11,color:C.muted,paddingLeft:6}}>+{dc.length-3} más</div>}
                 </div>
               );
             })}
@@ -219,6 +267,7 @@ export function Calendario({patients,citas,setCitas,config,setConfig,tipos,horar
           {[["day","Día"],["week","Semana"],["month","Mes"]].map(([v,l])=><button key={v} style={{...st.btn("sm"),background:view===v?C.aD:"transparent",color:view===v?C.bone:C.muted,border:"none"}} onClick={()=>setView(v)}>{l}</button>)}
         </div>
       </div>
+      <div style={{marginBottom:12}}><LeyendaTipos tipos={tipos}/></div>
       {view==="day"?DayV():view==="week"?WeekV():MonthV()}
       {citaM&&<CitaModal cita={citaM.cita} patients={patients} tipos={tipos} defaultFecha={citaM.defaultFecha} defaultHora={citaM.defaultHora} defaultTipoId={citaM.defaultTipoId} makeUrl={config.makeOut} onClose={()=>setCitaM(null)} onSave={saveCita} onDelete={delCita}/>}
       {editTarea&&<TareaModal tarea={editTarea} onClose={()=>setEditTarea(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTarea(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTarea(null);}}/>}
