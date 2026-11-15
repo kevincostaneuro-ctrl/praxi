@@ -8,6 +8,7 @@ import { Field, MFooter, Modal, StatCard } from "./ui.jsx";
 import { eur2, fechaES, toYMD, today, traducirError } from "./utilidades.js";
 
 export async function descargarFacturaPDF(d){
+  try{localStorage.setItem("praxi_factura_generada","1");}catch{/* sin almacenamiento */}
   const{jsPDF}=await import("jspdf");
   const doc=new jsPDF({unit:"mm",format:"a4"});
   doc.setProperties({title:`Factura ${d.numero}`,author:d.emisor.nombre,creator:d.emisor.nombre});

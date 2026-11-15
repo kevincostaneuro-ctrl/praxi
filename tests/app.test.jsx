@@ -51,4 +51,14 @@ describe("demo", () => {
     expect(document.body.textContent).toMatch(/Sesiones|Historia/);
     espia.mockRestore();
   });
+
+  it("el dashboard muestra primeros pasos, citas de hoy, cobros y plan", async () => {
+    const { espia } = await abrirDemo();
+    const t = document.body.textContent;
+    for (const bloque of ["Primeros pasos", "Citas de hoy", "Cobros pendientes", "Tu plan"]) expect(t).toContain(bloque);
+    const factura = screen.getAllByRole("button").find(b => b.textContent === "Factura");
+    await act(async () => fireEvent.click(factura));
+    expect(document.body.textContent).toMatch(/Descargar/);
+    espia.mockRestore();
+  });
 });

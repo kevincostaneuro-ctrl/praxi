@@ -3,9 +3,10 @@ import { AgendaPersonalPanel } from "./citas.jsx";
 import { CITA_BG, DAYS_ES, MONTHS_ES, WORK_END, WORK_START } from "./constantes.js";
 import { C, PRIORIDAD_T, st } from "./estilos.js";
 import { Avatar } from "./ui.jsx";
+import { CitasHoy, CobrosPendientes, PrimerosPasos, TuPlan } from "./dashboardBloques.jsx";
 import { addDays, diasEntre, etiquetaDia, etiquetaSemana, fechaDe, startOfWeek, timeToMins, toYMD, today } from "./utilidades.js";
 
-export function Dashboard({patients,citas,setCitas,tareas,setTareas,horario,onInforme,onEditCita,onEditTarea,onNuevaCita,onAgendar,onAbrirPaciente,onNuevoPaciente,onVerCalendario}){
+export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,horario,onInforme,onEditCita,onEditTarea,onNuevaCita,onAgendar,onAbrirPaciente,onNuevoPaciente,onVerCalendario,clinica,yo,esAdmin,demo,onIr,onVideo}){
   const[weekStart,setWeekStart]=useState(startOfWeek(today()));
   const ahora=today();
   const todayStr=toYMD(ahora);
@@ -93,6 +94,8 @@ export function Dashboard({patients,citas,setCitas,tareas,setTareas,horario,onIn
         </Stat>
       </div>
 
+      <PrimerosPasos clinica={clinica} yo={yo} esAdmin={esAdmin} demo={demo} patients={patients} citas={citas} onIr={onIr} onVideo={onVideo} onNuevoPaciente={onNuevoPaciente} onNuevaCita={onNuevaCita}/>
+
       {proxima&&(
         <div style={{...st.card,padding:"16px 20px",marginBottom:14,display:"flex",alignItems:"center",gap:16,flexWrap:"wrap",borderLeft:`3px solid ${C.accent}`,borderRadius:"0 18px 18px 0"}}>
           <Avatar nombre={nameOf(proxima)} apellidos="" size={44}/>
@@ -110,7 +113,9 @@ export function Dashboard({patients,citas,setCitas,tareas,setTareas,horario,onIn
         </div>
       )}
 
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))",gap:14,marginBottom:14,alignItems:"start"}}>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(420px,1fr))",gap:14,marginBottom:14,alignItems:"start"}}>
+        <CitasHoy citas={citas} patients={patients} onAbrirPaciente={onAbrirPaciente} onEditCita={onEditCita} onNuevaCita={onNuevaCita}/>
+        <CobrosPendientes patients={patients} setPatients={setPatients} onIr={onIr}/>
         <div style={{...st.card,padding:"16px 20px"}}>
           <Titulo n={sinCita.length}>Sin próxima cita</Titulo>
           {sinCita.length===0&&<div style={{fontSize:13,color:C.green,padding:"6px 0"}}>Todos tus pacientes activos tienen cita.</div>}
@@ -122,6 +127,7 @@ export function Dashboard({patients,citas,setCitas,tareas,setTareas,horario,onIn
           ))}
           {sinCita.length>6&&<div style={{fontSize:12,color:C.muted,paddingTop:8,borderTop:`1px solid ${C.border}`}}>Y {sinCita.length-6} más.</div>}
         </div>
+        <TuPlan clinica={clinica} patients={patients} citas={citas} demo={demo}/>
       </div>
 
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 300px",gap:14,alignItems:"start"}}>

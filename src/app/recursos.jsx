@@ -1,6 +1,7 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { PROFESIONES, RECURSOS } from "../recursos.js";
 import { DemoCtx } from "./constantes.js";
+import { MARCA_RECURSOS, ponerMarca } from "./dashboardBloques.jsx";
 import { C, st } from "./estilos.js";
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -55,6 +56,7 @@ export function RecursosDemo(){
 
 export function Recursos(){
   const demo=useContext(DemoCtx);
+  useEffect(()=>{ponerMarca(MARCA_RECURSOS);},[]);
   if(demo)return <RecursosDemo/>;
   return <BibliotecaRecursos/>;
 }
