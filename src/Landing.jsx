@@ -11,14 +11,14 @@ const C = {
 };
 
 const FEATURES = [
-  { icon: "🧠", title: "IA clínica contextual", desc: "Redacta notas, genera informes y analiza casos conociendo la historia completa del paciente." },
-  { icon: "📋", title: "Ficha clínica estructurada", desc: "Historia clínica, formulación, evolución por sesión y objetivos terapéuticos." },
-  { icon: "🧾", title: "Facturación automática", desc: "Facturas PDF, control de pagos e informes financieros mensuales con un clic." },
-  { icon: "👥", title: "Gestión multi-profesional", desc: "Agenda compartida y panel de administración para clínicas con varios profesionales." },
-  { icon: "🔒", title: "Pensado para el RGPD", desc: "Datos cifrados y alojados en Europa, acceso por roles, registro de accesos y contrato de encargo incluido." },
-  { icon: "📊", title: "Informe mensual", desc: "Resumen automático de actividad clínica y financiera listo para tu asesoría." },
-  { icon: "📱", title: "Acceso desde cualquier dispositivo", desc: "Ordenador, tablet y móvil. Sin instalaciones, siempre actualizado." },
-  { icon: "📆", title: "Agenda pública de reservas", desc: "Tus pacientes reservan cita desde tu enlace. Sin llamadas ni gestión manual." },
+  { icon: "📆", title: "Agenda con videollamada", desc: "Vista de día, semana y mes. Cada profesional guarda su enlace de Zoom, Meet o Teams y aparece solo en cada cita." },
+  { icon: "📋", title: "Ficha clínica estructurada", desc: "Historia clínica, formulación, evolución por sesión, pruebas y objetivos terapéuticos." },
+  { icon: "💬", title: "Confirmación por WhatsApp", desc: "Al crear la cita, envías al paciente la fecha, la hora y el enlace con un clic. Sin datos clínicos." },
+  { icon: "🧾", title: "Facturas en PDF", desc: "Facturas editables con tus datos, IRPF e IVA o exención, control de cobros e informe mensual." },
+  { icon: "👥", title: "Equipos con permisos", desc: "Cada profesional ve solo a sus pacientes; el administrador gestiona el equipo y la agenda conjunta." },
+  { icon: "📚", title: "Biblioteca de recursos", desc: "Más de 50 recursos clínicos en PDF para pacientes y profesionales, por profesión y por tema." },
+  { icon: "🔒", title: "Pensado para el RGPD", desc: "Datos alojados en la Unión Europea, acceso por roles, registro de accesos y contrato de encargo incluido." },
+  { icon: "📱", title: "Desde cualquier dispositivo", desc: "Ordenador, tablet y móvil. Sin instalaciones, siempre actualizado." },
 ];
 
 const Logo = ({ size = 22, textColor = C.ink }) => (
@@ -479,6 +479,62 @@ function Demo() {
 
 
 // Pantallas pequeñas (móvil)
+const PLANES = [
+  { nombre: "Básico", precio: "9,99", periodo: "€/mes", nota: "Para quien empieza consulta", destacado: false,
+    incluye: ["Hasta 10 pacientes activos", "Agenda con enlace de videollamada", "Historia clínica por sesiones", "Facturas en PDF editables", "Confirmación de citas por WhatsApp", "Biblioteca de recursos clínicos"] },
+  { nombre: "Profesional", precio: "24", periodo: "€/mes", nota: "o 240 €/año: dos meses gratis", destacado: true,
+    incluye: ["Pacientes ilimitados", "Todo lo del plan Básico", "Exportación de historias en PDF", "Informe mensual de actividad", "Recordatorios automáticos a pacientes (próximamente)", "Asistente clínico con IA (próximamente)"] },
+  { nombre: "Clínica", precio: "59", periodo: "€/mes", nota: "Hasta 3 profesionales · +19 € por cada uno más", destacado: false,
+    incluye: ["Todo lo del plan Profesional", "Equipo con permisos: cada profesional ve solo a sus pacientes", "Agenda conjunta del equipo", "Registro de accesos a las fichas", "Rol de administrador"] },
+];
+
+function Precios({ m, onEmpezar }) {
+  return (
+    <section id="precios" style={{ maxWidth: 1060, margin: m ? "0 auto 60px" : "0 auto 90px", padding: m ? "0 16px" : "0 48px" }}>
+      <div style={{ textAlign: "center", marginBottom: m ? 24 : 40 }}>
+        <div style={{ fontSize: 10, color: C.accent, textTransform: "uppercase", letterSpacing: "0.15em", fontWeight: 600, marginBottom: 12 }}>Precios</div>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontWeight: 400, fontSize: m ? 24 : 30, color: C.ink, margin: "0 0 12px", letterSpacing: "-0.3px" }}>Empieza gratis. Paga cuando tu consulta crezca.</h2>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: C.gD, color: C.green, borderRadius: 999, padding: "7px 16px", fontSize: 13, fontWeight: 600 }}>
+          3 meses gratis con todo incluido · sin tarjeta
+        </div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "repeat(3,1fr)", gap: m ? 14 : 18, alignItems: "stretch" }}>
+        {PLANES.map(p => (
+          <div key={p.nombre} style={{ position: "relative", background: p.destacado ? C.ink : C.bone, color: p.destacado ? C.bone : C.text, border: `1px solid ${p.destacado ? C.ink : C.border}`,
+            borderRadius: 18, padding: m ? "24px 22px" : "30px 28px", display: "flex", flexDirection: "column", boxShadow: p.destacado ? "0 18px 40px -18px rgba(34,22,16,0.45)" : "none" }}>
+            {p.destacado && <div style={{ position: "absolute", top: -11, left: 28, background: C.accent, color: C.bone, fontSize: 11, fontWeight: 700, borderRadius: 999, padding: "4px 12px", letterSpacing: "0.04em" }}>Recomendado</div>}
+            <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, color: p.destacado ? C.bone : C.ink }}>{p.nombre}</div>
+            <div style={{ fontSize: 12.5, color: p.destacado ? C.dim : C.muted, marginTop: 4, minHeight: 18 }}>{p.nota}</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6, margin: "18px 0 20px" }}>
+              <span style={{ fontSize: 44, fontWeight: 700, letterSpacing: "-0.03em", color: p.destacado ? C.bone : C.ink, lineHeight: 1 }}>{p.precio}</span>
+              <span style={{ fontSize: 14, color: p.destacado ? C.dim : C.muted }}>{p.periodo}</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 24 }}>
+              {p.incluye.map(t => (
+                <div key={t} style={{ display: "flex", gap: 10, fontSize: 13.5, lineHeight: 1.45 }}>
+                  <span style={{ color: p.destacado ? "#E2B48C" : C.accent, fontWeight: 700, flexShrink: 0 }}>✓</span>
+                  <span style={{ color: t.includes("próximamente") ? (p.destacado ? C.dim : C.muted) : "inherit" }}>{t}</span>
+                </div>
+              ))}
+            </div>
+            <button onClick={onEmpezar} style={{ background: p.destacado ? C.accent : "transparent", color: p.destacado ? C.bone : C.accent, border: `1px solid ${C.accent}`,
+              borderRadius: 10, padding: "12px 18px", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Empezar 3 meses gratis</button>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: 22, background: C.sand, borderRadius: 14, padding: m ? "16px 18px" : "18px 26px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: C.accent, whiteSpace: "nowrap" }}>Precio de fundador</span>
+        <span style={{ fontSize: 13, color: C.text, lineHeight: 1.6, flex: 1, minWidth: 220 }}>Los 100 primeros profesionales que se registren antes del 31 de marzo de 2027 tendrán el plan Profesional a <b>15 €/mes</b> mientras mantengan su suscripción.</span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: m ? "1fr" : "repeat(3,1fr)", gap: m ? 12 : 28, marginTop: 26, fontSize: 12.5, color: C.muted, lineHeight: 1.65 }}>
+        <div><b style={{ color: C.text }}>¿Qué pasa al acabar la prueba?</b><br />Eliges plan. Si no eliges ninguno, tu cuenta pasa a solo lectura: puedes ver y descargar todo, pero no crear citas ni sesiones.</div>
+        <div><b style={{ color: C.text }}>¿Qué es un paciente activo?</b><br />El que ha tenido una cita o una sesión en los últimos 90 días. Los pacientes dados de alta no cuentan.</div>
+        <div><b style={{ color: C.text }}>¿Puedo llevarme mis datos?</b><br />Siempre, en cualquier plan y en cualquier momento. Precios con IVA incluido; cancelas cuando quieras.</div>
+      </div>
+    </section>
+  );
+}
+
 function useEsMovil(ancho = 720) {
   const consulta = `(max-width: ${ancho}px)`;
   const [m, setM] = useState(() => typeof window !== "undefined" && window.matchMedia(consulta).matches);
@@ -505,6 +561,7 @@ export default function Landing() {
         <Logo size={m ? 19 : 22} />
         <div style={{ display: "flex", gap: m ? 8 : 32, alignItems: "center" }}>
           {!m && <a href="#features" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Funcionalidades</a>}
+          {!m && <a href="#precios" style={{ fontSize: 13, color: C.muted, textDecoration: "none" }}>Precios</a>}
           <button onClick={() => navigate("/app")} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 8, padding: m ? "7px 11px" : "7px 18px", fontSize: m ? 12 : 13, whiteSpace: "nowrap", fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Iniciar sesión</button>
           <button onClick={() => setWaitlist(true)} style={{ background: C.accent, color: C.bone, border: "none", borderRadius: 8, padding: m ? "8px 11px" : "8px 20px", fontSize: m ? 12 : 13, whiteSpace: "nowrap", fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif" }}>Solicitar acceso</button>
         </div>
@@ -541,7 +598,7 @@ export default function Landing() {
               <div key={i} style={{ width: 28, height: 28, borderRadius: "50%", background: [C.accent,"#6B4A30","#9A7E68","#4A6438","#B8A898"][i], border: `2px solid ${C.bone}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: C.bone, marginLeft: i > 0 ? -8 : 0 }}>{l}</div>
             ))}
           </div>
-          <div style={{ fontSize: 13, color: C.ink }}><span style={{ fontWeight: 700 }}>1.247</span> profesionales ya en la lista</div>
+          <div style={{ fontSize: 13, color: C.ink }}><span style={{ fontWeight: 700 }}>Acceso anticipado abierto</span> · 3 meses gratis</div>
         </div>
       </div>
 
@@ -566,13 +623,16 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* PRECIOS */}
+      <Precios m={m} onEmpezar={() => setWaitlist(true)} />
+
       {/* QUOTE */}
       <section style={{ background: C.ink, padding: m ? "48px 20px" : "70px 48px", textAlign: "center" }}>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
           <p style={{ fontFamily: "'Instrument Serif',serif", fontStyle: "italic", fontSize: m ? 21 : 28, color: C.bone, lineHeight: 1.5, margin: "0 0 20px" }}>
             "Las herramientas de gestión clínica que existen están pensadas por equipos técnicos. Praxi está pensada por alguien que pasa consulta."
           </p>
-          <div style={{ fontSize: 12, color: C.muted }}>Kevin Costa · Neuropsicólogo clínico</div>
+          <div style={{ fontSize: 12, color: C.muted }}>Fundador de Praxi · Neuropsicólogo clínico</div>
         </div>
       </section>
 
