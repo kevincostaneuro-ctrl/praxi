@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AgendaPersonalPanel } from "./citas.jsx";
 import { DAYS_ES, IA_VISIBLE, MONTHS_ES, WORK_END, WORK_START } from "./constantes.js";
-import { anadirNota, NoraMarca, NoraPanel } from "./nora.jsx";
+import { anadirNota, NORA, NoraMarca, NoraPanel } from "./nora.jsx";
 import { C, PRIORIDAD_T, st } from "./estilos.js";
 import { CitasHoy, PrimerosPasos } from "./dashboardBloques.jsx";
 import { colorTipo } from "./calendario.jsx";
@@ -146,7 +146,7 @@ export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,
           </div>
           <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
             {enl&&<a href={enl} target="_blank" rel="noreferrer" style={{...st.btn("sm"),textDecoration:"none"}}>🎥 Entrar</a>}
-            {pProx&&IA_VISIBLE&&<button style={{...st.btn("sm"),background:C.bone,color:C.walnut,display:"inline-flex",alignItems:"center",gap:6}} onClick={()=>setNora(pProx.id)}><NoraMarca size={16}/>Resumen de Nora</button>}
+            {pProx&&IA_VISIBLE&&<button style={{...st.btn("sm"),background:NORA.tinte,color:NORA.tinteTexto,display:"inline-flex",alignItems:"center",gap:6}} onClick={()=>setNora(pProx.id)}><NoraMarca size={16}/>Resumen de Nora</button>}
             {pProx&&<button style={enl?{...st.btn("sm"),background:C.bone,color:C.walnut}:st.btn("sm")} onClick={()=>onAbrirPaciente(pProx.id)}>Abrir ficha</button>}
             <button style={{...st.btn("sm"),background:C.bone,color:C.muted}} onClick={()=>onEditCita(proxima)}>Ver cita</button>
           </div>

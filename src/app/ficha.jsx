@@ -3,7 +3,7 @@ import { CitaModal } from "./citas.jsx";
 import { DEFAULT_CONSENT, EquipoCtx, IA_VISIBLE } from "./constantes.js";
 import { C, st } from "./estilos.js";
 import { TabDatos, TabEvolucion, TabFormulacionCaso, TabHistoriaClinica, TabInformes, TabObjetivos, TabPruebas, TabSesiones } from "./fichaPestanas.jsx";
-import { anadirNota, NoraMarca, NoraPanel } from "./nora.jsx";
+import { anadirNota, NORA, NoraMarca, NoraPanel } from "./nora.jsx";
 import { Avatar, Empty, Field, MFooter, Modal } from "./ui.jsx";
 import { toYMD, today } from "./utilidades.js";
 
@@ -244,7 +244,7 @@ export function FichaPaciente({patient,setPatients,onBack,citas,setCitas,profesi
           <span style={st.badge(patient.estado==="activo"?C.green:patient.estado==="alta"?C.walnut:C.muted,patient.estado==="activo"?C.gD:patient.estado==="alta"?C.sand:C.card)}>{patient.estado}</span>
           <button style={{...st.btn("sm"),background:C.gD,color:C.green}} onClick={()=>setShowNuevaCita(true)}>+ Nueva cita</button>
           <button style={st.btn("sm")} onClick={()=>exportPatientPDF(patient)}>🖨 Exportar PDF</button>
-          {IA_VISIBLE&&<button style={{...st.btn("sm"),background:C.accent,color:C.bone,display:"inline-flex",alignItems:"center",gap:6}} onClick={()=>setShowIA(v=>!v)}><NoraMarca size={18}/>Nora</button>}
+          {IA_VISIBLE&&<button style={{...st.btn("sm"),background:NORA.fondo,color:NORA.texto,display:"inline-flex",alignItems:"center",gap:6}} onClick={()=>setShowIA(v=>!v)}><NoraMarca size={18}/>Nora</button>}
           {patient.estado==="activo"&&<button style={{...st.btn("sm"),background:C.tD,color:C.teal}} onClick={()=>setShowAlta(true)}>Dar de alta</button>}
           {patient.estado==="alta"&&<span style={{...st.badge(C.walnut,C.sand),fontSize:11}}>✓ Dado de alta</span>}
         </div>

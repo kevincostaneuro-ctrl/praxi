@@ -31,3 +31,22 @@ describe("Nora", () => {
     expect(nueva).toMatchObject({ numero: 2, trabajado: "nota", pago: 0, pagado: false });
   });
 });
+
+import { contextoApp, huecosLibres } from "../src/app/noraContexto.js";
+describe("Nora en toda la app", () => {
+  const lunes = new Date(2026, 10, 16, 8, 0); // lunes 16/11/2026
+  const citas = [{ fecha: "2026-11-16", hora: "10:00", duracion: 60, tipo: "Seguimiento", pacienteId: 7 }, { fecha: "2026-11-16", hora: "12:30", duracion: 30, tipo: "Primera llamada", origen: "calendly", nombreExterno: "Ana" }];
+  it("calcula los huecos libres sin fines de semana", () => {
+    const h = huecosLibres(citas, { start: 9, end: 14 }, { desde: lunes, dias: 7 });
+    expect(h[0]).toMatchObject({ fecha: "2026-11-16", tramos: ["09:00–10:00", "11:00–12:30", "13:00–14:00"] });
+    expect(h.map(x => x.dia)).not.toContain("sábado");
+    expect(h).toHaveLength(5);
+  });
+  it("arma el contexto sin nombres reales", () => {
+    const t = contextoApp({ patients: [paciente], citas, tareas: [{ titulo: "Llamar al colegio", fecha: "2026-11-17", hecho: false }], horario: { start: 9, end: 14 }, ahora: lunes, alias: () => "Paciente 1" });
+    expect(t).toContain("lunes 2026-11-16 10:00 · 60 min · Seguimiento · Paciente 1");
+    expect(t).toContain("contacto externo");
+    expect(t).toContain("Llamar al colegio");
+    expect(t).not.toMatch(/Lucía|Martín/);
+  });
+});

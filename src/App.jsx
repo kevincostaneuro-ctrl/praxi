@@ -17,7 +17,7 @@ import { Acceso, Enlace, Onboarding, PantallaEstado } from "./app/acceso.jsx";
 import { Calendario } from "./app/calendario.jsx";
 import { CitaModal, TareaModal, useReminders } from "./app/citas.jsx";
 import { Configuracion } from "./app/configuracion.jsx";
-import { CLINICA_STORE, DEFAULT_TIPOS_CITA, DemoCtx, EquipoCtx, PRAXI_LOGO, WORK_END, WORK_START } from "./app/constantes.js";
+import { CLINICA_STORE, DEFAULT_TIPOS_CITA, DemoCtx, EquipoCtx, IA_VISIBLE, PRAXI_LOGO, WORK_END, WORK_START } from "./app/constantes.js";
 import { Dashboard } from "./app/dashboard.jsx";
 import { DEMO_MIEMBROS, DEMO_USER, SAMPLE_CITAS, demoPacientes, mkPatient } from "./app/demo.js";
 import { EquipoPanel, MiVideollamadaModal } from "./app/equipo.jsx";
@@ -27,6 +27,7 @@ import { FichaPaciente } from "./app/ficha.jsx";
 import { InformeMensual } from "./app/informe.jsx";
 import { Pacientes } from "./app/pacientes.jsx";
 import { Recursos } from "./app/recursos.jsx";
+import { NoraGlobal } from "./app/noraGlobal.jsx";
 import { toYMD, today } from "./app/utilidades.js";
 import { leerTodo, sincronizar, supabase } from "./supabase.js";
 
@@ -372,6 +373,7 @@ export default function App({demo=false}){
       {showVideo&&<MiVideollamadaModal yo={currentUser} demo={demo} onClose={()=>setShowVideo(false)} onDemo={()=>{setShowVideo(false);setDemoToast(true);}}
         onGuardado={e=>{setCurrentUser(u=>({...u,enlace_videollamada:e}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,enlace_videollamada:e}:m));setShowVideo(false);}}/>}
       {newCitaDash&&<CitaModal cita={null} defaultPacienteId={newCitaDash?.pacienteId} patients={patients} tipos={tipos} defaultFecha={toYMD(today())} defaultHora="09:00" defaultTipoId={tipos[0]?.id} makeUrl={config.makeOut} onClose={()=>setNewCitaDash(false)} onSave={form=>{setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:form.pacienteId?Number(form.pacienteId):null}]);setNewCitaDash(false);}} onDelete={()=>setNewCitaDash(false)}/>}
+      {IA_VISIBLE&&<NoraGlobal pagina={page} patients={patients} citas={citas} tareas={tareas} horario={horario}/>}
       {editTareaDash&&<TareaModal tarea={editTareaDash} onClose={()=>setEditTareaDash(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTareaDash(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTareaDash(null);}}/>}
     </div>
     </EquipoCtx.Provider>

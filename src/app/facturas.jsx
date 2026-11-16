@@ -1,9 +1,8 @@
 import { useContext, useMemo, useState } from "react";
 import { supabase } from "../supabase.js";
 import { Aviso } from "./acceso.jsx";
-import { DATOS_FACT_VACIOS, DemoCtx, EXENCION_IVA, EquipoCtx, IA_VISIBLE } from "./constantes.js";
+import { DATOS_FACT_VACIOS, DemoCtx, EXENCION_IVA, EquipoCtx } from "./constantes.js";
 import { C, st } from "./estilos.js";
-import { IAFacturasPanel } from "./ia.jsx";
 import { Field, MFooter, Modal, StatCard } from "./ui.jsx";
 import { eur2, fechaES, toYMD, today, traducirError } from "./utilidades.js";
 
@@ -178,13 +177,69 @@ export function GenerarFacturaModal({patient,sesion,onClose,onGuardarNumero}){
 // ══════════════════════════════════════════════════════════════════════════════
 // FACTURAS
 // ══════════════════════════════════════════════════════════════════════════════
+// Nueva factura: de una sesión ya registrada o de un cobro nuevo (crea la sesión)
+export function NuevaFacturaModal({patients,onClose,onContinuar}){
+  const ordenados=[...patients].sort((a,b)=>`${a.nombre} ${a.apellidos}`.localeCompare(`${b.nombre} ${b.apellidos}`,"es"));
+  const[pid,setPid]=useState("");
+  const pa=patients.find(p=>String(p.id)===String(pid));
+  const sesiones=pa?[...pa.sesiones].sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")):[];
+  const[modo,setModo]=useState("nueva");
+  const[sesId,setSesId]=useState("");
+  const[fecha,setFecha]=useState(toYMD(today()));
+  const[importe,setImporte]=useState("");
+  const[pagado,setPagado]=useState(false);
+  const[err,setErr]=useState("");
+  const continuar=()=>{
+    if(!pa){setErr("Elige un paciente.");return;}
+    if(modo==="existente"){const s=sesiones.find(x=>String(x.id)===String(sesId));if(!s){setErr("Elige la sesión.");return;}onContinuar(pa,s,false);return;}
+    if(!fecha||!(Number(importe)>0)){setErr("Indica la fecha y un importe mayor que 0.");return;}
+    const n=pa.sesiones.length+1;
+    onContinuar(pa,{id:Date.now(),numero:n,fecha,pago:Number(importe),pagado,trabajado:"",observaciones:"",estadoEmocional:5,alianza:5,observacionesAdicionales:"",factura:`FAC-${String(pa.id).slice(-2)}${String(n).padStart(3,"0")}`},true);
+  };
+  return(
+    <Modal onClose={onClose} title="Nueva factura" width={480}>
+      <div style={{display:"flex",flexDirection:"column",gap:14}}>
+        <Field label="Paciente">
+          <select style={st.input} value={pid} onChange={e=>{setPid(e.target.value);setSesId("");setErr("");}}>
+            <option value="">Elige un paciente…</option>
+            {ordenados.map(p=><option key={p.id} value={p.id}>{p.nombre} {p.apellidos}</option>)}
+          </select>
+          {patients.length===0&&<div style={{fontSize:12,color:C.muted,marginTop:6}}>Primero da de alta al paciente en «Pacientes».</div>}
+        </Field>
+        {pa&&<div style={{display:"flex",gap:4,background:C.bone,borderRadius:10,border:`1px solid ${C.border}`,padding:3,width:"fit-content"}}>
+          {[["nueva","Cobro nuevo"],["existente","Sesión ya registrada"]].map(([v,l])=>(
+            <button key={v} type="button" style={{...st.btn("sm"),background:modo===v?C.accent:"transparent",color:modo===v?C.bone:C.muted,border:"none"}} onClick={()=>{setModo(v);setErr("");}}>{l}</button>
+          ))}
+        </div>}
+        {pa&&modo==="nueva"&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+          <Field label="Fecha de la sesión"><input type="date" style={st.input} value={fecha} onChange={e=>setFecha(e.target.value)}/></Field>
+          <Field label="Importe €"><input type="number" min="0" step="0.01" style={st.input} value={importe} onChange={e=>setImporte(e.target.value)} placeholder="60"/></Field>
+          <Field label="Estado"><select style={st.input} value={String(pagado)} onChange={e=>setPagado(e.target.value==="true")}><option value="false">Pendiente</option><option value="true">Pagada</option></select></Field>
+        </div>}
+        {pa&&modo==="existente"&&<Field label="Sesión">
+          {sesiones.length?<select style={st.input} value={sesId} onChange={e=>setSesId(e.target.value)}>
+            <option value="">Elige la sesión…</option>
+            {sesiones.map(s=><option key={s.id} value={s.id}>Sesión {s.numero} · {fechaES(s.fecha)} · {eur2(s.pago)}</option>)}
+          </select>:<div style={{fontSize:12.5,color:C.muted}}>Este paciente no tiene sesiones registradas. Usa «Cobro nuevo».</div>}
+        </Field>}
+        {pa&&modo==="nueva"&&<div style={{fontSize:12,color:C.muted,lineHeight:1.5}}>Se registrará como sesión en su ficha para que la factura y el cobro queden enlazados.</div>}
+        {err&&<div role="alert" style={{fontSize:12.5,color:C.red}}>{err}</div>}
+      </div>
+      <div style={{display:"flex",justifyContent:"flex-end",gap:8,marginTop:20}}>
+        <button style={st.btn("ghost")} onClick={onClose}>Cancelar</button>
+        <button style={st.btn()} onClick={continuar}>Continuar</button>
+      </div>
+    </Modal>
+  );
+}
+
 export function Facturas({patients,setPatients}){
   const[filtro,setFiltro]=useState("todas");
   const[busqueda,setBusqueda]=useState("");
   const[viewF,setViewF]=useState(null);
   const[editF,setEditF]=useState(null);
   const[editPago,setEditPago]=useState("");
-  const[showIA,setShowIA]=useState(false);
+  const[nueva,setNueva]=useState(false);
 
   const updateImporte=(sesId,pacId,nuevoPago)=>{
     setPatients(ps=>ps.map(p=>p.id===pacId?{...p,sesiones:p.sesiones.map(s=>s.id===sesId?{...s,pago:Number(nuevoPago)}:s)}:p));
@@ -222,7 +277,7 @@ export function Facturas({patients,setPatients}){
         </div>
         <div style={{display:"flex",gap:8}}>
           <button style={{...st.btn("sm"),background:C.bone,color:C.walnut}} onClick={()=>setMisDatos(true)}>{yo.datos_facturacion?.nif?"Mis datos de facturación":"⚠ Añadir mis datos de facturación"}</button>
-          {IA_VISIBLE&&<button style={{...st.btn("sm"),background:C.accent,color:C.bone}} onClick={()=>setShowIA(v=>!v)}>✦ IA</button>}
+          <button style={st.btn("sm")} onClick={()=>setNueva(true)}>+ Nueva factura</button>
         </div>
       </div>
 
@@ -296,7 +351,7 @@ export function Facturas({patients,setPatients}){
         onGuardarNumero={n=>setPatients(ps=>ps.map(x=>x.id===pa.id?{...x,sesiones:x.sesiones.map(s=>s.id===genF.id?{...s,factura:n}:s)}:x))}/>;})()}
       {misDatos&&<MisDatosFacturacionModal yo={yo} demo={demo} onClose={()=>setMisDatos(false)} onDemo={()=>setMisDatos(false)}
         onGuardado={d=>{guardarMisDatosFact(d);setMisDatos(false);}}/>}
-      {IA_VISIBLE&&showIA&&<IAFacturasPanel patients={patients} onClose={()=>setShowIA(false)}/>}
+      {nueva&&<NuevaFacturaModal patients={patients} onClose={()=>setNueva(false)} onContinuar={(pa,ses,esNueva)=>{if(esNueva)setPatients(ps=>ps.map(x=>x.id===pa.id?{...x,sesiones:[...x.sesiones,ses]}:x));setNueva(false);setGenF({...ses,pacienteId:pa.id,pacienteNombre:`${pa.nombre} ${pa.apellidos}`});}}/>}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { PROFESIONES, RECURSOS } from "../recursos.js";
 import { DemoCtx, IA_VISIBLE } from "./constantes.js";
-import { NoraMarca, NoraPanel } from "./nora.jsx";
+import { NORA, NoraMarca, NoraPanel } from "./nora.jsx";
 import { MARCA_RECURSOS, ponerMarca } from "./dashboardBloques.jsx";
 import { C, st } from "./estilos.js";
 import { nombreArchivo, pdfPersonalizado, valoresCampos } from "./personalizarPdf.js";
@@ -122,7 +122,7 @@ export function BibliotecaRecursos({patients=[],citas=[],clinica,yo}){
         <div style={{fontSize:12,color:C.muted,flex:"1 1 260px",lineHeight:1.5}}>
           Los PDF salen con {paciente?<><b>{paciente.nombre}</b> (iniciales en los del profesional), </>:""}tu nombre{clinica?.nombre?<>, <b>{clinica.nombre}</b></>:""} y la fecha de hoy en la cabecera.
         </div>
-        {IA_VISIBLE&&paciente&&<button onClick={()=>setNora(true)} style={{...st.btn("sm"),display:"inline-flex",alignItems:"center",gap:6}}><NoraMarca size={16}/>¿Qué le doy? Pregunta a Nora</button>}
+        {IA_VISIBLE&&paciente&&<button onClick={()=>setNora(true)} style={{...st.btn("sm"),background:NORA.tinte,color:NORA.tinteTexto,display:"inline-flex",alignItems:"center",gap:6}}><NoraMarca size={16}/>¿Qué le doy? Pregunta a Nora</button>}
       </div>
       {error&&<div role="alert" style={{...st.card,padding:"10px 14px",marginBottom:14,color:C.red||"#A64A3A",fontSize:13}}>{error}</div>}
       {grupos.length===0
