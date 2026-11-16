@@ -5,7 +5,7 @@
 //   citas.jsx          Formularios de cita, tareas, horario y huecos
 //   facturas.jsx       Facturas y PDF         recursos.jsx    Biblioteca de recursos
 //   equipo.jsx         Equipo, accesos y videollamada         configuracion.jsx  Configuración
-//   informe.jsx        Informe mensual        ia.jsx          Asistente IA (oculto)
+//   informe.jsx        Informe mensual        ia.jsx          Conexión con la IA · nora.jsx Nora
 //   acceso.jsx         Login, alta y crear clínica
 //   ui.jsx             Piezas comunes (Modal, Field, Avatar…)  estilos.js  Colores y estilos
 //   utilidades.js      Fechas, WhatsApp, errores…             constantes.js  Valores fijos
@@ -194,7 +194,7 @@ export default function App({demo=false}){
   }
   return(
     <DemoCtx.Provider value={demo}>
-    <EquipoCtx.Provider value={{esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id,registrarVista,guardarMisDatosFact:d=>{setCurrentUser(u=>({...u,datos_facturacion:d}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,datos_facturacion:d}:m));}}}>
+    <EquipoCtx.Provider value={{miNombre:currentUser.nombre,clinicaNombre:currentClinica?.nombre,esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id,registrarVista,guardarMisDatosFact:d=>{setCurrentUser(u=>({...u,datos_facturacion:d}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,datos_facturacion:d}:m));}}}>
     <div style={st.app} className="praxi-app">
       {/* Móvil: barra superior con menú (en ordenador no se ve) */}
       <div className="praxi-topbar">
@@ -363,7 +363,7 @@ export default function App({demo=false}){
         {page==="pacientes"&&<Pacientes patients={patients} setPatients={setPatients} onSelect={selectPatient} autoNew={autoNewPaciente} onAutoNewDone={()=>setAutoNewPaciente(false)}/>}
         {page==="ficha"&&selectedPatient&&<FichaPaciente patient={selectedPatient} setPatients={setPatients} onBack={goBack} citas={citas} setCitas={setCitas} profesionales={profesionales} tipos={tipos}/>}
         {page==="facturas"&&<Facturas patients={patients} setPatients={setPatients}/>}
-        {page==="recursos"&&<Recursos patients={patients} clinica={currentClinica} yo={currentUser}/>}
+        {page==="recursos"&&<Recursos patients={patients} citas={citas} clinica={currentClinica} yo={currentUser}/>}
         {page==="admin"&&currentUser.rol==="admin"&&<EquipoPanel clinica={currentClinica} miembros={profesionales} yo={currentUser} patients={patients} citas={citas} demo={demo} onCambio={cargarTodo} bloquearDemo={()=>setDemoToast(true)} setAviso={setAviso} onBorrada={cerrarSesion}/>}
         {page==="configuracion"&&currentUser.rol==="admin"&&<Configuracion horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos}/>}
       </div>

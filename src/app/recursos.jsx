@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { PROFESIONES, RECURSOS } from "../recursos.js";
-import { DemoCtx } from "./constantes.js";
+import { DemoCtx, IA_VISIBLE } from "./constantes.js";
+import { NoraMarca, NoraPanel } from "./nora.jsx";
 import { MARCA_RECURSOS, ponerMarca } from "./dashboardBloques.jsx";
 import { C, st } from "./estilos.js";
 import { nombreArchivo, pdfPersonalizado, valoresCampos } from "./personalizarPdf.js";
@@ -55,14 +56,15 @@ export function RecursosDemo(){
   );
 }
 
-export function Recursos({patients=[],clinica,yo}){
+export function Recursos({patients=[],citas=[],clinica,yo}){
   const demo=useContext(DemoCtx);
   useEffect(()=>{ponerMarca(MARCA_RECURSOS);},[]);
   if(demo)return <RecursosDemo/>;
-  return <BibliotecaRecursos patients={patients} clinica={clinica} yo={yo}/>;
+  return <BibliotecaRecursos patients={patients} citas={citas} clinica={clinica} yo={yo}/>;
 }
-export function BibliotecaRecursos({patients=[],clinica,yo}){
+export function BibliotecaRecursos({patients=[],citas=[],clinica,yo}){
   const[pacienteId,setPacienteId]=useState("");
+  const[nora,setNora]=useState(false);
   const[ocupado,setOcupado]=useState(null);
   const[error,setError]=useState("");
   const paciente=patients.find(p=>String(p.id)===String(pacienteId));
@@ -77,7 +79,7 @@ export function BibliotecaRecursos({patients=[],clinica,yo}){
       if(ventana)ventana.location.href=url;
       else{const a=document.createElement("a");a.href=url;a.download=nombreArchivo(r,valores);document.body.appendChild(a);a.click();a.remove();}
       setTimeout(()=>URL.revokeObjectURL(url),60000);
-    }catch(e){if(ventana)ventana.close();setError("No se pudo preparar el PDF. Inténtalo de nuevo.");}
+    }catch{if(ventana)ventana.close();setError("No se pudo preparar el PDF. Inténtalo de nuevo.");}
     setOcupado(null);
   };
   const[prof,setProf]=useState("psicologia");
@@ -120,6 +122,7 @@ export function BibliotecaRecursos({patients=[],clinica,yo}){
         <div style={{fontSize:12,color:C.muted,flex:"1 1 260px",lineHeight:1.5}}>
           Los PDF salen con {paciente?<><b>{paciente.nombre}</b> (iniciales en los del profesional), </>:""}tu nombre{clinica?.nombre?<>, <b>{clinica.nombre}</b></>:""} y la fecha de hoy en la cabecera.
         </div>
+        {IA_VISIBLE&&paciente&&<button onClick={()=>setNora(true)} style={{...st.btn("sm"),display:"inline-flex",alignItems:"center",gap:6}}><NoraMarca size={16}/>¿Qué le doy? Pregunta a Nora</button>}
       </div>
       {error&&<div role="alert" style={{...st.card,padding:"10px 14px",marginBottom:14,color:C.red||"#A64A3A",fontSize:13}}>{error}</div>}
       {grupos.length===0
@@ -148,6 +151,7 @@ export function BibliotecaRecursos({patients=[],clinica,yo}){
             </div>
           </div>
         ))}
+      {nora&&paciente&&<NoraPanel patient={paciente} citas={citas} inicial="recursos" onClose={()=>setNora(false)}/>}
     </div>
   );
 }

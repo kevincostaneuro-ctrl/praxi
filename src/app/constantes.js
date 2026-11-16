@@ -2,7 +2,7 @@ import { createContext } from "react";
 
 // ── Asistente IA ─────────────────────────────────────────────────────────────
 // Oculto hasta configurar la clave de Anthropic en Vercel. Para activarlo: true.
-export const IA_VISIBLE = false;
+export const IA_VISIBLE = true;
 export const DemoCtx=createContext(false);
 // Equipo: quién soy, si soy admin y los miembros de la clínica
 export const EquipoCtx=createContext({esAdmin:true,miembros:[],miId:null,registrarVista:()=>{},guardarMisDatosFact:()=>{}});

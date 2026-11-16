@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AgendaPersonalPanel } from "./citas.jsx";
-import { DAYS_ES, MONTHS_ES, WORK_END, WORK_START } from "./constantes.js";
+import { DAYS_ES, IA_VISIBLE, MONTHS_ES, WORK_END, WORK_START } from "./constantes.js";
+import { anadirNota, NoraMarca, NoraPanel } from "./nora.jsx";
 import { C, PRIORIDAD_T, st } from "./estilos.js";
 import { CitasHoy, PrimerosPasos } from "./dashboardBloques.jsx";
 import { colorTipo } from "./calendario.jsx";
@@ -32,6 +33,7 @@ export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,
   const pendiente=todasSes.filter(s=>!s.pagado).reduce((a,s)=>a+(Number(s.pago)||0),0);
 
   // ── Siguiente cita
+  const[nora,setNora]=useState(null);
   const proxima=[...citas].filter(c=>!yaPaso(c)&&(c.fecha>todayStr||timeToMins(c.hora)>=ahoraMin-((c.duracion||0)-1)))
     .sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora))[0];
   const cuando=c=>{
@@ -138,12 +140,13 @@ export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,
               <span style={{fontSize:11.5,fontWeight:700,color:"#fff",background:col.c,borderRadius:999,padding:"2px 9px"}}>{cuando(proxima)}</span>
             </div>
             <div style={{fontSize:19,fontWeight:700,color:C.ink,marginTop:5}}>{nameOf(proxima)} <span style={{fontWeight:400,color:C.walnut,fontSize:14}}>· {pProx?`sesión ${(pProx.sesiones||[]).length+1}`:(proxima.tipo||"Cita")}{pProx&&proxima.tipo?` · ${proxima.tipo}`:""}</span></div>
-            {pProx&&(ultSes||ultPrueba)&&<div style={{fontSize:12.5,color:C.muted,marginTop:4,lineHeight:1.5}}>
+            {pProx&&(ultSes||ultPrueba)&&<div style={{fontSize:12.5,color:C.muted,marginTop:4,lineHeight:1.5,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>
               {ultSes&&<>Última sesión: {ultSes.trabajado||"sin resumen"}</>}{ultSes&&ultPrueba&&" · "}{ultPrueba&&<>{ultPrueba.prueba}: {ultPrueba.resultado}</>}
             </div>}
           </div>
           <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
             {enl&&<a href={enl} target="_blank" rel="noreferrer" style={{...st.btn("sm"),textDecoration:"none"}}>🎥 Entrar</a>}
+            {pProx&&IA_VISIBLE&&<button style={{...st.btn("sm"),background:C.bone,color:C.walnut,display:"inline-flex",alignItems:"center",gap:6}} onClick={()=>setNora(pProx.id)}><NoraMarca size={16}/>Resumen de Nora</button>}
             {pProx&&<button style={enl?{...st.btn("sm"),background:C.bone,color:C.walnut}:st.btn("sm")} onClick={()=>onAbrirPaciente(pProx.id)}>Abrir ficha</button>}
             <button style={{...st.btn("sm"),background:C.bone,color:C.muted}} onClick={()=>onEditCita(proxima)}>Ver cita</button>
           </div>
@@ -212,6 +215,7 @@ export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,
           <AgendaPersonalPanel tareas={tareas} setTareas={setTareas} onEditTarea={onEditTarea}/>
         </div>
       </div>
+      {nora&&pac(nora)&&<NoraPanel patient={pac(nora)} citas={citas} inicial="resumen" onClose={()=>setNora(null)} onGuardarNota={(t,sid)=>setPatients(ps=>ps.map(p=>p.id===nora?anadirNota(p,t,sid):p))}/>}
     </div>
   );
 }

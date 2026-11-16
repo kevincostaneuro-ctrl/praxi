@@ -228,8 +228,8 @@ function Demo() {
                   ))}
                 </Card>
                 <Card style={{padding:16}}>
-                  <SLabel>✦ Asistente IA</SLabel>
-                  <div style={{fontSize:12,color:D.muted,lineHeight:1.7,fontStyle:"italic"}}>"Laura lleva 5 sesiones — considera revisar los objetivos terapéuticos en la próxima cita."</div>
+                  <SLabel>✦ Nora · resumen para la cita</SLabel>
+                  <div style={{fontSize:12,color:D.muted,lineHeight:1.7,fontStyle:"italic"}}>"Sesión 6 con Laura. La última vez trabajasteis la exposición en el metro; quedó pendiente el registro de ansiedad. GAD-7: de 15 a 11."</div>
                 </Card>
               </div>
             </div>}
@@ -483,7 +483,7 @@ const PLANES = [
   { nombre: "Básico", precio: "9,99", periodo: "€/mes", nota: "Para quien empieza consulta", destacado: false,
     incluye: ["Hasta 10 pacientes activos", "Agenda con enlace de videollamada", "Historia clínica por sesiones", "Facturas en PDF editables", "Confirmación de citas por WhatsApp", "Biblioteca de recursos clínicos"] },
   { nombre: "Profesional", precio: "24", periodo: "€/mes", nota: "Consulta individual sin límite", anual: "o 240 €/año (dos meses gratis)", destacado: true,
-    incluye: ["Pacientes ilimitados", "Todo lo del plan Básico", "Exportación de historias en PDF", "Informe mensual de actividad", "Recordatorios automáticos a pacientes (próximamente)", "Asistente clínico con IA (próximamente)"] },
+    incluye: ["Pacientes ilimitados", "Todo lo del plan Básico", "Exportación de historias en PDF", "Informe mensual de actividad", "Recordatorios automáticos a pacientes (próximamente)", "Nora, asistente de documentación con IA"] },
   { nombre: "Clínica", precio: "59", periodo: "€/mes", nota: "Hasta 3 profesionales · +19 € por cada uno más", anual: "o 590 €/año (dos meses gratis)", destacado: false,
     incluye: ["Todo lo del plan Profesional", "Equipo con permisos: cada profesional ve solo a sus pacientes", "Agenda conjunta del equipo", "Registro de accesos a las fichas", "Rol de administrador"] },
 ];

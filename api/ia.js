@@ -85,7 +85,7 @@ export default async function handler(req, res, fetchImpl = fetch) {
       },
       body: JSON.stringify({
         model: MODELO,
-        max_tokens: 1500,
+        max_tokens: 2500,
         // La ficha va como contexto en caché: los mensajes siguientes no la pagan entera
         system: [{ type: "text", text: body.system, cache_control: { type: "ephemeral" } }],
         messages: body.messages,
