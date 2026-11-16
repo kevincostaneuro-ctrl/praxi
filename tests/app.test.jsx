@@ -52,13 +52,11 @@ describe("demo", () => {
     espia.mockRestore();
   });
 
-  it("el dashboard muestra primeros pasos, citas de hoy y cobros", async () => {
+  it("el dashboard muestra primeros pasos y citas de hoy", async () => {
     const { espia } = await abrirDemo();
     const t = document.body.textContent;
-    for (const bloque of ["Primeros pasos", "Citas de hoy", "Cobros pendientes"]) expect(t).toContain(bloque);
-    const factura = screen.getAllByRole("button").find(b => b.textContent === "Factura");
-    await act(async () => fireEvent.click(factura));
-    expect(document.body.textContent).toMatch(/Descargar/);
+    for (const bloque of ["Primeros pasos", "Citas de hoy", "Sin próxima cita"]) expect(t).toContain(bloque);
+    expect(t).not.toContain("Cobros pendientes");
     espia.mockRestore();
   });
 });

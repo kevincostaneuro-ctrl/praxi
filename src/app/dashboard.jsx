@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AgendaPersonalPanel } from "./citas.jsx";
 import { DAYS_ES, MONTHS_ES, WORK_END, WORK_START } from "./constantes.js";
 import { C, PRIORIDAD_T, st } from "./estilos.js";
-import { CitasHoy, CobrosPendientes, PrimerosPasos } from "./dashboardBloques.jsx";
+import { CitasHoy, PrimerosPasos } from "./dashboardBloques.jsx";
 import { colorTipo } from "./calendario.jsx";
 import { addDays, diasEntre, etiquetaDia, etiquetaSemana, fechaDe, startOfWeek, timeToMins, toYMD, today } from "./utilidades.js";
 
@@ -152,7 +152,6 @@ export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,
 
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(420px,1fr))",gap:14,marginBottom:14,alignItems:"start"}}>
         <CitasHoy tipos={tipos} citas={citas} patients={patients} onAbrirPaciente={onAbrirPaciente} onEditCita={onEditCita} onNuevaCita={onNuevaCita}/>
-        <CobrosPendientes patients={patients} setPatients={setPatients} onIr={onIr}/>
       </div>
 
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 320px",gap:14,alignItems:"start"}}>
