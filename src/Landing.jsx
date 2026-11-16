@@ -482,9 +482,9 @@ function Demo() {
 const PLANES = [
   { nombre: "Básico", precio: "9,99", periodo: "€/mes", nota: "Para quien empieza consulta", destacado: false,
     incluye: ["Hasta 10 pacientes activos", "Agenda con enlace de videollamada", "Historia clínica por sesiones", "Facturas en PDF editables", "Confirmación de citas por WhatsApp", "Biblioteca de recursos clínicos"] },
-  { nombre: "Profesional", precio: "24", periodo: "€/mes", nota: "o 240 €/año: dos meses gratis", destacado: true,
+  { nombre: "Profesional", precio: "24", periodo: "€/mes", nota: "Consulta individual sin límite", anual: "o 240 €/año (dos meses gratis)", destacado: true,
     incluye: ["Pacientes ilimitados", "Todo lo del plan Básico", "Exportación de historias en PDF", "Informe mensual de actividad", "Recordatorios automáticos a pacientes (próximamente)", "Asistente clínico con IA (próximamente)"] },
-  { nombre: "Clínica", precio: "59", periodo: "€/mes", nota: "Hasta 3 profesionales · +19 € por cada uno más", destacado: false,
+  { nombre: "Clínica", precio: "59", periodo: "€/mes", nota: "Hasta 3 profesionales · +19 € por cada uno más", anual: "o 590 €/año (dos meses gratis)", destacado: false,
     incluye: ["Todo lo del plan Profesional", "Equipo con permisos: cada profesional ve solo a sus pacientes", "Agenda conjunta del equipo", "Registro de accesos a las fichas", "Rol de administrador"] },
 ];
 
@@ -504,11 +504,12 @@ function Precios({ m, onEmpezar }) {
             borderRadius: 18, padding: m ? "24px 22px" : "30px 28px", display: "flex", flexDirection: "column", boxShadow: p.destacado ? "0 18px 40px -18px rgba(34,22,16,0.45)" : "none" }}>
             {p.destacado && <div style={{ position: "absolute", top: -11, left: 28, background: C.accent, color: C.bone, fontSize: 11, fontWeight: 700, borderRadius: 999, padding: "4px 12px", letterSpacing: "0.04em" }}>Recomendado</div>}
             <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, color: p.destacado ? C.bone : C.ink }}>{p.nombre}</div>
-            <div style={{ fontSize: 12.5, color: p.destacado ? C.dim : C.muted, marginTop: 4, minHeight: 18 }}>{p.nota}</div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 6, margin: "18px 0 20px" }}>
+            <div style={{ fontSize: 12.5, color: p.destacado ? C.dim : C.muted, marginTop: 4, minHeight: m ? 0 : 36, lineHeight: 1.45 }}>{p.nota}</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6, margin: "18px 0 4px" }}>
               <span style={{ fontSize: 44, fontWeight: 700, letterSpacing: "-0.03em", color: p.destacado ? C.bone : C.ink, lineHeight: 1 }}>{p.precio}</span>
               <span style={{ fontSize: 14, color: p.destacado ? C.dim : C.muted }}>{p.periodo}</span>
             </div>
+            <div style={{ fontSize: 12.5, color: p.destacado ? "#E2B48C" : C.accent, fontWeight: 600, minHeight: 18, marginBottom: 18 }}>{p.anual || ""}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, marginBottom: 24 }}>
               {p.incluye.map(t => (
                 <div key={t} style={{ display: "flex", gap: 10, fontSize: 13.5, lineHeight: 1.45 }}>
@@ -522,7 +523,14 @@ function Precios({ m, onEmpezar }) {
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 22, background: C.sand, borderRadius: 14, padding: m ? "16px 18px" : "18px 26px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+      <div style={{ marginTop: 22, background: C.bone, border: `1px solid ${C.border}`, borderRadius: 14, padding: m ? "16px 18px" : "18px 26px", display: "flex", gap: m ? 10 : 24, alignItems: "center", flexWrap: "wrap" }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: C.ink, whiteSpace: "nowrap" }}>¿Prefieres pagar una vez?</span>
+        <span style={{ fontSize: 13, color: C.text, lineHeight: 1.6, flex: 1, minWidth: 220 }}>
+          Pago por 3 años con un <b>20 % de descuento</b>: Profesional <b>690 €</b> · Clínica <b>1.699 €</b> (hasta 3 profesionales). Te olvidas de renovar hasta dentro de tres años.
+        </span>
+        <button onClick={onEmpezar} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "9px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif", whiteSpace: "nowrap" }}>Me interesa</button>
+      </div>
+      <div style={{ marginTop: 12, background: C.sand, borderRadius: 14, padding: m ? "16px 18px" : "18px 26px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
         <span style={{ fontSize: 13, fontWeight: 700, color: C.accent, whiteSpace: "nowrap" }}>Precio de fundador</span>
         <span style={{ fontSize: 13, color: C.text, lineHeight: 1.6, flex: 1, minWidth: 220 }}>Los 100 primeros profesionales que se registren antes del 31 de marzo de 2027 tendrán el plan Profesional a <b>15 €/mes</b> mientras mantengan su suscripción.</span>
       </div>
