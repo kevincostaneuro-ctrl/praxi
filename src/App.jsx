@@ -158,6 +158,7 @@ export default function App({demo=false}){
   const registrarVista=useCallback(id=>{if(!demo&&cid)supabase.rpc("registrar_vista",{p_clinica:cid,p_paciente:id}).then(()=>{},()=>{});},[demo,cid]);
   const cerrarSesion=async()=>{if(demo){window.location.href="/";return;}await supabase.auth.signOut();};
   const[page,setPage]=useState("dashboard");
+  const[menuMovil,setMenuMovil]=useState(false);
   const[selectedId,setSelectedId]=useState(null);
   const[showInforme,setShowInforme]=useState(false);
   const[editCitaDash,setEditCitaDash]=useState(null);
@@ -194,16 +195,23 @@ export default function App({demo=false}){
   return(
     <DemoCtx.Provider value={demo}>
     <EquipoCtx.Provider value={{esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id,registrarVista,guardarMisDatosFact:d=>{setCurrentUser(u=>({...u,datos_facturacion:d}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,datos_facturacion:d}:m));}}}>
-    <div style={st.app}>
+    <div style={st.app} className="praxi-app">
+      {/* Móvil: barra superior con menú (en ordenador no se ve) */}
+      <div className="praxi-topbar">
+        <button aria-label="Abrir menú" onClick={()=>setMenuMovil(true)} style={{background:"none",border:"none",fontSize:22,color:C.walnut,cursor:"pointer",padding:"4px 8px"}}>☰</button>
+        <img src={PRAXI_LOGO} alt="praXi" style={{height:30,display:"block"}}/>
+        <button aria-label="Notificaciones" onClick={()=>setShowNotifs(v=>!v)} style={{background:"none",border:"none",cursor:"pointer",fontSize:18,color:notifs.filter(n=>!dismissedNotifs.has(n.id)).length>0?C.amber:C.muted,padding:"4px 8px"}}>🔔</button>
+      </div>
+      {menuMovil&&<div className="praxi-velo" onClick={()=>setMenuMovil(false)}/>}
       {aviso&&<div style={{position:"fixed",top:20,left:"50%",transform:"translateX(-50%)",zIndex:400,background:C.red,color:"#fff",padding:"10px 18px",borderRadius:10,fontSize:13,boxShadow:"0 8px 24px rgba(34,22,16,0.25)",maxWidth:"90vw"}}>{aviso}</div>}
       {pendientes>0&&<div style={{position:"fixed",bottom:16,left:16,zIndex:300,background:C.bone,border:`1px solid ${C.border}`,color:C.muted,padding:"6px 12px",borderRadius:8,fontSize:12}}>Guardando…</div>}
       {demoToast&&<div style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",zIndex:400,background:C.ink,color:C.bone,padding:"10px 18px",borderRadius:10,fontSize:13,boxShadow:"0 8px 24px rgba(34,22,16,0.25)"}}>Estás en la demo: los cambios no se guardan</div>}
-      {reminders.length>0&&<div style={{position:"fixed",bottom:16,right:16,zIndex:200,display:"flex",flexDirection:"column",gap:8}}>{reminders.map(r=><div key={r.id} style={{background:r.type==="soon"?C.rD:C.amD,border:`1px solid ${r.type==="soon"?C.red:C.amber}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:r.type==="soon"?C.red:C.amber,display:"flex",gap:10,alignItems:"center",maxWidth:340,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"}}><span style={{flex:1}}>{r.msg}</span><button onClick={()=>setReminders(rs=>rs.filter(x=>x.id!==r.id))} style={{background:"none",border:"none",color:"inherit",cursor:"pointer",fontSize:14}}>✕</button></div>)}</div>}
+      {reminders.length>0&&<div className="praxi-avisos" style={{position:"fixed",bottom:16,right:16,zIndex:200,display:"flex",flexDirection:"column",gap:8}}>{reminders.map(r=><div key={r.id} style={{background:r.type==="soon"?C.rD:C.amD,border:`1px solid ${r.type==="soon"?C.red:C.amber}`,borderRadius:10,padding:"10px 14px",fontSize:13,color:r.type==="soon"?C.red:C.amber,display:"flex",gap:10,alignItems:"center",maxWidth:340,boxShadow:"0 4px 20px rgba(0,0,0,0.4)"}}><span style={{flex:1}}>{r.msg}</span><button onClick={()=>setReminders(rs=>rs.filter(x=>x.id!==r.id))} style={{background:"none",border:"none",color:"inherit",cursor:"pointer",fontSize:14}}>✕</button></div>)}</div>}
 
       {/* Panel de notificaciones — fixed dentro del área principal */}
       {showNotifs&&(
-        <div style={{position:"fixed",top:0,left:220,right:0,bottom:0,zIndex:250}} onClick={()=>setShowNotifs(false)}>
-          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:16,left:16,width:360,background:C.bone,border:`1px solid ${C.border}`,borderRadius:14,boxShadow:"0 8px 32px rgba(59,42,30,0.16)",overflow:"hidden"}}>
+        <div className="praxi-notifs" style={{position:"fixed",top:0,left:220,right:0,bottom:0,zIndex:250}} onClick={()=>setShowNotifs(false)}>
+          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:16,left:16,width:360,maxWidth:"calc(100vw - 32px)",background:C.bone,border:`1px solid ${C.border}`,borderRadius:14,boxShadow:"0 8px 32px rgba(59,42,30,0.16)",overflow:"hidden"}}>
             <div style={{padding:"12px 16px",borderBottom:`1px solid ${C.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:C.sand}}>
               <div style={{fontSize:13,fontWeight:600,color:C.text}}>
                 Notificaciones {notifs.filter(n=>!dismissedNotifs.has(n.id)).length>0&&`(${notifs.filter(n=>!dismissedNotifs.has(n.id)).length})`}
@@ -233,7 +241,7 @@ export default function App({demo=false}){
           </div>
         </div>
       )}
-      <div style={st.sidebar}>
+      <div style={st.sidebar} className={`praxi-sidebar${menuMovil?" abierto":""}`} onClick={e=>{if(e.target.closest("[data-nav]"))setMenuMovil(false);}}>
         <div style={{...st.sidebarBrand,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
           <div>
             <img src={PRAXI_LOGO} alt="praXi" style={{height:38,display:"block"}}/>
@@ -318,18 +326,18 @@ export default function App({demo=false}){
         {[["dashboard","Dashboard"],["calendario","Calendario"],["pacientes","Pacientes"],["facturas","Facturas"],["recursos","Recursos"]].map(([id,label])=>{
           const badge=id==="pacientes"?patients.filter(p=>!p.consentimiento&&p.estado==="activo").length:0;
           return(
-            <div key={id} style={{...st.navItem(page===id||(id==="pacientes"&&page==="ficha")),justifyContent:"space-between"}} onClick={()=>{setPage(id);setSelectedId(null);}}>
+            <div key={id} data-nav style={{...st.navItem(page===id||(id==="pacientes"&&page==="ficha")),justifyContent:"space-between"}} onClick={()=>{setPage(id);setSelectedId(null);}}>
               <span>▪ {label}</span>
               {badge>0&&<span style={{...st.badge(C.amber,C.amD),fontSize:9}}>{badge}</span>}
             </div>
           );
         })}
         {currentUser.rol==="admin"&&(
-          <div style={st.navItem(page==="admin")} onClick={()=>setPage("admin")}>▪ Equipo</div>
+          <div data-nav style={st.navItem(page==="admin")} onClick={()=>setPage("admin")}>▪ Equipo</div>
         )}
         
         {currentUser.rol==="admin"&&<div style={{marginTop:16,borderTop:`1px solid ${C.border}`,paddingTop:8}}>
-          <div style={st.navItem(page==="configuracion")} onClick={()=>setPage("configuracion")}>▪ Configuración</div>
+          <div data-nav style={st.navItem(page==="configuracion")} onClick={()=>setPage("configuracion")}>▪ Configuración</div>
         </div>}
         <div style={{flex:1}}/>
         <div style={{padding:"12px 20px",borderTop:`1px solid ${C.border}`,display:"flex",flexDirection:"column",gap:5}}>
@@ -345,7 +353,7 @@ export default function App({demo=false}){
           <button style={{...st.btn("ghost"),marginTop:4,fontSize:11,color:C.muted,textAlign:"left",padding:"4px 0"}} onClick={cerrarSesion}>🔒 {demo?"Salir de la demo":"Cerrar sesión"}</button>
         </div>
       </div>
-      <div style={st.main}>
+      <div style={st.main} className="praxi-main">
         {demo&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap",background:C.sand,border:`1px solid ${C.border}`,borderRadius:12,padding:"10px 16px",marginBottom:20,fontSize:13,color:C.walnut}}>
           <span><strong style={{color:C.accent}}>Modo demo</strong> · Navega por todas las secciones con pacientes de ejemplo. Los cambios no se guardan.</span>
           <a href="/" style={{...st.btn("sm"),textDecoration:"none"}}>Solicitar acceso</a>

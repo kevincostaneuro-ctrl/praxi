@@ -227,7 +227,7 @@ export function Facturas({patients,setPatients}){
       </div>
 
       {/* Stats */}
-      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:22}}>
+      <div className="praxi-cols-fijas" style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:14,marginBottom:22}}>
         <StatCard val={todasFacturas.length} label="Total facturas" color={C.aL}/>
         <StatCard val={`${totalCobrado}€`} label="Cobrado" color={C.green}/>
         <StatCard val={`${totalPendiente}€`} label="Pendiente" color={C.amber}/>

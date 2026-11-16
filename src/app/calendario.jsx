@@ -46,9 +46,9 @@ export function TimeGrid({days,citas,patients,horario,onNew,onEdit,showHeader,ti
   const yaPaso=c=>c.fecha<todayStr||(c.fecha===todayStr&&timeToMins(c.hora)+(Number(c.duracion)||60)<=ahoraMin);
   const topAhora=(ahoraMin-horario.start*60)/30*SLOT_H;
   return(
-    <div style={{background:FONDO_REJILLA}}>
+    <div style={{background:FONDO_REJILLA}} className={varios?"praxi-min-680":undefined}>
       {showHeader&&(
-        <div style={{display:"grid",gridTemplateColumns:cols,borderBottom:`1px solid ${LINEA_HORA}`,position:"sticky",top:0,zIndex:4,background:C.card}}>
+        <div className="praxi-cols-fijas" style={{display:"grid",gridTemplateColumns:cols,borderBottom:`1px solid ${LINEA_HORA}`,position:"sticky",top:0,zIndex:4,background:C.card}}>
           <div/>
           {days.map((d,i)=>{const ds=toYMD(d);const isT=ds===todayStr;const finde=d.getDay()===0||d.getDay()===6;const n=citas.filter(c=>c.fecha===ds).length;return(
             <div key={i} style={{padding:"10px 6px 9px",textAlign:"center",borderLeft:`1px solid ${LINEA_HORA}`,opacity:finde&&!isT?0.75:1}}>
@@ -60,7 +60,7 @@ export function TimeGrid({days,citas,patients,horario,onNew,onEdit,showHeader,ti
           );})}
         </div>
       )}
-      <div style={{display:"grid",gridTemplateColumns:cols,position:"relative"}}>
+      <div className="praxi-cols-fijas" style={{display:"grid",gridTemplateColumns:cols,position:"relative"}}>
         {/* Horas: etiqueta pegada a la línea de cada hora */}
         <div style={{position:"relative",height:totalH}}>
           {slots.map((t,k)=>t.endsWith(":00")&&(
@@ -190,7 +190,7 @@ export function Calendario({patients,citas,setCitas,config,setConfig,tipos,horar
     const cw=[...citas.filter(c=>keys.includes(c.fecha))].sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
     return(
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:16,alignItems:"start"}}>
-        <div style={{...st.card,overflow:"clip"}}>
+        <div style={{...st.card,overflow:"clip"}} className="praxi-scroll-x">
           <TimeGrid days={days} citas={citas} patients={patients} horario={horario} onNew={openNew} onEdit={openEdit} showHeader tipos={tipos}/>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12}}>
@@ -211,11 +211,11 @@ export function Calendario({patients,citas,setCitas,config,setConfig,tipos,horar
     const cm=[...citas.filter(c=>c.fecha.startsWith(mesKey))].sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.hora.localeCompare(b.hora));
     return(
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:16,alignItems:"start"}}>
-        <div style={{...st.card,overflow:"hidden"}}>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",borderBottom:`1px solid ${C.border}`}}>
+        <div style={{...st.card,overflow:"hidden"}} className="praxi-scroll-x">
+          <div className="praxi-cols-fijas praxi-min-680" style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",borderBottom:`1px solid ${C.border}`}}>
             {DAYS_ES.map(d=><div key={d} style={{padding:"10px 0",textAlign:"center",fontSize:12,color:C.walnut,textTransform:"uppercase",letterSpacing:"0.05em",fontWeight:600}}>{d}</div>)}
           </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(7,minmax(0,1fr))",background:FONDO_REJILLA}}>
+          <div className="praxi-cols-fijas praxi-min-680" style={{display:"grid",gridTemplateColumns:"repeat(7,minmax(0,1fr))",background:FONDO_REJILLA}}>
             {cells.map((d,i)=>{
               const ds=toYMD(d);const inMonth=d.getMonth()===date.getMonth();const isT=ds===todayStr;
               const dc=citas.filter(c=>c.fecha===ds).sort((a,b)=>a.hora.localeCompare(b.hora));
@@ -303,7 +303,7 @@ export function AgendaGlobal({citas,patients,profesionales}){
         ))}
       </div>
 
-      <div style={st.card}>
+      <div style={st.card} className="praxi-scroll-x">
         {/* Nav semanal */}
         <div style={{padding:"10px 14px",borderBottom:`1px solid ${C.border}`,display:"flex",gap:8,alignItems:"center"}}>
           <button style={st.btn("sm")} onClick={()=>nav(-1)}>‹</button>
@@ -313,7 +313,7 @@ export function AgendaGlobal({citas,patients,profesionales}){
         </div>
 
         {/* Grid 7 días */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)"}}>
+        <div className="praxi-cols-fijas praxi-min-680" style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)"}}>
           {dayRange.map((d,i)=>{
             const ds=toYMD(d);
             const isToday=ds===todayStr;

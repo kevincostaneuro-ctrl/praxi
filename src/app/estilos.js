@@ -41,7 +41,7 @@ export const st={
   textarea:{background:C.bone,border:`1px solid ${C.border}`,borderRadius:4,padding:"9px 12px",color:C.text,fontSize:14,width:"100%",outline:"none",boxSizing:"border-box",fontFamily:"'Manrope',sans-serif",resize:"vertical",minHeight:80},
   label:{fontSize:11,color:C.walnut,marginBottom:6,display:"block",textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:500},
   modal:{position:"fixed",inset:0,background:"rgba(34,22,16,0.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,backdropFilter:"blur(6px)"},
-  modalBox:(w=500)=>({background:C.bone,border:`1px solid ${C.border}`,borderRadius:18,padding:32,width:w,maxHeight:"88vh",overflowY:"auto",boxShadow:"0 1px 2px rgba(59,42,30,0.06),0 8px 24px -12px rgba(59,42,30,0.18)"}),
+  modalBox:(w=500)=>({background:C.bone,border:`1px solid ${C.border}`,borderRadius:18,padding:"clamp(18px,4vw,32px)",width:w,maxWidth:"calc(100vw - 20px)",boxSizing:"border-box",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 1px 2px rgba(59,42,30,0.06),0 8px 24px -12px rgba(59,42,30,0.18)"}),
   btn:(v="primary")=>({padding:v==="sm"?"5px 14px":"10px 22px",borderRadius:10,border:"none",cursor:"pointer",fontSize:v==="sm"?12:13,fontWeight:500,fontFamily:"'Manrope',sans-serif",letterSpacing:"0.01em",transition:"background 200ms cubic-bezier(0.4,0,0.2,1),transform 120ms",
     background:v==="ghost"?"transparent":v==="danger"?C.rD:v==="teal"?C.tD:v==="success"?C.gD:C.accent,
     color:v==="ghost"?C.muted:v==="danger"?C.red:v==="teal"?C.walnut:v==="success"?C.green:C.bone}),

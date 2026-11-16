@@ -20,3 +20,45 @@ html {
 .praxi-hueco { position: relative; transition: background .12s; }
 .praxi-hueco:hover { background: rgba(166,107,63,0.07); }
 .praxi-hueco:hover::after { content: "+ Nueva cita"; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 11.5px; font-weight: 600; color: #A66B3F; pointer-events: none; }
+
+/* ══════════════════════════ Versión móvil ══════════════════════════ */
+.praxi-topbar { display: none; }
+@media (max-width: 767px) {
+  .praxi-app { flex-direction: column; }
+  .praxi-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 60; height: 52px; padding: 0 8px;
+    background: #F2E9DB; border-bottom: 1px solid #E3D6BF;
+  }
+  /* Menú lateral → cajón que entra desde la izquierda */
+  .praxi-sidebar {
+    position: fixed !important; top: 0; left: 0; bottom: 0; z-index: 90;
+    width: 270px !important; height: 100dvh !important;
+    transform: translateX(-105%); transition: transform .22s ease;
+    box-shadow: 0 0 40px rgba(34,22,16,.25);
+  }
+  .praxi-sidebar.abierto { transform: translateX(0); }
+  .praxi-velo { position: fixed; inset: 0; z-index: 80; background: rgba(34,22,16,.4); }
+  .praxi-notifs { left: 0 !important; top: 52px !important; }
+  .praxi-avisos { left: 12px !important; right: 12px !important; bottom: 12px !important; }
+  .praxi-avisos > div { max-width: none !important; }
+  .praxi-main { padding: 16px !important; min-width: 0; }
+
+  /* Rejillas en una sola columna (salvo las marcadas como fijas) */
+  .praxi-main [style*="grid-template-columns"]:not(.praxi-cols-fijas),
+  .praxi-app [style*="grid-template-columns"]:not(.praxi-cols-fijas) { grid-template-columns: minmax(0,1fr) !important; }
+  .praxi-main .praxi-cols-2 { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+
+  /* Tablas: se deslizan de lado dentro de su tarjeta */
+  .praxi-main div:has(> table) { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+  .praxi-main table { min-width: 640px; }
+
+  /* Calendario semanal y mes: se desliza de lado */
+  .praxi-scroll-x { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+  .praxi-min-680 { min-width: 680px; }
+
+  /* Títulos de página algo más pequeños */
+  .praxi-main [style*="Instrument Serif"] { font-size: 30px !important; }
+  /* Botones y campos más cómodos al tacto */
+  .praxi-app input, .praxi-app select, .praxi-app textarea { font-size: 16px !important; }
+}

@@ -213,14 +213,14 @@ export function FichaPaciente({patient,setPatients,onBack,citas,setCitas,profesi
   return(
     <div>
       {/* Header */}
-      <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:18}}>
+      <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:18,flexWrap:"wrap"}}>
         <button style={{...st.btn("ghost"),paddingLeft:0,fontSize:18}} onClick={onBack}>←</button>
         <Avatar nombre={patient.nombre} apellidos={patient.apellidos} size={48}/>
-        <div style={{flex:1}}>
+        <div style={{flex:"1 1 220px",minWidth:0}}>
           <div style={{fontSize:22,fontWeight:800}}>{patient.nombre} {patient.apellidos}</div>
           <div style={{fontSize:13,color:C.muted}}>{patient.telefono} · {patient.email}</div>
           {/* Contador de sesiones y progreso */}
-          <div style={{display:"flex",gap:12,marginTop:6,alignItems:"center"}}>
+          <div style={{display:"flex",gap:12,marginTop:6,alignItems:"center",flexWrap:"wrap"}}>
             <span style={{fontSize:12,color:C.walnut,fontWeight:500}}>{patient.sesiones.length} sesiones</span>
             {patient.sesiones.length>0&&<><span style={{color:C.border}}>·</span><span style={{fontSize:12,color:C.muted}}>Última: {[...patient.sesiones].sort((a,b)=>b.fecha.localeCompare(a.fecha))[0]?.fecha}</span></>}
             {patient.objetivos.length>0&&(

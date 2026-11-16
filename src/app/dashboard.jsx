@@ -106,7 +106,7 @@ export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,
         </div>
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:14,marginBottom:14}}>
+      <div className="praxi-cols-fijas praxi-cols-2" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:14,marginBottom:14}}>
         <Stat val={activos.length} label="Pacientes activos" color={C.ink} icono="pacientes">
           <Sub>de {patients.length} en total</Sub>
         </Stat>
@@ -155,7 +155,7 @@ export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,
       </div>
 
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 320px",gap:14,alignItems:"start"}}>
-        <div style={{...st.card,overflow:"hidden"}}>
+        <div style={{...st.card,overflow:"hidden"}} className="praxi-scroll-x">
           <div style={{padding:"10px 14px",borderBottom:`1px solid ${C.border}`,display:"grid",gridTemplateColumns:"1fr auto 1fr",gap:10,alignItems:"center"}}>
            <div style={{display:"flex",gap:10,alignItems:"center"}}>
             <button style={st.btn("sm")} onClick={()=>setWeekStart(d=>addDays(d,-7))}>‹</button>
@@ -167,7 +167,7 @@ export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,
             </span>
             <button style={{...st.btn("sm"),background:C.bone,color:C.muted,justifySelf:"end"}} onClick={onVerCalendario}>Ver calendario →</button>
           </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(7,minmax(0,1fr))",minHeight:260,background:"#FBF8F2"}}>
+          <div className="praxi-cols-fijas praxi-min-680" style={{display:"grid",gridTemplateColumns:"repeat(7,minmax(0,1fr))",minHeight:260,background:"#FBF8F2"}}>
             {days.map((d,i)=>{
               const ds=toYMD(d);const isT=ds===todayStr;
               const dc=[...citas.filter(c=>c.fecha===ds)].sort((a,b)=>a.hora.localeCompare(b.hora));
