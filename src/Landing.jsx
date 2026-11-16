@@ -523,14 +523,7 @@ function Precios({ m, onEmpezar }) {
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 22, background: C.bone, border: `1px solid ${C.border}`, borderRadius: 14, padding: m ? "16px 18px" : "18px 26px", display: "flex", gap: m ? 10 : 24, alignItems: "center", flexWrap: "wrap" }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: C.ink, whiteSpace: "nowrap" }}>¿Prefieres pagar una vez?</span>
-        <span style={{ fontSize: 13, color: C.text, lineHeight: 1.6, flex: 1, minWidth: 220 }}>
-          Pago por 3 años con un <b>20 % de descuento</b>: Profesional <b>690 €</b> · Clínica <b>1.699 €</b> (hasta 3 profesionales). Te olvidas de renovar hasta dentro de tres años.
-        </span>
-        <button onClick={onEmpezar} style={{ background: "transparent", color: C.accent, border: `1px solid ${C.accent}`, borderRadius: 10, padding: "9px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Manrope',sans-serif", whiteSpace: "nowrap" }}>Me interesa</button>
-      </div>
-      <div style={{ marginTop: 12, background: C.sand, borderRadius: 14, padding: m ? "16px 18px" : "18px 26px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+      <div style={{ marginTop: 22, background: C.sand, borderRadius: 14, padding: m ? "16px 18px" : "18px 26px", display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
         <span style={{ fontSize: 13, fontWeight: 700, color: C.accent, whiteSpace: "nowrap" }}>Precio de fundador</span>
         <span style={{ fontSize: 13, color: C.text, lineHeight: 1.6, flex: 1, minWidth: 220 }}>Los 100 primeros profesionales que se registren antes del 31 de marzo de 2027 tendrán el plan Profesional a <b>15 €/mes</b> mientras mantengan su suscripción.</span>
       </div>
