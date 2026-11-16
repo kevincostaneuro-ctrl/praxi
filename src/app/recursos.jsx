@@ -3,6 +3,7 @@ import { PROFESIONES, RECURSOS } from "../recursos.js";
 import { DemoCtx } from "./constantes.js";
 import { MARCA_RECURSOS, ponerMarca } from "./dashboardBloques.jsx";
 import { C, st } from "./estilos.js";
+import { nombreArchivo, pdfPersonalizado, valoresCampos } from "./personalizarPdf.js";
 
 // ══════════════════════════════════════════════════════════════════════════════
 // AGENDA GLOBAL — todos los profesionales
@@ -54,13 +55,31 @@ export function RecursosDemo(){
   );
 }
 
-export function Recursos(){
+export function Recursos({patients=[],clinica,yo}){
   const demo=useContext(DemoCtx);
   useEffect(()=>{ponerMarca(MARCA_RECURSOS);},[]);
   if(demo)return <RecursosDemo/>;
-  return <BibliotecaRecursos/>;
+  return <BibliotecaRecursos patients={patients} clinica={clinica} yo={yo}/>;
 }
-export function BibliotecaRecursos(){
+export function BibliotecaRecursos({patients=[],clinica,yo}){
+  const[pacienteId,setPacienteId]=useState("");
+  const[ocupado,setOcupado]=useState(null);
+  const[error,setError]=useState("");
+  const paciente=patients.find(p=>String(p.id)===String(pacienteId));
+  const ordenados=[...patients].sort((a,b)=>`${a.nombre} ${a.apellidos}`.localeCompare(`${b.nombre} ${b.apellidos}`,"es"));
+  // Genera el PDF con los datos de la cabecera y lo abre o lo descarga
+  const usar=async(r,modo)=>{
+    setError("");setOcupado(r.url+modo);
+    const ventana=modo==="abrir"?window.open("","_blank"):null;
+    try{
+      const valores=valoresCampos({recurso:r,paciente,profesional:yo?.nombre,clinica:clinica?.nombre});
+      const url=URL.createObjectURL(await pdfPersonalizado(r,valores));
+      if(ventana)ventana.location.href=url;
+      else{const a=document.createElement("a");a.href=url;a.download=nombreArchivo(r,valores);document.body.appendChild(a);a.click();a.remove();}
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    }catch(e){if(ventana)ventana.close();setError("No se pudo preparar el PDF. Inténtalo de nuevo.");}
+    setOcupado(null);
+  };
   const[prof,setProf]=useState("psicologia");
   const[cat,setCat]=useState("paciente");
   const[q,setQ]=useState("");
@@ -92,6 +111,17 @@ export function BibliotecaRecursos(){
         <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Buscar recurso…" aria-label="Buscar recurso"
           style={{...st.input,width:240,maxWidth:"100%",marginBottom:8,borderRadius:10}}/>
       </div>
+      <div style={{...st.card,padding:"14px 18px",marginBottom:20,display:"flex",flexWrap:"wrap",alignItems:"center",gap:"10px 16px",background:C.sand}}>
+        <div style={{fontSize:13,fontWeight:600,color:C.ink}}>Personalizar para</div>
+        <select value={pacienteId} onChange={e=>setPacienteId(e.target.value)} aria-label="Paciente para personalizar" style={{...st.input,width:260,maxWidth:"100%",borderRadius:10}}>
+          <option value="">Sin paciente (en blanco)</option>
+          {ordenados.map(p=><option key={p.id} value={p.id}>{p.nombre} {p.apellidos}</option>)}
+        </select>
+        <div style={{fontSize:12,color:C.muted,flex:"1 1 260px",lineHeight:1.5}}>
+          Los PDF salen con {paciente?<><b>{paciente.nombre}</b> (iniciales en los del profesional), </>:""}tu nombre{clinica?.nombre?<>, <b>{clinica.nombre}</b></>:""} y la fecha de hoy en la cabecera.
+        </div>
+      </div>
+      {error&&<div role="alert" style={{...st.card,padding:"10px 14px",marginBottom:14,color:C.red||"#A64A3A",fontSize:13}}>{error}</div>}
       {grupos.length===0
         ?<div style={{...st.card,padding:32,textAlign:"center",color:C.muted,fontSize:13}}>No hay recursos que coincidan con «{q}».</div>
         :grupos.map(g=>(
@@ -110,8 +140,8 @@ export function BibliotecaRecursos(){
                   <div style={{fontSize:15,fontWeight:600,lineHeight:1.35,color:C.text}}>{r.titulo}</div>
                   <div style={{fontSize:12.5,color:C.muted,lineHeight:1.55,flex:1}}>{r.desc}</div>
                   <div style={{display:"flex",gap:8,marginTop:4}}>
-                    <a href={r.url} target="_blank" rel="noopener" style={{...st.btn("sm"),textDecoration:"none",display:"inline-flex",alignItems:"center"}}>Abrir PDF</a>
-                    <a href={r.url} download style={{...st.btn("teal"),padding:"5px 14px",fontSize:12,textDecoration:"none",display:"inline-flex",alignItems:"center"}}>Descargar</a>
+                    <button onClick={()=>usar(r,"abrir")} disabled={!!ocupado} style={{...st.btn("sm"),display:"inline-flex",alignItems:"center"}}>{ocupado===r.url+"abrir"?"Preparando…":"Abrir PDF"}</button>
+                    <button onClick={()=>usar(r,"descargar")} disabled={!!ocupado} style={{...st.btn("teal"),padding:"5px 14px",fontSize:12,display:"inline-flex",alignItems:"center"}}>{ocupado===r.url+"descargar"?"Preparando…":"Descargar"}</button>
                   </div>
                 </div>
               ))}

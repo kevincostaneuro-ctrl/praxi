@@ -1,0 +1,285 @@
+// Neuropsicología · recursos para el paciente y la familia, y para el profesional
+const { B } = require("../plantilla.cjs");
+const I = require("../iconos.cjs");
+const F = require("../figuras.cjs");
+const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const AVISO_NEU = "Uso profesional. Material de apoyo: no sustituye las pruebas estandarizadas con sus baremos ni el juicio clínico.";
+const pac = (archivo, codigo, titulo, subtitulo, ilustracion, bloques, referencias) =>
+  ({ archivo: `neuropsicologia/pacientes/${archivo}.pdf`, codigo, cat: "paciente", etiqueta: "Para el paciente y la familia", tema: "neuro", titulo, subtitulo, ilustracion, bloques, referencias });
+const pro = (archivo, codigo, titulo, subtitulo, ilustracion, bloques, referencias) =>
+  ({ archivo: `neuropsicologia/profesionales/${archivo}.pdf`, codigo, cat: "profesional", tema: "neuro", aviso: AVISO_NEU, titulo, subtitulo, ilustracion, bloques, referencias });
+const campos = (filas, alto = 10, etq = 34) => B.tabla(["Campo", "Información"], filas.map(f => [f, ""]), 0, { anchos: [etq, 100 - etq], negrita0: true, altoFilas: alto });
+
+module.exports = [
+  // ── NEU-PAC-01 · Estrategias de memoria ────────────────────────────────────
+  pac("01-estrategias-de-memoria", "NEU-PAC-01", "Estrategias de memoria para el día a día",
+    "Ayudas externas y trucos sencillos para recordar más y olvidar menos.", I.cerebro,
+    t => [
+      B.uso("Elige dos o tres ayudas y úsalas todos los días durante dos semanas, aunque al principio te parezca que no las necesitas. Un familiar puede ayudarte a recordarlas los primeros días."),
+      B.h("Apóyate fuera de la cabeza", 1),
+      B.p("Después de un daño cerebral, con la edad o en momentos de mucho estrés, la memoria puede fallar más. La forma más eficaz de compensarlo no es «entrenar» sin más, sino **usar ayudas externas de forma constante** hasta que se conviertan en hábito."),
+      B.rejilla([
+        ["Agenda o libreta única", "Siempre la misma y en el mismo sitio. Revísala por la mañana y por la noche."],
+        ["Alarmas del móvil", "Para citas, medicación y tareas. Escribe en la alarma **qué** tienes que hacer, no solo la hora."],
+        ["Calendario a la vista", "En la cocina o la entrada, con las citas de la semana."],
+        ["Notas y listas", "La compra, los recados y los pasos de las tareas largas."],
+        ["Pastillero semanal", "Rellénalo un día fijo; así ves si ya has tomado la dosis."],
+        ["Un sitio para cada cosa", "Llaves, cartera, gafas y móvil siempre en la misma bandeja."],
+      ]),
+      B.h("Cinco pasos para recordar mejor", 2),
+      B.svg(F.flujo([["Atiende", "una cosa cada vez"], ["Repite", "con tus palabras"], ["Asocia", "con algo conocido"], ["Agrupa", "por temas o zonas"], ["Escríbelo", "enseguida"]], t, { fuerte: 4 })),
+      B.lista([
+        "**Atiende** al principio: mira a quien te habla y evita hacer dos cosas a la vez.",
+        "**Repite** con tus palabras lo que te han dicho y pide que lo repitan si hace falta.",
+        "**Asocia** lo nuevo con algo que ya conoces: un nombre con una persona conocida, un número con una fecha.",
+        "**Agrupa** la información: la compra por secciones, los recados por zonas.",
+        "**Escríbelo** en tu agenda en el momento, no «luego».",
+      ]),
+      B.salto(),
+      B.h("Mis ayudas", 3),
+      B.p("Marca las que vas a usar y dónde las vas a tener. Al final de cada semana, comprueba si las has usado."),
+      B.tabla(["Ayuda", "Dónde / cuándo", "¿La uso? Semana 1", "¿La uso? Semana 2"],
+        ["Agenda o libreta", "Alarmas del móvil", "Calendario a la vista", "Notas y listas", "Pastillero semanal", "Bandeja para llaves y cartera", "", ""].map(a => [a, "", "", ""]),
+        0, { anchos: [30, 38, 16, 16], negrita0: true, altoFilas: 13 }),
+      B.lineas(4, "¿Qué me ha funcionado mejor? ¿Qué me ha costado?"),
+    ],
+    ["Wilson, B. A. (2009). *Memory rehabilitation: integrating theory and practice*. Guilford Press."]),
+
+  // ── NEU-PAC-02 · Diario de memoria ─────────────────────────────────────────
+  pac("02-diario-de-memoria", "NEU-PAC-02", "Diario de memoria",
+    "Una hoja por día para organizar lo que tienes que hacer y lo que ha pasado.", I.libreta,
+    t => [
+      B.uso("Lleva este diario siempre contigo. Revísalo al levantarte, a mediodía y antes de dormir. Si te cuesta, pide a un familiar que lo revise contigo los primeros días. Imprime una hoja por día."),
+      B.p("**Día:** ____________________   **Fecha:** ______________"),
+      B.h("Hoy tengo que…", 1),
+      B.tabla(["Franja", "Hora", "Cita o tarea", "¿Hecho?"], [["Mañana", "", "", ""], ["", "", "", ""], ["Mediodía", "", "", ""], ["Tarde", "", "", ""], ["", "", "", ""], ["Noche", "", "", ""]],
+        0, { anchos: [16, 12, 60, 12], negrita0: true, altoFilas: 11 }),
+      B.h("Medicación", 2),
+      B.tabla(["Medicamento", "Hora", "¿Tomada?"], [], 4, { anchos: [60, 20, 20], alto: 10 }),
+      B.salto(),
+      B.h("Lo que ha pasado hoy", 3),
+      B.p("Con quién he hablado, qué he hecho, algo que quiera recordar."),
+      B.lineas(10),
+      B.h("Antes de dormir", 4),
+      B.checks(["He revisado lo que tengo mañana", "He preparado lo que necesito (ropa, papeles, llaves)", "He puesto las alarmas", "He tomado la medicación de la noche"]),
+    ]),
+
+  // ── NEU-PAC-03 · Fatiga cognitiva ──────────────────────────────────────────
+  pac("03-fatiga-cognitiva", "NEU-PAC-03", "Fatiga cognitiva y gestión de la energía",
+    "Por qué te cansas antes y cómo repartir tu energía a lo largo del día.", I.bateria,
+    t => [
+      B.uso("Lee la primera página con tu familia. Durante una semana, puntúa tu energía en cada franja del día: veréis cuándo rindes mejor y cuándo conviene parar."),
+      B.h("Qué es la fatiga cognitiva", 1),
+      B.p("Tras un daño cerebral, una enfermedad neurológica o un periodo de estrés intenso, pensar, concentrarse o estar en sitios con ruido consume más energía que antes. **Esa fatiga no es pereza** y no siempre mejora durmiendo: aparece antes y tarda más en irse."),
+      B.h("Señales de aviso", 2),
+      B.chips(["Me cuesta seguir una conversación", "No encuentro las palabras", "Estoy más irritable", "Me molestan el ruido o la luz", "Cometo más errores", "Me olvido de más cosas", "Dolor de cabeza o pesadez", "Necesito parar"]),
+      B.h("Pausas antes de agotarte", 3),
+      B.svg(F.tiempos([["Actividad", 50], ["Pausa", 15], ["Actividad", 50], ["Pausa", 15], ["Actividad", 50]], t), "Ejemplo: descansa 10–15 minutos cada 45–60 minutos de actividad mental, aunque te encuentres bien."),
+      B.h("Dosificar la energía", 4),
+      B.rejilla([
+        ["Planificar", "Reparte las tareas exigentes a lo largo de la semana; no las juntes en un día."],
+        ["Elegir el momento", "Lo más difícil, cuando tengas más energía (para muchas personas, por la mañana)."],
+        ["Reducir estímulos", "Menos ruido, una conversación cada vez, el móvil en silencio."],
+        ["Equilibrar", "Combina tareas que cansan con otras que recargan: paseo, música, descanso."],
+      ], 4),
+      B.columnas(B.lineas(3, "A mí me gasta energía…"), B.lineas(3, "A mí me recarga…")),
+      B.salto(),
+      B.h("Mi registro de energía", 5),
+      B.p("Puntúa tu energía de 0 (agotado/a) a 10 (lleno/a de energía) y anota la actividad principal de cada franja."),
+      B.escala("0 · Agotado/a", "10 · Lleno/a de energía", 10, true),
+      B.tabla(["Día", "Mañana", "Mediodía", "Tarde", "Noche"], DIAS.map(d => [d, "", "", "", ""]), 0, { anchos: [14, 21.5, 21.5, 21.5, 21.5], negrita0: true, altoFilas: 20 }),
+      B.lineas(2, "¿En qué franja tengo más energía? ¿Qué la agota antes?"),
+    ]),
+
+  // ── NEU-PAC-04 · La atención en el día a día ───────────────────────────────
+  pac("04-atencion-en-el-dia-a-dia", "NEU-PAC-04", "La atención en el día a día",
+    "Cómo reducir las distracciones y terminar lo que empiezas.", I.lupa,
+    t => [
+      B.uso("Prepara tu entorno antes de empezar algo que te exija concentración. Usa la hoja de la segunda página para dividir una tarea en pasos."),
+      B.h("Cuando cuesta concentrarse", 1),
+      B.p("La atención es la puerta de entrada de la memoria: lo que no se atiende bien no se puede recordar después. Si te distraes con facilidad, te pierdes en las conversaciones o dejas tareas a medias, estas pautas pueden ayudarte."),
+      B.h("Adapta tu entorno", 2),
+      B.rejilla([
+        ["Sitio tranquilo", "Con la televisión y la radio apagadas."], ["Solo lo necesario", "A la vista, únicamente lo que necesitas para la tarea."],
+        ["Móvil en silencio", "Sin notificaciones mientras haces algo que requiera atención."], ["En grupo", "Siéntate cerca de quien habla y pide turnos."],
+      ], 4),
+      B.h("Una cosa cada vez", 3),
+      B.svg(F.flujo([["Decir", "qué voy a hacer"], ["Dividir", "en pasos pequeños"], ["Anotar", "si me interrumpen"], ["Revisar", "¿lo he terminado?"]], t, { fuerte: 1, ancho: "160mm" })),
+      B.pasos([
+        "Antes de empezar, **di en voz alta o escribe** qué vas a hacer.",
+        "**Divide la tarea** en pasos pequeños y táchalos al terminarlos.",
+        "Si te interrumpen, **anota en qué paso estabas** antes de atender la interrupción.",
+        "**Revisa al final:** ¿he terminado todos los pasos?",
+      ]),
+      B.salto(),
+      B.h("Mi tarea por pasos", 4),
+      B.p("**Tarea:** ____________________________________________   **Fecha:** ______________"),
+      B.tabla(["Paso", "Qué tengo que hacer", "¿Hecho?"], Array.from({ length: 10 }, (_, i) => [String(i + 1), "", ""]), 0, { anchos: [8, 78, 14], altoFilas: 13 }),
+      B.lineas(3, "Si me interrumpieron: ¿en qué paso estaba?"),
+    ]),
+
+  // ── NEU-PAC-05 · Guía para familiares ──────────────────────────────────────
+  pac("05-guia-para-familiares", "NEU-PAC-05", "Guía para familiares tras un daño cerebral",
+    "Cómo entender los cambios y cuidar sin olvidarte de ti.", I.familia,
+    t => [
+      B.uso("Léela con calma y compártela con otras personas que convivan o cuiden. Apunta tus dudas en la última sección y tráelas a la próxima cita."),
+      B.h("Cambios que pueden aparecer", 1),
+      B.p("Un ictus, un traumatismo craneoencefálico u otra lesión cerebral pueden cambiar la forma de pensar, sentir y comportarse de una persona. **No lo hace a propósito:** son consecuencias de la lesión. Cada caso es distinto, y muchos cambios mejoran con el tiempo y la rehabilitación."),
+      B.rejilla([
+        ["Cognición", "Olvidos, lentitud, dificultad para concentrarse, planificar o resolver problemas."],
+        ["Comunicación", "Dificultad para encontrar palabras, entender frases largas o seguir conversaciones."],
+        ["Emociones", "Cambios bruscos de humor, irritabilidad, apatía, tristeza, llanto o risa fácil."],
+        ["Conducta", "Impulsividad, desinhibición, falta de iniciativa, menor conciencia de las propias dificultades."],
+        ["Fatiga", "Cansancio que aparece antes y dura más (ver NEU-PAC-03)."],
+        ["Lo que se mantiene", "Su historia, sus gustos y su forma de querer: apóyate en ellos."],
+      ]),
+      B.h("Pautas para comunicaros mejor", 2),
+      B.pasos([
+        "Habla **despacio**, con frases cortas y de un tema cada vez.",
+        "**Reduce el ruido** y las distracciones cuando habléis de algo importante.",
+        "**Dale tiempo** para responder; no termines sus frases.",
+        "**Comprueba** que te ha entendido pidiéndole que lo repita con sus palabras.",
+        "Usa **apoyos visuales**: notas, calendario, fotos.",
+        "Fomenta su **autonomía**: ayuda solo en lo necesario.",
+      ]),
+      B.salto(),
+      B.h("Cuídate tú también", 3),
+      B.columnas(
+        B.lista(["Reparte las tareas de cuidado con otras personas siempre que puedas.", "Reserva tiempo para ti cada semana, sin sentirte culpable.", "Busca información y apoyo: asociaciones de daño cerebral y grupos de familiares."]),
+        B.tarjeta("Pide ayuda profesional si notas…", "Agotamiento, tristeza persistente, irritabilidad que no se va o problemas de sueño. Cuidar también cansa, y pedir ayuda es parte de cuidar bien.", "aviso")),
+      B.h("Mi semana de cuidados", 4),
+      B.tabla(["Tarea de cuidado", "Quién se encarga", "Quién puede ayudar"], [], 5, { anchos: [40, 30, 30], alto: 10 }),
+      B.lineas(2, "Un rato para mí esta semana:"),
+      B.h("Preguntas para el equipo", 5),
+      B.lineas(6),
+    ]),
+
+  // ── NEU-PRO-01 · Anamnesis neuropsicológica ────────────────────────────────
+  pro("01-anamnesis-neuropsicologica", "NEU-PRO-01", "Anamnesis neuropsicológica",
+    "Guion de entrevista inicial con el paciente y un informante.", I.portapapeles,
+    t => [
+      B.uso("Entreviste al paciente y, por separado si es posible, a un informante que le conozca bien. Las discrepancias entre ambos son información clínica (conciencia de déficit).", true),
+      campos(["Edad y lateralidad", "Años de escolarización y profesión", "Informante y relación", "Derivado por / motivo"], 9),
+      B.h("Historia del problema", 1),
+      B.tabla(["Aspecto", "Notas"], [
+        ["Diagnóstico neurológico y fecha (si existe)", ""], ["Inicio", "Brusco / progresivo"], ["Curso", "Estable / fluctuante / progresivo / en mejoría"],
+        ["Neuroimagen y resultados", ""], ["Quejas principales del paciente", ""], ["Quejas del informante", ""], ["Conciencia de las dificultades", ""],
+      ], 0, { anchos: [34, 66], negrita0: true, altoFilas: 11 }),
+      B.h("Antecedentes", 2),
+      B.tabla(["Médicos y riesgo vascular", "Psiquiátricos", "Consumo de sustancias", "Familiares (demencia, ictus…)"], [], 1, { anchos: [25, 25, 25, 25], alto: 26 }),
+      B.lineas(2, "Medicación actual"),
+      B.h("Funcionalidad", 3),
+      B.tabla(["Actividad", "Independiente", "Con ayuda", "Dependiente", "Cambio respecto a antes"],
+        ["Manejo del dinero", "Medicación", "Transporte / conducción", "Tareas domésticas", "Trabajo o estudios", "Autocuidado"].map(a => [a, "", "", "", ""]),
+        0, { anchos: [24, 14, 14, 14, 34], negrita0: true, altoFilas: 11 }),
+      B.h("Observación conductual", 4),
+      B.chips(["Aspecto", "Colaboración", "Nivel de alerta", "Orientación", "Lenguaje espontáneo", "Estado de ánimo", "Fatiga"]),
+      B.lineas(5),
+      B.saltoFijo(),
+      B.h("Entrevista con el informante", 5),
+      B.pequeno("Ejemplos concretos de los fallos en la vida diaria, cambios de conducta o de carácter, y cómo ha evolucionado desde el inicio."),
+      B.lineas(9),
+      B.h("Hipótesis y plan de evaluación", 6),
+      B.tabla(["Dominio a explorar", "Prueba prevista", "Motivo"], [], 6, { anchos: [30, 30, 40], alto: 11 }),
+    ],
+    ["Lezak, M. D., Howieson, D. B., Bigler, E. D., y Tranel, D. (2012). *Neuropsychological assessment* (5.ª ed.). Oxford University Press."]),
+
+  // ── NEU-PRO-02 · Quejas cognitivas ─────────────────────────────────────────
+  pro("02-quejas-cognitivas", "NEU-PRO-02", "Registro de quejas cognitivas",
+    "Cuestionario orientativo de quejas subjetivas para paciente e informante.", I.dialogo,
+    t => [
+      B.tarjeta("Herramienta de entrevista, no un test", "No tiene puntos de corte ni baremos. Sirve para orientar la exploración y comparar la percepción del paciente con la del informante.", "aviso"),
+      B.p("Indique con qué frecuencia ha ocurrido **en el último mes**: **0** nunca · **1** alguna vez · **2** a menudo · **3** casi siempre."),
+      B.tabla(["Dominio", "Situación", "Paciente (0–3)", "Informante (0–3)"], [
+        ["Memoria", "Olvida conversaciones o encargos recientes.", "", ""], ["Memoria", "Pierde objetos o no recuerda dónde los ha dejado.", "", ""],
+        ["Memoria", "Repite preguntas o historias.", "", ""], ["Atención", "Se distrae con facilidad o pierde el hilo.", "", ""],
+        ["Atención", "Le cuesta hacer dos cosas a la vez.", "", ""], ["Velocidad", "Tarda más que antes en hacer las cosas.", "", ""],
+        ["Lenguaje", "Le cuesta encontrar palabras o nombres.", "", ""], ["Lenguaje", "Le cuesta entender conversaciones o textos.", "", ""],
+        ["Funciones ejecutivas", "Le cuesta planificar u organizar tareas.", "", ""], ["Funciones ejecutivas", "Actúa de forma impulsiva o sin pensar en las consecuencias.", "", ""],
+        ["Funciones ejecutivas", "Le cuesta empezar actividades por iniciativa propia.", "", ""], ["Orientación", "Se desorienta en lugares conocidos o con las fechas.", "", ""],
+        ["Visoespacial", "Tiene dificultades para calcular distancias o vestirse.", "", ""], ["Conducta", "Cambios de carácter, irritabilidad o apatía.", "", ""],
+      ], 0, { anchos: [20, 50, 15, 15], negrita0: true, altoFilas: 8.8 }),
+      B.salto(),
+      B.h("Comparación por dominios", 1),
+      B.tabla(["Dominio", "Suma paciente", "Suma informante", "Discrepancia"], [
+        ["Memoria (0–9)", "", "", ""], ["Atención (0–6)", "", "", ""], ["Velocidad (0–3)", "", "", ""], ["Lenguaje (0–6)", "", "", ""],
+        ["Funciones ejecutivas (0–9)", "", "", ""], ["Orientación (0–3)", "", "", ""], ["Visoespacial (0–3)", "", "", ""], ["Conducta (0–3)", "", "", ""],
+      ], 0, { anchos: [34, 22, 22, 22], negrita0: true, altoFilas: 9 }),
+      B.columnas(B.tarjeta("Paciente < informante", "Posible menor conciencia de las dificultades (anosognosia). Explore con cuidado y apóyese en el informante.", "borde"),
+        B.tarjeta("Paciente > informante", "Quejas que el entorno no percibe: valore ansiedad, ánimo, fatiga o sobrevaloración de fallos normales.", "borde")),
+      B.h("Impresión y dominios a explorar", 2),
+      B.lineas(7),
+    ]),
+
+  // ── NEU-PRO-03 · Plan de rehabilitación ────────────────────────────────────
+  pro("03-plan-de-rehabilitacion", "NEU-PRO-03", "Plan de rehabilitación cognitiva",
+    "Objetivos funcionales medibles, estrategias y revisión con escalamiento de metas (GAS).", I.brote,
+    t => [
+      B.uso("Defina los objetivos con el paciente y la familia, en términos de la vida diaria. Revíselos cada 4–6 semanas con la escala GAS.", true),
+      campos(["Diagnóstico y fecha de la lesión", "Perfil cognitivo resumido", "Frecuencia y duración previstas"], 11),
+      B.h("Enfoques de intervención", 1),
+      B.rejilla([
+        ["Restauración", "Entrenamiento de la función afectada cuando hay potencial de recuperación."],
+        ["Compensación", "Ayudas externas y estrategias internas para sortear el déficit."],
+        ["Sustitución / adaptación", "Modificar el entorno, la tarea o las demandas."],
+        ["Psicoeducación", "Paciente y familia: comprensión de los déficits, conciencia y expectativas."],
+      ], 4),
+      B.h("Objetivos con escalamiento de metas (GAS)", 2),
+      B.svg(F.gasEscala(t)),
+      B.p("Describa para cada objetivo el resultado esperado (0) y los niveles por debajo y por encima. **Ejemplo:** «Usar la agenda para acudir a las citas»: −2 = ninguna cita sin recordatorio familiar; 0 = acude a 3 de 4 citas usando la agenda; +2 = gestiona todas sus citas solo."),
+      B.tabla(["Objetivo", "−2", "−1", "0 (esperado)", "+1", "+2"], [["1.", "", "", "", "", ""], ["2.", "", "", "", "", ""], ["3.", "", "", "", "", ""]],
+        0, { anchos: [24, 14, 14, 20, 14, 14], altoFilas: 24 }),
+      B.salto(),
+      B.h("Estrategias por objetivo", 3),
+      B.tabla(["Objetivo", "Enfoque", "Estrategias y materiales", "Implicación de la familia"], [["1.", "", "", ""], ["2.", "", "", ""], ["3.", "", "", ""]], 0, { anchos: [12, 18, 40, 30], altoFilas: 22 }),
+      B.h("Revisiones", 4),
+      B.tabla(["Fecha", "Objetivo 1", "Objetivo 2", "Objetivo 3", "Cambios en el plan"], [], 5, { anchos: [14, 14, 14, 14, 44], alto: 12 }),
+    ],
+    ["Turner-Stokes, L. (2009). Goal attainment scaling (GAS) in rehabilitation: a practical guide. *Clinical Rehabilitation, 23*(4), 362-370.",
+      "Cicerone, K. D., et al. (2019). Evidence-based cognitive rehabilitation: systematic review of the literature from 2009 through 2014. *Archives of Physical Medicine and Rehabilitation, 100*(8), 1515-1533."]),
+
+  // ── NEU-PRO-04 · Registro de sesión ────────────────────────────────────────
+  pro("04-registro-de-sesion", "NEU-PRO-04", "Registro de sesión de rehabilitación",
+    "Hoja de sesión con tareas, nivel de ayuda, rendimiento y tareas para casa.", I.libreta,
+    t => [
+      B.uso("Una hoja por sesión. Registre el nivel de ayuda que necesitó en cada tarea: su disminución es uno de los mejores indicadores de progreso.", true),
+      B.tabla(["Sesión nº", "Fecha", "Duración", "Objetivos GAS trabajados"], [["", "", "", ""]], 0, { anchos: [14, 16, 14, 56], altoFilas: 10 }),
+      B.h("Estado al inicio", 1),
+      B.tabla(["Aspecto", "Notas"], [["Alerta / fatiga (0–10)", ""], ["Estado de ánimo", ""], ["Uso de ayudas desde la última sesión", ""]], 0, { anchos: [34, 66], negrita0: true, altoFilas: 10 }),
+      B.h("Tareas", 2),
+      B.p("**Nivel de ayuda:**"),
+      B.chips(["**I** · independiente", "**V** · clave verbal", "**M** · modelado", "**F** · ayuda física o total"]),
+      B.tabla(["Tarea / ejercicio", "Dominio", "Dificultad", "Ayuda (I/V/M/F)", "Rendimiento (aciertos, tiempo)", "Observaciones"], [], 6, { anchos: [24, 14, 11, 11, 17, 23], alto: 14 }),
+      B.lineas(2, "Fatiga al final (0–10) y conducta"),
+      B.h("Tareas para casa y pautas para la familia", 3),
+      B.lineas(4),
+      B.h("Plan para la próxima sesión", 4),
+      B.lineas(3),
+    ]),
+
+  // ── NEU-PRO-05 · Informe neuropsicológico ──────────────────────────────────
+  pro("05-informe-neuropsicologico", "NEU-PRO-05", "Informe neuropsicológico",
+    "Estructura de informe con resultados por dominios cognitivos y perfil gráfico.", I.documento,
+    t => [
+      B.tarjeta("Criterios", "Indique para cada prueba la **versión y el baremo** utilizados, y exprese los resultados en puntuaciones normalizadas (percentil, puntuación típica o escalar). Diferencie el rendimiento observado de su interpretación clínica."),
+      B.h("Datos", 1),
+      campos(["Edad y escolaridad", "Lateralidad", "Solicitante", "Profesional (nombre y nº de colegiado/a)", "Fechas de evaluación"], 9),
+      B.h("Motivo y antecedentes relevantes", 2),
+      B.lineas(6),
+      B.salto(),
+      B.h("Resultados por dominio", 3),
+      B.tabla(["Dominio", "Pruebas aplicadas", "Resultado (normalizado)", "Interpretación"], [
+        "Orientación y nivel de alerta", "Atención y velocidad de procesamiento", "Memoria (verbal / visual)", "Lenguaje", "Funciones visoespaciales y visoconstructivas", "Funciones ejecutivas", "Estado emocional y conducta", "Funcionalidad",
+      ].map(d => [d, "", "", ""]), 0, { anchos: [26, 26, 18, 30], negrita0: true, altoFilas: 14 }),
+      B.h("Perfil cognitivo", 4),
+      B.svg(F.perfilCognitivo(["Atención", "Velocidad", "Memoria verbal", "Memoria visual", "Lenguaje", "Visoespacial", "Funciones ejecutivas"], t)),
+      B.salto(),
+      B.h("Conclusiones", 5),
+      B.lineas(8),
+      B.h("Recomendaciones", 6),
+      B.pequeno("Para el paciente, la familia, el equipo médico y, en su caso, el entorno laboral o escolar. Indique si se recomienda reevaluación y cuándo."),
+      B.lineas(8),
+      B.firmas("Lugar y fecha", "Firma del profesional"),
+    ],
+    ["Lezak, M. D., Howieson, D. B., Bigler, E. D., y Tranel, D. (2012). *Neuropsychological assessment* (5.ª ed.). Oxford University Press."]),
+];

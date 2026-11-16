@@ -1,0 +1,1556 @@
+{
+ "/recursos/guias/como-abrir-tu-consulta.pdf": [
+  {
+   "campo": "profesional",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "clinica",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 199.2
+  }
+ ],
+ "/recursos/neuropsicologia/pacientes/01-estrategias-de-memoria.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/neuropsicologia/pacientes/02-diario-de-memoria.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/neuropsicologia/pacientes/03-fatiga-cognitiva.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/neuropsicologia/pacientes/04-atencion-en-el-dia-a-dia.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/neuropsicologia/pacientes/05-guia-para-familiares.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 618.4,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 618.4,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 618.4,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 618.4,
+   "w": 64.1
+  }
+ ],
+ "/recursos/neuropsicologia/profesionales/01-anamnesis-neuropsicologica.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 618.4,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 618.4,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 618.4,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 618.4,
+   "w": 64.1
+  }
+ ],
+ "/recursos/neuropsicologia/profesionales/02-quejas-cognitivas.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/neuropsicologia/profesionales/03-plan-de-rehabilitacion.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/neuropsicologia/profesionales/04-registro-de-sesion.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/neuropsicologia/profesionales/05-informe-neuropsicologico.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/nutricion/pacientes/01-diario-de-alimentacion.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/nutricion/pacientes/03-hambre-fisica-y-emocional.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/nutricion/pacientes/04-planificador-de-menus.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/nutricion/pacientes/05-como-leer-las-etiquetas.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 618.4,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 618.4,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 618.4,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 618.4,
+   "w": 64.1
+  }
+ ],
+ "/recursos/nutricion/profesionales/01-historia-dietetica.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/nutricion/profesionales/02-recordatorio-24-horas.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/nutricion/profesionales/03-senales-de-alerta-tca.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/nutricion/profesionales/04-plan-de-alimentacion.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/nutricion/profesionales/05-entrevista-motivacional-nutricion.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 618.4,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 618.4,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 618.4,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 618.4,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/01-autorregistro-ansiedad.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/10-exposicion-gradual.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/05-formulacion-de-caso.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/nutricion/pacientes/02-el-plato-saludable.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/02-registro-estado-animo.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/03-que-es-la-ansiedad.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/04-respiracion-diafragmatica.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/05-pensamientos-automaticos.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/06-higiene-del-sueno.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/07-introduccion-mindfulness.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/08-gestion-del-estres.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/09-activacion-conductual.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/11-relajacion-muscular-progresiva.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/12-resolucion-de-problemas.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/13-mi-plan-de-seguridad.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/14-tiempo-de-preocupacion.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/15-comunicacion-asertiva.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/16-el-duelo.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/17-autocompasion.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/18-mis-valores.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/19-manejo-de-la-ira.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/20-prevencion-de-recaidas.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/pacientes/21-diario-de-sueno.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/01-phq-9.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/02-gad-7.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/03-protocolo-primera-sesion.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/04-pcl-5.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/06-evaluacion-riesgo-suicida.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/07-guia-act.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/08-informe-de-alta.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/09-entrenamiento-habilidades-sociales.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/10-seguimiento-del-caso.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/11-consentimiento-informado.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 572.7,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 572.7,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 572.7,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 572.7,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/12-nota-de-sesion.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/13-plan-de-tratamiento.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/14-guia-reestructuracion-cognitiva.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/15-informe-de-derivacion.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 628.9,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 628.9,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 628.9,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/16-analisis-funcional.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/17-informe-psicologico.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ],
+ "/recursos/profesionales/18-entrevista-familia-infantojuvenil.pdf": [
+  {
+   "campo": "paciente",
+   "x": 42.5,
+   "y": 604.2,
+   "w": 156
+  },
+  {
+   "campo": "profesional",
+   "x": 208.5,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "clinica",
+   "x": 343.6,
+   "y": 604.2,
+   "w": 125.1
+  },
+  {
+   "campo": "fecha",
+   "x": 478.7,
+   "y": 604.2,
+   "w": 64.1
+  }
+ ]
+}
