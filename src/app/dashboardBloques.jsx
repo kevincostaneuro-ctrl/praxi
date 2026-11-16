@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { EquipoCtx } from "./constantes.js";
 import { C, st } from "./estilos.js";
 import { GenerarFacturaModal } from "./facturas.jsx";
+import { colorTipo } from "./calendario.jsx";
 import { diasEntre, fechaDe, fechaES, mensajeCita, telWhatsApp, timeToMins, toYMD, today } from "./utilidades.js";
 
 // Marcas ligeras guardadas en este navegador (si el navegador no deja guardar, no pasa nada)
@@ -78,7 +79,7 @@ export function PrimerosPasos({ clinica, yo, esAdmin, demo, patients, citas, onI
 }
 
 // ── 2 · Citas de hoy con acciones ───────────────────────────────────────────
-export function CitasHoy({ citas, patients, onAbrirPaciente, onEditCita, onNuevaCita }) {
+export function CitasHoy({ citas, patients, onAbrirPaciente, onEditCita, onNuevaCita, tipos = [] }) {
   const { miembros, miId } = useContext(EquipoCtx);
   const hoy = toYMD(today());
   const ahora = today(); const ahoraMin = ahora.getHours() * 60 + ahora.getMinutes();
@@ -107,7 +108,9 @@ export function CitasHoy({ citas, patients, onAbrirPaciente, onEditCita, onNueva
         const tel = telWhatsApp(p?.telefono || c.telefonoExterno);
         return (
           <Linea key={c.id}>
-            <div style={{ width: 46, fontSize: 13, fontWeight: 700, color: estado === "ahora" ? C.accent : estado === "pasada" ? C.dim : C.walnut }}>{c.hora}</div>
+            <div style={{ width: 46, fontSize: 13, fontWeight: 700, color: estado === "pasada" ? C.dim : colorTipo(c, tipos).c }}>{c.hora}</div>
+            <span style={{ width: 10, height: 10, borderRadius: "50%", flexShrink: 0, background: estado === "pasada" ? C.border : colorTipo(c, tipos).c,
+              boxShadow: estado === "ahora" ? `0 0 0 4px ${colorTipo(c, tipos).bg}` : "none" }} />
             <div onClick={() => onEditCita(c)} style={{ flex: 1, minWidth: 0, cursor: "pointer" }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: estado === "pasada" ? C.muted : C.ink }}>{nombre}</div>
               <div style={{ fontSize: 12, color: C.muted }}>{c.tipo || "Cita"} · {c.duracion} min{estado === "ahora" ? " · ahora" : ""}</div>
