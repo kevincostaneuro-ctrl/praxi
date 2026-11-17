@@ -102,19 +102,19 @@ export const NORA_ESTILOS = {
   A: { nombre: "Aurora", fondo: "linear-gradient(135deg,#7B5CF0,#1FB5A8)", texto: "#fff", tinte: "#ECE8FB", tinteTexto: "#4B3BB0" },
   B: { nombre: "Verde salvia", fondo: "#2E6F68", texto: "#F4EEE3", tinte: "#DCEBE6", tinteTexto: "#2E6F68" },
   C: { nombre: "Burbuja", fondo: "#4B4FD1", texto: "#fff", tinte: "#E4E4FA", tinteTexto: "#3B3FB0" },
-  D: { nombre: "Orbe vivo", fondo: "radial-gradient(circle at 35% 30%,#FFD3B8,#F0715A 55%,#C2405F)", texto: "#fff", tinte: "#FBE3DC", tinteTexto: "#B23D52" },
+  D: { nombre: "Orbe vivo", fondo: "radial-gradient(circle at 35% 30%,#FFD3B8,#F0715A 55%,#C2405F)", texto: "#fff", tinte: "#FBE3DC", tinteTexto: "#B23D52", fab: "#fff", fabTexto: "#B23D52", fabBorde: "#F3B9A8" },
 };
-export const NORA_ESTILO = "A";
+export const NORA_ESTILO = "D";
 export const NORA = NORA_ESTILOS[NORA_ESTILO];
 
-export function NoraMarca({ size = 26 }) {
+export function NoraMarca({ size = 26, vivo = false }) {
   const glifo = NORA_ESTILO === "B"
     ? <span style={{ fontFamily: "'Instrument Serif',serif", fontSize: size * 0.62, lineHeight: 1 }}>N</span>
     : NORA_ESTILO === "C"
       ? <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 64 64"><path d="M10 12h44a6 6 0 0 1 6 6v22a6 6 0 0 1-6 6H30l-12 10V46h-8a6 6 0 0 1-6-6V18a6 6 0 0 1 6-6z" fill="#fff" /></svg>
       : NORA_ESTILO === "D" ? null
         : <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 64 64"><path d="M32 4c3 17 11 25 28 28-17 3-25 11-28 28-3-17-11-25-28-28 17-3 25-11 28-28z" fill="#fff" /></svg>;
-  return <span aria-hidden="true" style={{ width: size, height: size, borderRadius: NORA_ESTILO === "C" ? size * 0.32 : "50%", background: NORA.fondo, color: NORA.texto, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: NORA_ESTILO === "D" ? `0 0 0 ${Math.max(2, size * 0.12)}px rgba(240,113,90,.18)` : "none" }}>{glifo}</span>;
+  return <span aria-hidden="true" className={vivo && NORA_ESTILO === "D" ? "nora-respira" : undefined} style={{ width: size, height: size, borderRadius: NORA_ESTILO === "C" ? size * 0.32 : "50%", background: NORA.fondo, color: NORA.texto, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: NORA_ESTILO === "D" ? `0 0 0 ${Math.max(2, size * 0.12)}px rgba(240,113,90,.18)` : "none" }}>{glifo}</span>;
 }
 
 const copiar = t => navigator.clipboard?.writeText(t).catch(() => {});
@@ -225,7 +225,7 @@ export function NoraPanel({ patient, citas = [], inicial = null, onClose, onGuar
           </div>
         )}
 
-        {cargando && <div style={{ fontSize: 13, color: C.muted, display: "flex", gap: 8, alignItems: "center" }}><NoraMarca size={20} /> Nora está escribiendo…</div>}
+        {cargando && <div style={{ fontSize: 13, color: C.muted, display: "flex", gap: 8, alignItems: "center" }}><NoraMarca size={20} vivo /> Nora está escribiendo…</div>}
         {aviso && <div role="alert" style={{ fontSize: 12.5, color: C.red, background: C.rD, borderRadius: 8, padding: "8px 12px" }}>{aviso}</div>}
 
         {resultado && resultado.tarea === "recursos" && !demo && (() => {

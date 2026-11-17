@@ -49,8 +49,8 @@ export function NoraGlobal({ pagina, patients, citas, tareas, horario }) {
 
   if (!abierta) return (
     <button className="praxi-nora-fab" onClick={() => setAbierta(true)} aria-label="Pregúntale a Nora"
-      style={{ position: "fixed", right: 22, bottom: 22, zIndex: 90, display: "inline-flex", alignItems: "center", gap: 9, padding: "8px 18px 8px 8px", border: "none", borderRadius: 999, background: NORA.fondo, color: NORA.texto, fontWeight: 700, fontSize: 14, fontFamily: "inherit", cursor: "pointer", boxShadow: "0 8px 24px rgba(40,30,70,.22)" }}>
-      <span style={{ width: 30, height: 30, borderRadius: "50%", background: "rgba(255,255,255,.22)", display: "inline-flex", alignItems: "center", justifyContent: "center" }}><NoraMarca size={26} /></span>
+      style={{ position: "fixed", right: 22, bottom: 22, zIndex: 90, display: "inline-flex", alignItems: "center", gap: 9, padding: "8px 18px 8px 8px", border: NORA.fabBorde ? `1.5px solid ${NORA.fabBorde}` : "none", borderRadius: 999, background: NORA.fab || NORA.fondo, color: NORA.fabTexto || NORA.texto, fontWeight: 700, fontSize: 14, fontFamily: "inherit", cursor: "pointer", boxShadow: "0 8px 24px rgba(40,30,70,.22)" }}>
+      <span style={{ width: 30, height: 30, borderRadius: "50%", display: "inline-flex", alignItems: "center", justifyContent: "center" }}><NoraMarca size={26} vivo /></span>
       <span className="praxi-nora-fab-txt">Pregúntale a Nora</span>
     </button>
   );
@@ -83,7 +83,7 @@ export function NoraGlobal({ pagina, patients, citas, tareas, horario }) {
             <div style={{ maxWidth: "88%", padding: "9px 13px", borderRadius: m.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: m.role === "user" ? NORA.tinteTexto : C.card, color: m.role === "user" ? "#fff" : C.text, fontSize: 13, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{m.content}</div>
           </div>
         ))}
-        {cargando && <div style={{ fontSize: 13, color: C.muted, display: "flex", gap: 8, alignItems: "center" }}><NoraMarca size={20} /> Nora está mirando tu consulta…</div>}
+        {cargando && <div style={{ fontSize: 13, color: C.muted, display: "flex", gap: 8, alignItems: "center" }}><NoraMarca size={20} vivo /> Nora está mirando tu consulta…</div>}
         <div ref={abajo} />
       </div>
       <div style={{ padding: "10px 14px", borderTop: `1px solid ${C.border}`, display: "flex", gap: 8 }}>

@@ -69,3 +69,8 @@ html {
 .praxi-nora-fab{animation:noraEntra .35s ease-out;transition:transform .15s ease,box-shadow .15s ease;}
 .praxi-nora-fab:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(40,30,70,.28)!important;}
 @keyframes noraEntra{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* Orbe de Nora: respira despacio */
+.nora-respira{animation:noraRespira 2.6s ease-in-out infinite;}
+@keyframes noraRespira{0%,100%{box-shadow:0 0 0 2px rgba(240,113,90,.16);transform:scale(1);}50%{box-shadow:0 0 0 7px rgba(240,113,90,.10);transform:scale(1.05);}}
+@media (prefers-reduced-motion: reduce){.nora-respira,.praxi-nora-fab{animation:none;}}
