@@ -3,22 +3,50 @@ import { DemoCtx, EquipoCtx } from "./constantes.js";
 import { C, st } from "./estilos.js";
 import { crearSeudonimos, enviarIA } from "./ia.jsx";
 import { NORA, NoraMarca } from "./nora.jsx";
-import { contextoApp, REGLAS_APP } from "./noraContexto.js";
+import { contextoApp, leerAcciones, REGLAS_APP, validarAccion } from "./noraContexto.js";
+import { fechaDe } from "./utilidades.js";
 
 // ══════════════════════════════════════════════════════════════════════════════
 // NORA EN TODA LA APP — botón flotante y chat con la agenda, los huecos,
 // los pacientes, los cobros y las tareas
 // ══════════════════════════════════════════════════════════════════════════════
 const SUGERENCIAS = {
-  dashboard: ["¿Qué citas tengo hoy y de qué tipo?", "Resúmeme la semana", "¿Qué tengo pendiente?"],
-  calendario: ["¿Qué huecos libres tengo esta semana?", "¿Qué día de la próxima semana tengo más libre?", "Resúmeme la agenda de mañana"],
+  dashboard: ["¿Qué citas tengo hoy y de qué tipo?", "Resúmeme la semana", "Recuérdame mañana a las 9 llamar a la gestoría"],
+  calendario: ["¿Qué huecos libres tengo esta semana?", "Resúmeme la agenda de mañana", "Pasa mi última cita de hoy a mañana"],
   pacientes: ["¿Qué pacientes activos no tienen próxima cita?", "¿Quién lleva más tiempo sin venir?", "¿Cuántas sesiones he hecho este mes?"],
   facturas: ["¿Cuánto llevo cobrado este mes?", "¿Quién me debe dinero?", "¿Cuánto tengo pendiente de cobro?"],
   recursos: ["¿Qué pacientes tengo con ansiedad?", "¿Qué citas tengo hoy?"],
 };
 const PAGINAS = { dashboard: "Dashboard", calendario: "Calendario", pacientes: "Pacientes", facturas: "Facturas", recursos: "Recursos", admin: "Equipo", configuracion: "Configuración" };
 
-export function NoraGlobal({ pagina, patients, citas, tareas, horario }) {
+const fechaLarga = ymd => fechaDe(ymd).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
+const nombre = p => (p ? `${p.nombre} ${p.apellidos || ""}`.trim() : "sin paciente");
+
+// Tarjeta de confirmación de una acción propuesta por Nora
+function TarjetaAccion({ accion, estado, datos, onConfirmar, onDescartar }) {
+  const v = validarAccion(accion, datos);
+  const titulo = { crear_cita: "Nueva cita", mover_cita: "Mover cita", cancelar_cita: "Cancelar cita", crear_tarea: "Nueva tarea" }[accion.accion] || "Acción";
+  let detalle = "";
+  if (v.ok && accion.accion === "crear_cita") detalle = `${nombre(v.paciente)} · ${fechaLarga(v.fecha)} a las ${v.hora} · ${v.tipo?.nombre || "cita"}`;
+  if (v.ok && accion.accion === "mover_cita") detalle = `${nombre(v.paciente)} · de ${fechaLarga(v.cita.fecha)} ${v.cita.hora} → ${fechaLarga(v.fecha)} a las ${v.hora}`;
+  if (v.ok && accion.accion === "cancelar_cita") detalle = `${nombre(v.paciente)} · ${fechaLarga(v.cita.fecha)} a las ${v.cita.hora} · ${v.cita.tipo || "cita"}`;
+  if (v.ok && accion.accion === "crear_tarea") detalle = `${v.titulo} · ${fechaLarga(v.fecha)} ${v.hora} · prioridad ${v.prioridad}`;
+  const boton = { crear_cita: "Revisar y guardar", mover_cita: "Revisar y guardar", cancelar_cita: "Sí, cancelar la cita", crear_tarea: "Añadir tarea" }[accion.accion];
+  return (
+    <div style={{ background: C.card, border: `1.5px solid ${estado ? C.border : NORA.fabBorde || C.border}`, borderRadius: 12, padding: "10px 12px", fontSize: 12.5 }}>
+      <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: ".07em", textTransform: "uppercase", color: NORA.tinteTexto }}>{titulo}</div>
+      {v.ok ? <div style={{ color: C.text, margin: "3px 0 6px", lineHeight: 1.45, fontWeight: 600 }}>{detalle}</div> : <div style={{ color: C.red, margin: "3px 0 6px" }}>{v.error}</div>}
+      {v.ok && v.avisos.map(a => <div key={a} style={{ color: "#A8661E", fontSize: 12, marginBottom: 4 }}>⚠ {a}</div>)}
+      {estado ? <div style={{ color: C.muted, fontSize: 12 }}>{estado}</div>
+        : <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+          {v.ok && <button onClick={() => onConfirmar(v)} style={{ ...st.btn("sm"), background: accion.accion === "cancelar_cita" ? C.red : NORA.tinteTexto, color: "#fff", border: "none" }}>{boton}</button>}
+          <button onClick={onDescartar} style={{ ...st.btn("ghost"), fontSize: 12 }}>Descartar</button>
+        </div>}
+    </div>
+  );
+}
+
+export function NoraGlobal({ pagina, patients, citas, tareas, horario, tipos = [], setCitas, setTareas, onNuevaCita, onEditarCita }) {
   const demo = useContext(DemoCtx);
   const { miId, miembros = [] } = useContext(EquipoCtx) || {};
   const [abierta, setAbierta] = useState(false);
@@ -32,15 +60,26 @@ export function NoraGlobal({ pagina, patients, citas, tareas, horario }) {
   const aliasDe = useMemo(() => { const m = new Map(); patients.forEach((p, i) => m.set(String(p.id), `Paciente ${i + 1}`)); return m; }, [patients]);
   const seud = useMemo(() => crearSeudonimos(patients.map(p => ({ nombre: p.nombre, apellidos: p.apellidos, alias: aliasDe.get(String(p.id)) }))), [patients, aliasDe]);
 
+  const pacientePorNumero = n => patients.find(p => aliasDe.get(String(p.id)) === `Paciente ${Number(n)}`) || null;
+  const datos = { patients, citas, tipos, horario, pacientePorNumero };
+  const marcar = (i, k, estado) => setChat(m => m.map((x, j) => j === i ? { ...x, estados: { ...(x.estados || {}), [k]: estado } } : x));
+  const confirmar = (i, k, accion, v) => {
+    if (accion.accion === "crear_cita") { onNuevaCita?.({ pacienteId: v.paciente.id, fecha: v.fecha, hora: v.hora, tipoId: v.tipo?.id }); marcar(i, k, "Abierta en el formulario de cita para que la guardes."); setAbierta(false); }
+    if (accion.accion === "mover_cita") { onEditarCita?.({ ...v.cita, fecha: v.fecha, hora: v.hora }); marcar(i, k, "Abierta en el formulario de cita para que la guardes."); setAbierta(false); }
+    if (accion.accion === "cancelar_cita") { setCitas?.(cs => cs.filter(c => c.id !== v.cita.id)); marcar(i, k, "Cita cancelada ✓"); }
+    if (accion.accion === "crear_tarea") { setTareas?.(ts => [...ts, { id: Date.now(), titulo: v.titulo, texto: "", fecha: v.fecha, hora: v.hora, prioridad: v.prioridad, hecho: false }]); marcar(i, k, "Tarea añadida a tu agenda ✓"); }
+  };
+
   const enviar = async texto => {
     const q = (texto ?? pregunta).trim(); if (!q || cargando) return;
     setPregunta(""); const nuevos = [...chat, { role: "user", content: q }]; setChat(nuevos);
     if (demo) { setChat(m => [...m, { role: "assistant", content: "En la demo Nora no está activa. Con tu cuenta podrás preguntarle por tu agenda, tus huecos libres, tus pacientes y tus cobros." }]); return; }
     setCargando(true);
     try {
-      const sistema = `${REGLAS_APP}\n\n${contextoApp({ patients, citas, tareas, horario, miId, miembros, pagina: PAGINAS[pagina] || pagina, alias: p => aliasDe.get(String(p.id)) })}`;
-      const r = await enviarIA({ system: sistema, messages: nuevos.slice(-12), seud });
-      setChat(m => [...m, { role: "assistant", content: r }]);
+      const sistema = `${REGLAS_APP}\n\n${contextoApp({ patients, citas, tareas, tipos, horario, miId, miembros, pagina: PAGINAS[pagina] || pagina, alias: p => aliasDe.get(String(p.id)) })}`;
+      const historial = nuevos.slice(-12).map(({ role, content }) => ({ role, content }));
+      const { texto: limpio, acciones } = leerAcciones(await enviarIA({ system: sistema, messages: historial, seud }));
+      setChat(m => [...m, { role: "assistant", content: limpio || (acciones.length ? "Te propongo esto:" : "…"), acciones }]);
     } catch (e) { setChat(m => [...m, { role: "assistant", content: e.message || "Nora no ha podido responder." }]); }
     setCargando(false);
   };
@@ -72,15 +111,16 @@ export function NoraGlobal({ pagina, patients, citas, tareas, horario }) {
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "16px 18px", display: "flex", flexDirection: "column", gap: 10 }}>
         {chat.length === 0 && <div>
-          <div style={{ fontSize: 13.5, color: C.text, lineHeight: 1.6, marginBottom: 12 }}>Pregúntame lo que necesites de tu consulta: qué citas tienes y con quién, qué huecos te quedan libres, quién no tiene próxima cita o cuánto te deben.</div>
+          <div style={{ fontSize: 13.5, color: C.text, lineHeight: 1.6, marginBottom: 12 }}>Pregúntame lo que necesites de tu consulta: qué citas tienes y con quién, qué huecos te quedan libres, quién no tiene próxima cita o cuánto te deben. También puedo darte citas, moverlas, cancelarlas o apuntarte tareas: siempre te pido confirmación antes.</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {sugerencias.map(s => <button key={s} onClick={() => enviar(s)} style={{ ...st.btn("sm"), textAlign: "left", padding: "9px 12px", fontSize: 12.5, background: C.card, color: NORA.tinteTexto, border: `1px solid ${C.border}`, borderRadius: 10 }}>{s}</button>)}
           </div>
           <div style={{ fontSize: 11, color: C.muted, marginTop: 14, lineHeight: 1.5 }}>Los nombres de tus pacientes no salen de Praxi: Nora los ve como «Paciente 1, 2…». Para notas o informes de un paciente, abre su ficha y pulsa «Nora».</div>
         </div>}
         {chat.map((m, i) => (
-          <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
+          <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: m.role === "user" ? "flex-end" : "flex-start", gap: 6 }}>
             <div style={{ maxWidth: "88%", padding: "9px 13px", borderRadius: m.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: m.role === "user" ? NORA.tinteTexto : C.card, color: m.role === "user" ? "#fff" : C.text, fontSize: 13, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{m.content}</div>
+            {(m.acciones || []).map((a, k) => <div key={k} style={{ width: "88%" }}><TarjetaAccion accion={a} estado={m.estados?.[k]} datos={datos} onConfirmar={v => confirmar(i, k, a, v)} onDescartar={() => marcar(i, k, "Descartada")} /></div>)}
           </div>
         ))}
         {cargando && <div style={{ fontSize: 13, color: C.muted, display: "flex", gap: 8, alignItems: "center" }}><NoraMarca size={20} vivo /> Nora está mirando tu consulta…</div>}

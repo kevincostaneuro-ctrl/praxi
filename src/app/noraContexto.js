@@ -29,7 +29,7 @@ export function huecosLibres(citas, horario, { desde = today(), dias = 14, minim
 }
 
 // alias: id de paciente → «Paciente N» (el nombre real nunca sale del navegador)
-export function contextoApp({ patients = [], citas = [], tareas = [], horario, miId, miembros = [], pagina = "", ahora = today(), alias }) {
+export function contextoApp({ patients = [], citas = [], tareas = [], tipos = [], horario, miId, miembros = [], pagina = "", ahora = today(), alias }) {
   const hoy = toYMD(ahora), ahoraMin = ahora.getHours() * 60 + ahora.getMinutes();
   const pac = id => patients.find(p => String(p.id) === String(id));
   const quien = c => { const p = pac(c.pacienteId); return p ? alias(p) : c.origen === "calendly" || c.nombreExterno ? "contacto externo (aún no es paciente)" : "sin paciente"; };
@@ -39,7 +39,7 @@ export function contextoApp({ patients = [], citas = [], tareas = [], horario, m
   const desde = toYMD(addDays(ahora, -7)), hasta = toYMD(addDays(ahora, 28));
   const lineaCita = c => {
     const pasada = c.fecha < hoy || (c.fecha === hoy && timeToMins(c.hora) + (Number(c.duracion) || 0) <= ahoraMin);
-    return `- ${diaDe(c.fecha)} ${c.fecha} ${c.hora} · ${c.duracion || 60} min · ${c.tipo || "cita"} · ${quien(c)}${c.precio ? ` · ${eur(c.precio)}` : ""}${equipo && c.profesionalId && c.profesionalId !== miId ? ` · con ${nombreProf(c.profesionalId)}` : ""}${pasada ? " · ya pasada" : ""}`;
+    return `- [cita #${c.id}] ${diaDe(c.fecha)} ${c.fecha} ${c.hora} · ${c.duracion || 60} min · ${c.tipo || "cita"} · ${quien(c)}${c.precio ? ` · ${eur(c.precio)}` : ""}${equipo && c.profesionalId && c.profesionalId !== miId ? ` · con ${nombreProf(c.profesionalId)}` : ""}${pasada ? " · ya pasada" : ""}`;
   };
   const agenda = citas.filter(c => c.fecha >= desde && c.fecha <= hasta).sort((a, b) => (a.fecha + a.hora).localeCompare(b.fecha + b.hora));
   const huecos = huecosLibres(mias, horario, { desde: ahora, dias: 14, ahoraMin });
@@ -58,6 +58,7 @@ export function contextoApp({ patients = [], citas = [], tareas = [], horario, m
   const tareasProx = tareas.filter(t => !t.hecho).sort((a, b) => (a.fecha || "").localeCompare(b.fecha || "")).slice(0, 30);
   return `HOY: ${diaDe(hoy)} ${hoy}, son las ${minsToTime(ahoraMin)}. Pantalla abierta: ${pagina || "—"}.
 HORARIO DE CONSULTA: de ${minsToTime((horario?.start ?? 9) * 60)} a ${minsToTime((horario?.end ?? 20) * 60)}, de lunes a viernes.${equipo ? "\nTrabajas en equipo: las citas sin «con …» son tuyas." : ""}
+TIPOS DE CITA: ${tipos.map(t => `${t.nombre} (${t.duracion || 60} min${t.precio ? `, ${eur(t.precio)}` : ""})`).join(" · ") || "—"}
 
 AGENDA (de hace 7 días a dentro de 4 semanas, ${agenda.length} citas):
 ${agenda.map(lineaCita).join("\n") || "Sin citas"}
@@ -78,6 +79,61 @@ export const REGLAS_APP = `Eres Nora, la asistente de Praxi, un programa de gest
 Reglas:
 1. Responde corto y directo, en español de España: primero la respuesta, después el detalle en una lista breve si hace falta. Sin saludos.
 2. No inventes citas, huecos ni cifras: los huecos y las sumas ya vienen calculados. Si algo no está en los datos, dilo.
-3. Todavía no puedes crear, mover ni borrar citas, pacientes o facturas: si te lo piden, di dónde hacerlo en Praxi (Calendario → + Nueva cita, Pacientes → + Nuevo paciente, Facturas → + Nueva factura) y ofrece los huecos o datos que necesite.
+3. Puedes PROPONER cambios en la agenda; el profesional los confirma con un botón antes de que se guarden. Cuando te pidan crear, mover o cancelar una cita, o apuntar una tarea, responde con una frase corta y añade una línea por cada acción con este formato exacto (JSON en una sola línea):
+[[ACCION]]{"accion":"crear_cita","paciente":3,"fecha":"AAAA-MM-DD","hora":"HH:MM","tipo":"nombre exacto del tipo"}[[/ACCION]]
+[[ACCION]]{"accion":"mover_cita","cita":123,"fecha":"AAAA-MM-DD","hora":"HH:MM"}[[/ACCION]]
+[[ACCION]]{"accion":"cancelar_cita","cita":123}[[/ACCION]]
+[[ACCION]]{"accion":"crear_tarea","titulo":"texto","fecha":"AAAA-MM-DD","hora":"HH:MM","prioridad":"alta|media|baja"}[[/ACCION]]
+«paciente» es el número de «Paciente N»; «cita» es el número de «[cita #…]». Solo pacientes de la lista: si no está, di que primero hay que darlo de alta en Pacientes. Usa los huecos libres para elegir hora; si falta un dato imprescindible (qué paciente, qué día) pregunta antes de proponer. No digas que ya está hecho: queda pendiente de que lo confirme. No puedes crear pacientes ni facturas: indica Pacientes → + Nuevo paciente o Facturas → + Nueva factura.
 4. No propones diagnósticos ni valoras riesgos clínicos. Para ayuda con la ficha de un paciente, indica que abra su ficha y pulse «Nora».
 5. Los pacientes aparecen como «Paciente N». Usa exactamente esos nombres.`;
+
+// Saca las acciones propuestas por Nora del texto: {texto, acciones}
+export function leerAcciones(respuesta) {
+  const acciones = [];
+  const texto = String(respuesta || "").replace(/\[\[ACCION\]\]([\s\S]*?)\[\[\/ACCION\]\]/g, (_, json) => {
+    try { const a = JSON.parse(json.trim()); if (a && typeof a.accion === "string") acciones.push(a); } catch { /* acción mal formada: se ignora */ }
+    return "";
+  }).replace(/\n{3,}/g, "\n\n").trim();
+  return { texto, acciones: acciones.slice(0, 5) };
+}
+
+const FECHA = /^\d{4}-\d{2}-\d{2}$/, HORA = /^\d{2}:\d{2}$/;
+// Comprueba una acción contra los datos reales. Devuelve {ok, error?, avisos[], ...datos resueltos}
+export function validarAccion(a, { patients = [], citas = [], tipos = [], horario, pacientePorNumero = () => null, ahora = today() }) {
+  const avisos = [], hoy = toYMD(ahora);
+  const choque = (fecha, hora, dur, sinId) => citas.find(c => c.id !== sinId && c.fecha === fecha && c.hora && timeToMins(hora) < timeToMins(c.hora) + (Number(c.duracion) || 60) && timeToMins(hora) + dur > timeToMins(c.hora));
+  const revisarHueco = (fecha, hora, dur, sinId) => {
+    if (fecha < hoy) avisos.push("La fecha ya ha pasado.");
+    const dow = fechaDe(fecha).getDay(); if (dow === 0 || dow === 6) avisos.push("Es fin de semana.");
+    const m = timeToMins(hora); if (m < (horario?.start ?? 9) * 60 || m + dur > (horario?.end ?? 20) * 60) avisos.push("Queda fuera de tu horario de consulta.");
+    const c = choque(fecha, hora, dur, sinId); if (c) avisos.push(`Coincide con otra cita a las ${c.hora}.`);
+  };
+  if (a.accion === "crear_cita") {
+    const paciente = pacientePorNumero(a.paciente);
+    if (!paciente) return { ok: false, error: "Ese paciente no está registrado. Dalo de alta primero en Pacientes." };
+    if (!FECHA.test(a.fecha || "") || !HORA.test(a.hora || "")) return { ok: false, error: "Falta la fecha o la hora." };
+    const tipo = tipos.find(t => t.nombre?.toLowerCase() === String(a.tipo || "").toLowerCase()) || tipos.find(t => !/primera llamada/i.test(t.nombre)) || tipos[0];
+    revisarHueco(a.fecha, a.hora, Number(tipo?.duracion) || 60);
+    return { ok: true, avisos, paciente, tipo, fecha: a.fecha, hora: a.hora };
+  }
+  if (a.accion === "mover_cita") {
+    const cita = citas.find(c => String(c.id) === String(a.cita));
+    if (!cita) return { ok: false, error: "No encuentro esa cita." };
+    if (!FECHA.test(a.fecha || "") || !HORA.test(a.hora || "")) return { ok: false, error: "Falta la nueva fecha o la hora." };
+    revisarHueco(a.fecha, a.hora, Number(cita.duracion) || 60, cita.id);
+    return { ok: true, avisos, cita, paciente: patients.find(p => String(p.id) === String(cita.pacienteId)), fecha: a.fecha, hora: a.hora };
+  }
+  if (a.accion === "cancelar_cita") {
+    const cita = citas.find(c => String(c.id) === String(a.cita));
+    if (!cita) return { ok: false, error: "No encuentro esa cita." };
+    return { ok: true, avisos, cita, paciente: patients.find(p => String(p.id) === String(cita.pacienteId)) };
+  }
+  if (a.accion === "crear_tarea") {
+    const titulo = String(a.titulo || "").trim();
+    if (!titulo) return { ok: false, error: "Falta el texto de la tarea." };
+    const fecha = FECHA.test(a.fecha || "") ? a.fecha : hoy, hora = HORA.test(a.hora || "") ? a.hora : "09:00";
+    return { ok: true, avisos, titulo, fecha, hora, prioridad: ["alta", "media", "baja"].includes(a.prioridad) ? a.prioridad : "media" };
+  }
+  return { ok: false, error: "Nora ha propuesto algo que todavía no sabe hacer." };
+}

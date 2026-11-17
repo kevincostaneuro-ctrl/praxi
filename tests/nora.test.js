@@ -50,3 +50,28 @@ describe("Nora en toda la app", () => {
     expect(t).not.toMatch(/Lucía|Martín/);
   });
 });
+
+import { leerAcciones, validarAccion } from "../src/app/noraContexto.js";
+describe("acciones de Nora", () => {
+  const lunes = new Date(2026, 10, 16, 8, 0);
+  const tipos = [{ id: "t1", nombre: "Primera llamada", duracion: 30 }, { id: "t2", nombre: "Seguimiento", duracion: 60 }];
+  const citas = [{ id: 50, fecha: "2026-11-17", hora: "10:00", duracion: 60, pacienteId: 7, tipo: "Seguimiento" }];
+  const datos = { patients: [paciente], citas, tipos, horario: { start: 9, end: 20 }, pacientePorNumero: n => (n === 1 ? paciente : null), ahora: lunes };
+  it("separa el texto de las acciones y descarta las mal formadas", () => {
+    const r = leerAcciones('Te la paso al martes.\n[[ACCION]]{"accion":"mover_cita","cita":50,"fecha":"2026-11-18","hora":"11:00"}[[/ACCION]]\n[[ACCION]]{roto[[/ACCION]]');
+    expect(r.texto).toBe("Te la paso al martes.");
+    expect(r.acciones).toEqual([{ accion: "mover_cita", cita: 50, fecha: "2026-11-18", hora: "11:00" }]);
+  });
+  it("valida crear una cita y avisa de choques y fines de semana", () => {
+    const ok = validarAccion({ accion: "crear_cita", paciente: 1, fecha: "2026-11-17", hora: "10:30", tipo: "seguimiento" }, datos);
+    expect(ok.ok).toBe(true); expect(ok.tipo.id).toBe("t2");
+    expect(ok.avisos.join(" ")).toMatch(/Coincide con otra cita a las 10:00/);
+    expect(validarAccion({ accion: "crear_cita", paciente: 1, fecha: "2026-11-21", hora: "10:00" }, datos).avisos).toContain("Es fin de semana.");
+    expect(validarAccion({ accion: "crear_cita", paciente: 9, fecha: "2026-11-17", hora: "12:00" }, datos).ok).toBe(false);
+  });
+  it("valida mover, cancelar y crear tareas", () => {
+    expect(validarAccion({ accion: "mover_cita", cita: 50, fecha: "2026-11-18", hora: "12:00" }, datos)).toMatchObject({ ok: true, avisos: [] });
+    expect(validarAccion({ accion: "cancelar_cita", cita: 999 }, datos).ok).toBe(false);
+    expect(validarAccion({ accion: "crear_tarea", titulo: "Llamar a la gestoría", prioridad: "urgente" }, datos)).toMatchObject({ ok: true, prioridad: "media", hora: "09:00" });
+  });
+});
