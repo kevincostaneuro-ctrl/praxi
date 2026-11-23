@@ -82,6 +82,8 @@ export default async function handler(req, res, fetchImpl = fetch) {
         "content-type": "application/json",
         "x-api-key": process.env.ANTHROPIC_API_KEY,
         "anthropic-version": "2023-06-01",
+        // Solo si la clave no pertenece a un espacio de trabajo (workspace) de Anthropic
+        ...(process.env.ANTHROPIC_WORKSPACE_ID ? { "anthropic-workspace-id": process.env.ANTHROPIC_WORKSPACE_ID } : {}),
       },
       body: JSON.stringify({
         model: MODELO,
