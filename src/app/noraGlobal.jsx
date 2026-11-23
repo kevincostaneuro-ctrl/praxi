@@ -51,8 +51,8 @@ export function BotonNora() {
   const { abrirNora } = useContext(EquipoCtx) || {};
   if (!abrirNora) return null;
   return (
-    <button onClick={abrirNora} title="Pregúntale a Nora: agenda, huecos, pacientes, cobros…" style={{ ...st.btn("sm"), background: NORA.tinte, color: NORA.tinteTexto, display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 700 }}>
-      <NoraMarca size={16} />Nora
+    <button onClick={abrirNora} title="Pregúntale a Nora: agenda, huecos, pacientes, cobros…" style={{ ...st.btn("sm"), background: NORA.tinte, color: NORA.tinteTexto, display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 700, padding: "4px 14px 4px 5px" }}>
+      <NoraMarca size={26} />Nora
     </button>
   );
 }
