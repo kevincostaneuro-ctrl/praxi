@@ -76,3 +76,10 @@ begin
 end $$;
 revoke all on function consumir_ia(int) from public, anon;
 grant execute on function consumir_ia(int) to authenticated;
+
+-- Plazas de fundador ocupadas (para la barra de cupo; no revela de qué clínicas son)
+create or replace function plazas_fundador() returns int
+language sql stable security definer set search_path = public as $$
+  select count(*)::int from suscripciones where plan = 'fundador' and estado in ('activa','impagada','cortesia');
+$$;
+grant execute on function plazas_fundador() to authenticated;

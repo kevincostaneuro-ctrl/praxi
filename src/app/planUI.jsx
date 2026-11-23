@@ -1,6 +1,6 @@
 // Planes en la app: «Tu plan» (Equipo), avisos de prueba / solo lectura / impago y el aviso
 // que sale cuando el plan no deja hacer un cambio. El pago lo hace Stripe (api/pago.js).
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../supabase.js";
 import { C, st } from "./estilos.js";
 import { Modal } from "./ui.jsx";
@@ -61,7 +61,6 @@ function TarjetaPlan({ id, periodo, actual, destacado, cargando, onElegir }) {
   const puntos = {
     basico: ["Hasta 10 pacientes activos", "Nora incluida, igual que en Profesional", "1 profesional"],
     profesional: ["Pacientes ilimitados", "Nora incluida", "1 profesional"],
-    fundador: ["Todo lo de Profesional", "Precio fijo mientras sigas", "Solo las 100 primeras cuentas"],
     clinica: ["3 profesionales incluidos", `+${euros(p.extra || 19)}/mes por profesional extra`, "Agenda y equipo compartidos"],
   }[id];
   return (
@@ -83,6 +82,41 @@ function TarjetaPlan({ id, periodo, actual, destacado, cargando, onElegir }) {
   );
 }
 
+// ── Fundador: opción exclusiva aparte, con el cupo de plazas ─────────────────
+export function OpcionFundador({ ocupadas, actual, cargando, onElegir }) {
+  const total = 100;
+  const n = Math.min(total, Math.max(0, ocupadas ?? 0));
+  const quedan = total - n;
+  const agotado = quedan <= 0;
+  return (
+    <div style={{ marginTop: 14, background: `linear-gradient(135deg, ${C.bone}, ${C.amD})`, border: `1px solid ${C.accent}`, borderRadius: 16, padding: "18px 20px", display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
+      <div style={{ flex: "1 1 260px", minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", fontWeight: 700, color: C.accent }}>Opción exclusiva</span>
+          <span style={st.badge(C.walnut, C.bone)}>Hasta el 31 de marzo de 2027</span>
+        </div>
+        <div style={{ fontSize: 22, fontFamily: "'Instrument Serif',serif", color: C.ink, marginTop: 6 }}>Plan Fundador · Profesional por 15 €/mes</div>
+        <div style={{ fontSize: 12, color: C.text, marginTop: 4, lineHeight: 1.6 }}>Todo lo de Profesional con el precio congelado para siempre mientras mantengas la suscripción. Solo para las 100 primeras cuentas.</div>
+        <div style={{ marginTop: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: C.walnut, marginBottom: 6 }}>
+            <span><b style={{ color: C.ink }}>{n}</b> de {total} plazas ocupadas</span>
+            <span style={{ color: quedan <= 15 ? C.red : C.walnut, fontWeight: 600 }}>{agotado ? "Agotado" : `Quedan ${quedan}`}</span>
+          </div>
+          <div style={{ height: 8, background: C.sand, borderRadius: 4, overflow: "hidden" }}>
+            <div style={{ width: `${n}%`, minWidth: n ? 6 : 0, height: 8, background: `linear-gradient(90deg, ${C.aL}, ${C.accent})`, borderRadius: 4, transition: "width 600ms ease" }} />
+          </div>
+        </div>
+      </div>
+      <div style={{ flex: "1 0 170px", textAlign: "center" }}>
+        <div style={{ color: C.ink }}><span style={{ fontSize: 34, fontFamily: "'Instrument Serif',serif" }}>15 €</span><span style={{ fontSize: 12, color: C.muted }}> /mes</span></div>
+        <div style={{ fontSize: 11, color: C.muted, textDecoration: "line-through" }}>24 €/mes</div>
+        {actual ? <div style={{ ...st.badge(C.green, C.gD), marginTop: 8 }}>Tu plan actual</div>
+          : <button style={{ ...st.btn(), marginTop: 8, opacity: cargando || agotado ? 0.6 : 1 }} disabled={!!cargando || agotado} onClick={onElegir}>{cargando === "fundador" ? "Abriendo…" : agotado ? "Plazas agotadas" : "Quiero ser fundador"}</button>}
+      </div>
+    </div>
+  );
+}
+
 // ── Tu plan (Equipo) ─────────────────────────────────────────────────────────
 export function TuPlan({ plan, suscripcion, patients, citas, demo, abrir = false }) {
   const [periodo, setPeriodo] = useState("mensual");
@@ -94,6 +128,12 @@ export function TuPlan({ plan, suscripcion, patients, citas, demo, abrir = false
   const pagando = suscripcion && ["activa", "impagada"].includes(suscripcion.estado) && suscripcion.stripe_subscription_id;
   const cortesia = suscripcion?.estado === "cortesia";
   const fundadorAbierto = Date.now() < new Date("2027-04-01T00:00:00+02:00").getTime();
+  const [fundadores, setFundadores] = useState(null);
+  useEffect(() => {
+    if (!verPlanes || !fundadorAbierto) return;
+    if (demo) { setFundadores(37); return; }
+    supabase.rpc("plazas_fundador").then(({ data }) => setFundadores(typeof data === "number" ? data : 0), () => setFundadores(0));
+  }, [verPlanes, fundadorAbierto, demo]);
 
   const ejecutar = async (cuerpo, marca) => {
     if (demo) { setError("En la demo no se puede contratar un plan."); return; }
@@ -107,7 +147,7 @@ export function TuPlan({ plan, suscripcion, patients, citas, demo, abrir = false
   }[plan.plan] || `${PLANES[plan.plan]?.nombre || "Plan"}${cortesia ? " · cortesía" : ""}`;
   const fin = suscripcion?.fin_periodo ? new Date(suscripcion.fin_periodo).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" }) : null;
 
-  const planes = ["basico", fundadorAbierto ? "fundador" : null, "profesional", "clinica"].filter(Boolean);
+  const planes = ["basico", "profesional", "clinica"];
   return (
     <div style={{ ...st.card, padding: "16px 20px" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
@@ -139,10 +179,11 @@ export function TuPlan({ plan, suscripcion, patients, citas, demo, abrir = false
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10 }}>
           {planes.filter(id => periodo === "mensual" || PLANES[id].anual).map(id => (
-            <TarjetaPlan key={id} id={id} periodo={periodo} actual={plan.plan === id} destacado={id === (fundadorAbierto ? "fundador" : "profesional")} cargando={cargando} onElegir={id => ejecutar({ accion: "elegir", plan: id, periodo: PLANES[id].anual ? periodo : "mensual" }, id)} />
+            <TarjetaPlan key={id} id={id} periodo={periodo} actual={plan.plan === id} destacado={id === "profesional"} cargando={cargando} onElegir={id => ejecutar({ accion: "elegir", plan: id, periodo: PLANES[id].anual ? periodo : "mensual" }, id)} />
           ))}
         </div>
-        {periodo === "anual" && <div style={{ fontSize: 11, color: C.muted, marginTop: 8 }}>Básico y Fundador solo tienen pago mensual.</div>}
+        {periodo === "anual" && <div style={{ fontSize: 11, color: C.muted, marginTop: 8 }}>Básico solo tiene pago mensual.</div>}
+        {fundadorAbierto && <OpcionFundador ocupadas={fundadores} actual={plan.plan === "fundador"} cargando={cargando} onElegir={() => ejecutar({ accion: "elegir", plan: "fundador", periodo: "mensual" }, "fundador")} />}
         <div style={{ fontSize: 11, color: C.muted, marginTop: 10, lineHeight: 1.5 }}>El pago se hace en una página segura de Stripe. Tus datos clínicos nunca salen de Praxi.</div>
       </div>}
       {error && <div style={{ fontSize: 12, color: C.red, marginTop: 10 }}>{error}</div>}

@@ -44,7 +44,7 @@ export default async function handler(req, res, fetchImpl = fetch) {
     if (actual && ["activa", "impagada"].includes(actual.estado) && actual.stripe_subscription_id) return responder(res, 409, { error: "Ya tienes un plan activo. Cámbialo o cancélalo desde «Gestionar suscripción»." });
     if (plan === "fundador") {
       if (Date.now() >= new Date(FUNDADOR.hasta).getTime()) return responder(res, 400, { error: "El precio de fundador ya no está disponible." });
-      const fundadores = await supabaseServicio("suscripciones?plan=eq.fundador&select=clinica_id", { fetchImpl });
+      const fundadores = await supabaseServicio("suscripciones?plan=eq.fundador&estado=in.(activa,impagada,cortesia)&select=clinica_id", { fetchImpl });
       if ((fundadores || []).length >= FUNDADOR.plazas) return responder(res, 400, { error: "Ya se han cubierto las 100 plazas de fundador." });
     }
     // Profesionales extra en Clínica: los que pasen de 3
