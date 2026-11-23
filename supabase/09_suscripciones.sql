@@ -5,7 +5,7 @@
 --   puede ver, exportar y borrar, pero no crear ni modificar pacientes ni citas.
 -- · La tabla suscripciones solo la escribe el servidor (webhook de Stripe) con la
 --   clave de servicio: ningún usuario puede darse un plan a sí mismo.
--- · Nora: 50 consultas al día en el plan Básico; ninguna si la cuenta está caducada.
+-- · Nora: igual en todos los planes (mismo tope de seguridad); ninguna si la cuenta está caducada.
 -- Pegar entero en Supabase → SQL Editor → Run. Se puede ejecutar más de una vez.
 -- ═════════════════════════════════════════════════════════════════════════════
 
@@ -57,16 +57,14 @@ create policy pac_plan_update on pacientes as restrictive for update to authenti
 create policy cit_plan_insert on citas as restrictive for insert to authenticated with check (puede_escribir(clinica_id));
 create policy cit_plan_update on citas as restrictive for update to authenticated using (puede_escribir(clinica_id)) with check (puede_escribir(clinica_id));
 
--- Nora: el límite depende del plan
+-- Nora: mismo límite en todos los planes; sin acceso si la cuenta está caducada
 create or replace function consumir_ia(p_limite int)
 returns int language plpgsql security definer set search_path = public as $$
-declare yo miembros%rowtype; hoy date := (now() at time zone 'Europe/Madrid')::date; n int; pl text; lim int;
+declare yo miembros%rowtype; hoy date := (now() at time zone 'Europe/Madrid')::date; n int; lim int := greatest(p_limite, 1);
 begin
   select * into yo from miembros where user_id = auth.uid() and activo limit 1;
   if not found then raise exception 'No autorizado'; end if;
-  pl := plan_efectivo(yo.clinica_id);
-  if pl = 'caducado' then raise exception 'Plan caducado'; end if;
-  lim := case when pl = 'basico' then least(50, greatest(p_limite, 1)) else greatest(p_limite, 1) end;
+  if plan_efectivo(yo.clinica_id) = 'caducado' then raise exception 'Plan caducado'; end if;
   insert into uso_ia (miembro_id, clinica_id, dia, consultas)
   values (yo.id, yo.clinica_id, hoy, 0)
   on conflict (miembro_id, dia) do nothing;

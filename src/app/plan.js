@@ -4,11 +4,10 @@
 export const DIAS_PRUEBA = 90;
 export const DIAS_GRACIA = 14;
 export const LIMITE_PACIENTES_BASICO = 10;
-export const NORA_DIA_BASICO = 50;
 
 // Precios finales, IVA incluido
 export const PLANES = {
-  basico: { nombre: "Básico", mensual: 9.99, anual: null, pacientes: LIMITE_PACIENTES_BASICO, profesionales: 1, nora: `${NORA_DIA_BASICO} consultas al día` },
+  basico: { nombre: "Básico", mensual: 9.99, anual: null, pacientes: LIMITE_PACIENTES_BASICO, profesionales: 1, nora: "Incluida, igual que en todos los planes" },
   profesional: { nombre: "Profesional", mensual: 24, anual: 240, pacientes: null, profesionales: 1, nora: "Sin límite práctico" },
   fundador: { nombre: "Profesional · fundador", mensual: 15, anual: null, pacientes: null, profesionales: 1, nora: "Sin límite práctico" },
   clinica: { nombre: "Clínica", mensual: 59, anual: 590, pacientes: null, profesionales: 3, extra: 19, nora: "Sin límite práctico" },

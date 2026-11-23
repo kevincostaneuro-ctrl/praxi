@@ -42,7 +42,7 @@ export function AvisoPlan({ tipo, esAdmin, onVerPlanes, onClose }) {
       <div style={{ fontSize: 14, color: C.text, lineHeight: 1.6 }}>
         {lectura
           ? <>Tu prueba gratuita ha terminado. Tus datos siguen aquí y puedes exportarlos cuando quieras desde Configuración. Para volver a crear y modificar, elige un plan.</>
-          : <>El plan Básico incluye hasta 10 pacientes activos a la vez. Con Profesional no hay límite de pacientes y Nora no tiene tope diario.</>}
+          : <>El plan Básico incluye hasta 10 pacientes activos a la vez. Con Profesional no hay límite de pacientes.</>}
       </div>
       <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>
         <button style={st.btn("ghost")} onClick={onClose}>Ahora no</button>
@@ -59,8 +59,8 @@ function TarjetaPlan({ id, periodo, actual, destacado, cargando, onElegir }) {
   const anual = periodo === "anual" && p.anual;
   const precio = anual ? p.anual : p.mensual;
   const puntos = {
-    basico: ["Hasta 10 pacientes activos", "Nora: 50 consultas al día", "1 profesional"],
-    profesional: ["Pacientes ilimitados", "Nora sin tope diario", "1 profesional"],
+    basico: ["Hasta 10 pacientes activos", "Nora incluida, igual que en Profesional", "1 profesional"],
+    profesional: ["Pacientes ilimitados", "Nora incluida", "1 profesional"],
     fundador: ["Todo lo de Profesional", "Precio fijo mientras sigas", "Solo las 100 primeras cuentas"],
     clinica: ["3 profesionales incluidos", `+${euros(p.extra || 19)}/mes por profesional extra`, "Agenda y equipo compartidos"],
   }[id];
