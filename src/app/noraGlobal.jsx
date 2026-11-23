@@ -124,7 +124,7 @@ export function NoraGlobal({ abierta, setAbierta, pagina, patients, citas, tarea
         </div>}
         {chat.map((m, i) => (
           <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: m.role === "user" ? "flex-end" : "flex-start", gap: 6 }}>
-            <div style={{ maxWidth: "88%", padding: "9px 13px", borderRadius: m.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: m.role === "user" ? NORA.tinteTexto : C.card, color: m.role === "user" ? "#fff" : C.text, fontSize: 13, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{m.content}</div>
+            <div style={{ maxWidth: "88%", padding: "9px 13px", borderRadius: m.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px", background: m.role === "user" ? NORA.fondo : C.card, color: m.role === "user" ? "#fff" : C.text, fontSize: 13, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{m.content}</div>
             {(m.acciones || []).map((a, k) => <div key={k} style={{ width: "88%" }}><TarjetaAccion accion={a} estado={m.estados?.[k]} datos={datos} onConfirmar={v => confirmar(i, k, a, v)} onDescartar={() => marcar(i, k, "Descartada")} /></div>)}
           </div>
         ))}

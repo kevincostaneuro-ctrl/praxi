@@ -103,10 +103,11 @@ export const NORA_ESTILOS = {
   A: { nombre: "Aurora", fondo: "linear-gradient(135deg,#7B5CF0,#1FB5A8)", texto: "#fff", tinte: "#ECE8FB", tinteTexto: "#4B3BB0" },
   B: { nombre: "Verde salvia", fondo: "#2E6F68", texto: "#F4EEE3", tinte: "#DCEBE6", tinteTexto: "#2E6F68" },
   C: { nombre: "Burbuja", fondo: "#4B4FD1", texto: "#fff", tinte: "#E4E4FA", tinteTexto: "#3B3FB0" },
+  F: { nombre: "Destello · océano", fondo: "linear-gradient(135deg,#2BB3C0,#2A4FA8)", texto: "#fff", tinte: "#DDEEF5", tinteTexto: "#234A8F" },
   E: { nombre: "Destello", fondo: "#E2604F", texto: "#fff", tinte: "#FBE3DC", tinteTexto: "#B23D52", fab: "#fff", fabTexto: "#B23D52", fabBorde: "#F3B9A8" },
   D: { nombre: "Orbe vivo", fondo: "radial-gradient(circle at 35% 30%,#FFD3B8,#F0715A 55%,#C2405F)", texto: "#fff", tinte: "#FBE3DC", tinteTexto: "#B23D52", fab: "#fff", fabTexto: "#B23D52", fabBorde: "#F3B9A8" },
 };
-export const NORA_ESTILO = "E";
+export const NORA_ESTILO = "F";
 export const NORA = NORA_ESTILOS[NORA_ESTILO];
 
 export function NoraMarca({ size = 26, vivo = false }) {
@@ -116,7 +117,7 @@ export function NoraMarca({ size = 26, vivo = false }) {
       ? <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 64 64"><path d="M10 12h44a6 6 0 0 1 6 6v22a6 6 0 0 1-6 6H30l-12 10V46h-8a6 6 0 0 1-6-6V18a6 6 0 0 1 6-6z" fill="#fff" /></svg>
       : NORA_ESTILO === "D" ? null
         : <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 64 64"><path d="M32 4c3 17 11 25 28 28-17 3-25 11-28 28-3-17-11-25-28-28 17-3 25-11 28-28z" fill="#fff" /></svg>;
-  if (NORA_ESTILO === "E") return (
+  if (NORA_ESTILO === "E" || NORA_ESTILO === "F") return (
     <span aria-hidden="true" className={vivo ? "nora-destello" : undefined} style={{ width: size, height: size, borderRadius: size * 0.3, background: NORA.fondo, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
       <svg width={size * 0.72} height={size * 0.72} viewBox="0 0 64 64"><path d="M30 8c2.6 13 8.6 19 21.6 21.6C38.6 32.2 32.6 38.2 30 51.2 27.4 38.2 21.4 32.2 8.4 29.6 21.4 27 27.4 21 30 8z" fill="#fff" /><circle cx="51" cy="12" r="4.5" fill="#fff" opacity=".85" /></svg>
     </span>
