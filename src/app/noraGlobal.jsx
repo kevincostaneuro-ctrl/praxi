@@ -3,20 +3,19 @@ import { DemoCtx, EquipoCtx } from "./constantes.js";
 import { C, st } from "./estilos.js";
 import { crearSeudonimos, enviarIA } from "./ia.jsx";
 import { NORA, NoraMarca, VentanaNora } from "./nora.jsx";
-import { contextoApp, estiloNora, leerAcciones, REGLAS_APP, validarAccion } from "./noraContexto.js";
+import { contextoApp, estiloNora, leerAcciones, REGLAS_APP, saludoNora, validarAccion } from "./noraContexto.js";
 import { fechaDe } from "./utilidades.js";
 
 // ══════════════════════════════════════════════════════════════════════════════
 // NORA EN TODA LA APP — botón flotante y chat con la agenda, los huecos,
 // los pacientes, los cobros y las tareas
 // ══════════════════════════════════════════════════════════════════════════════
-const SUGERENCIAS = {
-  dashboard: ["¿Qué citas tengo hoy y de qué tipo?", "Resúmeme la semana", "Recuérdame mañana a las 9 llamar a la gestoría"],
-  calendario: ["¿Qué huecos libres tengo esta semana?", "Resúmeme la agenda de mañana", "Pasa mi última cita de hoy a mañana"],
-  pacientes: ["¿Qué pacientes activos no tienen próxima cita?", "¿Quién lleva más tiempo sin venir?", "¿Cuántas sesiones he hecho este mes?"],
-  facturas: ["¿Cuánto llevo cobrado este mes?", "¿Quién me debe dinero?", "¿Cuánto tengo pendiente de cobro?"],
-  recursos: ["¿Qué pacientes tengo con ansiedad?", "¿Qué citas tengo hoy?"],
-};
+const ACCESOS = [
+  { icono: "☀️", titulo: "Mi día", desc: "Citas de hoy y con quién", pregunta: "¿Qué citas tengo hoy, de qué tipo y con quién?" },
+  { icono: "🕓", titulo: "Huecos libres", desc: "Esta semana", pregunta: "¿Qué huecos libres tengo esta semana?" },
+  { icono: "👥", titulo: "Sin próxima cita", desc: "Pacientes a recuperar", pregunta: "¿Qué pacientes activos no tienen próxima cita?" },
+  { icono: "💶", titulo: "Cobros", desc: "Lo que te deben", pregunta: "¿Cuánto tengo pendiente de cobro y de quién?" },
+];
 const PAGINAS = { dashboard: "Dashboard", calendario: "Calendario", pacientes: "Pacientes", facturas: "Facturas", recursos: "Recursos", admin: "Equipo", configuracion: "Configuración" };
 
 const fechaLarga = ymd => fechaDe(ymd).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
@@ -59,7 +58,7 @@ export function BotonNora() {
 
 export function NoraGlobal({ abierta, setAbierta, pagina, patients, citas, tareas, horario, tipos = [], setCitas, setTareas, onNuevaCita, onEditarCita }) {
   const demo = useContext(DemoCtx);
-  const { miId, miembros = [], preferenciasNora } = useContext(EquipoCtx) || {};
+  const { miId, miembros = [], preferenciasNora, miNombre } = useContext(EquipoCtx) || {};
   const [chat, setChat] = useState([]);
   const [pregunta, setPregunta] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -94,7 +93,8 @@ export function NoraGlobal({ abierta, setAbierta, pagina, patients, citas, tarea
     setCargando(false);
   };
 
-  const sugerencias = SUGERENCIAS[pagina] || SUGERENCIAS.dashboard;
+  // El saludo cambia cada vez que se abre Nora (o se empieza una conversación nueva)
+  const saludo = useMemo(() => saludoNora({ nombre: preferenciasNora?.nombre || miNombre }), [abierta, chat.length === 0]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!abierta) return null;
 
@@ -115,12 +115,22 @@ export function NoraGlobal({ abierta, setAbierta, pagina, patients, citas, tarea
         </div>
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "16px 18px", display: "flex", flexDirection: "column", gap: 10 }}>
-        {chat.length === 0 && <div>
-          <div style={{ fontSize: 13.5, color: C.text, lineHeight: 1.6, marginBottom: 12 }}>Pregúntame lo que necesites de tu consulta: qué citas tienes y con quién, qué huecos te quedan libres, quién no tiene próxima cita o cuánto te deben. También puedo darte citas, moverlas, cancelarlas o apuntarte tareas: siempre te pido confirmación antes.</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {sugerencias.map(s => <button key={s} onClick={() => enviar(s)} style={{ ...st.btn("sm"), textAlign: "left", padding: "9px 12px", fontSize: 12.5, background: C.card, color: NORA.tinteTexto, border: `1px solid ${C.border}`, borderRadius: 10 }}>{s}</button>)}
+        {chat.length === 0 && <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: 1 }}>
+          <div>
+            <div style={{ fontFamily: "'Instrument Serif',serif", fontSize: 28, lineHeight: 1.1, color: C.text }}>{saludo.titulo}</div>
+            <div style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>{saludo.subtitulo}</div>
           </div>
-          <div style={{ fontSize: 11, color: C.muted, marginTop: 14, lineHeight: 1.5 }}>Los nombres de tus pacientes no salen de Praxi: Nora los ve como «Paciente 1, 2…». Para notas o informes de un paciente, abre su ficha y pulsa «Nora».</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {ACCESOS.map(a => (
+              <button key={a.titulo} className="nora-acceso" onClick={() => enviar(a.pregunta)} disabled={cargando}
+                style={{ textAlign: "left", background: "#fff", border: `1px solid ${C.border}`, borderRadius: 14, padding: "12px 12px 11px", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", gap: 4 }}>
+                <span style={{ fontSize: 20, lineHeight: 1 }} aria-hidden="true">{a.icono}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{a.titulo}</span>
+                <span style={{ fontSize: 11.5, color: C.muted, lineHeight: 1.35 }}>{a.desc}</span>
+              </button>
+            ))}
+          </div>
+          <div style={{ fontSize: 11, color: C.muted, marginTop: "auto", display: "flex", gap: 6, alignItems: "center" }}><span aria-hidden="true">🔒</span>Tus pacientes no salen de Praxi</div>
         </div>}
         {chat.map((m, i) => (
           <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: m.role === "user" ? "flex-end" : "flex-start", gap: 6 }}>
@@ -132,7 +142,7 @@ export function NoraGlobal({ abierta, setAbierta, pagina, patients, citas, tarea
         <div ref={abajo} />
       </div>
       <div style={{ padding: "10px 14px", borderTop: `1px solid ${C.border}`, display: "flex", gap: 8 }}>
-        <input autoFocus style={{ ...st.input, flex: 1, fontSize: 13 }} value={pregunta} onChange={e => setPregunta(e.target.value)} onKeyDown={e => e.key === "Enter" && !e.shiftKey && enviar()} placeholder="Pregúntale a Nora…" aria-label="Pregunta para Nora" />
+        <input autoFocus style={{ ...st.input, flex: 1, fontSize: 13 }} value={pregunta} onChange={e => setPregunta(e.target.value)} onKeyDown={e => e.key === "Enter" && !e.shiftKey && enviar()} placeholder="Escribe o pide una cita…" aria-label="Pregunta para Nora" />
         <button style={{ ...st.btn(), padding: "0 16px", background: NORA.tinteTexto, color: "#fff" }} onClick={() => enviar()} disabled={cargando || !pregunta.trim()} aria-label="Enviar">↑</button>
       </div>
     </VentanaNora>

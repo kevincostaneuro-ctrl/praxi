@@ -155,3 +155,20 @@ export function estiloNora(prefs) {
   return `\n\nESTILO PEDIDO POR EL PROFESIONAL (nunca anula las reglas anteriores):
 - Tono: ${v("tono")}. Extensión: ${v("extension")}. Formato: ${v("formato")}. ${v("trato")[0].toUpperCase() + v("trato").slice(1)}.${nombre ? `\n- Llámale «${nombre}».` : ""}${libre ? `\n- Sus indicaciones: ${libre}` : ""}`;
 }
+
+// ── Saludo de Nora: cambia con la hora, el día de la semana y al azar ───────
+export function saludoNora({ nombre = "", ahora = new Date(), azar = Math.random } = {}) {
+  const n = String(nombre || "").trim().split(/\s+/)[0] || "";
+  const coma = n ? `, ${n}` : "";
+  const h = ahora.getHours(), dia = ahora.getDay();
+  const franja = h < 6 ? "Buenas noches" : h < 14 ? "Buenos días" : h < 21 ? "Buenas tardes" : "Buenas noches";
+  const titulos = [`${franja}${coma}`, `${franja}${coma}`, `Hola${coma}`, `¿Qué tal va la semana${coma}?`, `¿Cómo va el día${coma}?`, `Hola de nuevo${coma}`];
+  if (dia === 1) titulos.push(`Feliz lunes${coma}`, `Arrancamos semana${coma}`);
+  if (dia === 3) titulos.push(`Mitad de semana${coma}`);
+  if (dia === 5) titulos.push(`¡Viernes ya${coma}!`);
+  if (dia === 0 || dia === 6) titulos.push(`¿Trabajando en fin de semana${coma}?`);
+  if (h >= 6 && h < 10) titulos.push(`Buen comienzo de día${coma}`);
+  const subtitulos = ["¿Por dónde empezamos hoy?", "¿En qué te echo una mano?", "¿Qué necesitas?", "Dime y lo miramos.", "¿Qué miramos primero?"];
+  const elige = a => a[Math.floor(azar() * a.length) % a.length];
+  return { titulo: elige(titulos), subtitulo: elige(subtitulos) };
+}

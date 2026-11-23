@@ -95,3 +95,17 @@ describe("estilo de Nora", () => {
     expect(estiloNora(null)).toMatch(/profesional y neutro/);
   });
 });
+
+import { saludoNora } from "../src/app/noraContexto.js";
+describe("saludo de Nora", () => {
+  it("cambia según la hora y usa el nombre de pila", () => {
+    expect(saludoNora({ nombre: "Kevin Costa", ahora: new Date(2026, 10, 24, 9, 0), azar: () => 0 }).titulo).toBe("Buenos días, Kevin");
+    expect(saludoNora({ nombre: "Kevin", ahora: new Date(2026, 10, 24, 17, 0), azar: () => 0 }).titulo).toBe("Buenas tardes, Kevin");
+    expect(saludoNora({ nombre: "", ahora: new Date(2026, 10, 24, 22, 0), azar: () => 0 }).titulo).toBe("Buenas noches");
+  });
+  it("tiene saludos propios del día de la semana", () => {
+    const viernes = new Set(Array.from({ length: 40 }, (_, i) => saludoNora({ nombre: "Kevin", ahora: new Date(2026, 10, 27, 12, 0), azar: () => i / 40 }).titulo));
+    expect(viernes.has("¡Viernes ya, Kevin!")).toBe(true);
+    expect(viernes.has("¿Qué tal va la semana, Kevin?")).toBe(true);
+  });
+});

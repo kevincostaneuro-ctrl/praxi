@@ -80,3 +80,7 @@ html {
 .nora-destello{animation:noraDestello 1.6s ease-in-out infinite;}
 @keyframes noraDestello{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
 @media (prefers-reduced-motion: reduce){.nora-destello{animation:none;}}
+
+/* Accesos rápidos de Nora */
+.nora-acceso{transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;}
+.nora-acceso:hover{transform:translateY(-1px);border-color:#9CC9DD!important;box-shadow:0 4px 14px rgba(35,74,143,.10);}
