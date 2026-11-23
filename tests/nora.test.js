@@ -75,3 +75,11 @@ describe("acciones de Nora", () => {
     expect(validarAccion({ accion: "crear_tarea", titulo: "Llamar a la gestoría", prioridad: "urgente" }, datos)).toMatchObject({ ok: true, prioridad: "media", hora: "09:00" });
   });
 });
+
+import { crearSeudonimos } from "../src/app/ia.jsx";
+describe("seudónimos", () => {
+  it("quita el artículo delante del nombre real y no confunde Paciente 1 con Paciente 10", () => {
+    const s = crearSeudonimos([{ nombre: "Lucía", apellidos: "Martín", alias: "Paciente 1" }, { nombre: "Pedro", apellidos: "Gil", alias: "Paciente 10" }]);
+    expect(s.desenmascarar("Solo el Paciente 1 y al Paciente 10; la cita del Paciente 1.")).toBe("Solo Lucía Martín y a Pedro Gil; la cita de Lucía Martín.");
+  });
+});

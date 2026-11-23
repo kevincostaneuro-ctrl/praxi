@@ -15,7 +15,9 @@ export function crearSeudonimos(pares){
   reemplazos.sort((x,y)=>y[0].length-x[0].length);
   const enmascarar=txt=>reemplazos.reduce((s,[t,al])=>s.replace(new RegExp(`(?<![\\p{L}\\p{N}])${escRe(t)}(?![\\p{L}\\p{N}])`,"giu"),al),txt||"");
   const vuelta=pares.map(p=>[p.alias,`${p.nombre||""} ${p.apellidos||""}`.trim()]).sort((x,y)=>y[0].length-x[0].length);
-  const desenmascarar=txt=>vuelta.reduce((s,[al,n])=>s.split(al).join(n),txt||"");
+  // «el Paciente 3» → «Lucía Martín» (sin artículo delante del nombre real)
+  const sinArticulo=(s,al)=>s.replace(new RegExp(`\\b(el|la|al|del)\\s+(?=${escRe(al)}(?![0-9]))`,"giu"),m=>({al:"a ",del:"de "}[m.trim().toLowerCase()]||""));
+  const desenmascarar=txt=>vuelta.reduce((s,[al,n])=>sinArticulo(s,al).split(al).join(n),txt||"");
   return{enmascarar,desenmascarar};
 }
 export async function enviarIA({system,messages,seud}){
@@ -29,5 +31,7 @@ export async function enviarIA({system,messages,seud}){
   }catch{throw new Error("No se ha podido conectar con el asistente. Revisa tu conexión.");}
   const j=await r.json().catch(()=>({}));
   if(!r.ok)throw new Error(j.error||"El asistente no ha podido responder.");
-  return seud.desenmascarar(j.texto);
+  // Texto plano: fuera los asteriscos y almohadillas de Markdown
+  const limpio=String(j.texto||"").replace(/\*\*(.+?)\*\*/gs,"$1").replace(/^#{1,6}\s+/gm,"");
+  return seud.desenmascarar(limpio);
 }
