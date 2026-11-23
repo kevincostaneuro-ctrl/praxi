@@ -93,7 +93,7 @@ export default async function handler(req, res, fetchImpl = fetch) {
     });
     const data = await r.json();
     if (!r.ok) {
-      console.error("Anthropic", r.status, data?.error?.type);
+      console.error("Anthropic", r.status, data?.error?.type, String(data?.error?.message || "").slice(0, 200));
       return responder(res, 502, { error: "El asistente no ha podido responder. Inténtalo de nuevo." });
     }
     const texto = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n").trim();
