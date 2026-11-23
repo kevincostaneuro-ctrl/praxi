@@ -83,3 +83,15 @@ describe("seudónimos", () => {
     expect(s.desenmascarar("Solo el Paciente 1 y al Paciente 10; la cita del Paciente 1.")).toBe("Solo Lucía Martín y a Pedro Gil; la cita de Lucía Martín.");
   });
 });
+
+import { estiloNora } from "../src/app/noraContexto.js";
+describe("estilo de Nora", () => {
+  it("aplica las preferencias y avisa de que no anulan las reglas", () => {
+    const t = estiloNora({ tono: "directo", extension: "breve", formato: "texto", trato: "tu", nombre: "Kevin", instrucciones: "Horas en 24 h" });
+    expect(t).toMatch(/nunca anula las reglas/);
+    expect(t).toMatch(/directo y sin rodeos/);
+    expect(t).toMatch(/Llámale «Kevin»/);
+    expect(t).toMatch(/Horas en 24 h/);
+    expect(estiloNora(null)).toMatch(/profesional y neutro/);
+  });
+});

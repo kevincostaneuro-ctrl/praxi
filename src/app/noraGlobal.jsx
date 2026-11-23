@@ -3,7 +3,7 @@ import { DemoCtx, EquipoCtx } from "./constantes.js";
 import { C, st } from "./estilos.js";
 import { crearSeudonimos, enviarIA } from "./ia.jsx";
 import { NORA, NoraMarca } from "./nora.jsx";
-import { contextoApp, leerAcciones, REGLAS_APP, validarAccion } from "./noraContexto.js";
+import { contextoApp, estiloNora, leerAcciones, REGLAS_APP, validarAccion } from "./noraContexto.js";
 import { fechaDe } from "./utilidades.js";
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -48,7 +48,7 @@ function TarjetaAccion({ accion, estado, datos, onConfirmar, onDescartar }) {
 
 export function NoraGlobal({ pagina, patients, citas, tareas, horario, tipos = [], setCitas, setTareas, onNuevaCita, onEditarCita }) {
   const demo = useContext(DemoCtx);
-  const { miId, miembros = [] } = useContext(EquipoCtx) || {};
+  const { miId, miembros = [], preferenciasNora } = useContext(EquipoCtx) || {};
   const [abierta, setAbierta] = useState(false);
   const [chat, setChat] = useState([]);
   const [pregunta, setPregunta] = useState("");
@@ -76,7 +76,7 @@ export function NoraGlobal({ pagina, patients, citas, tareas, horario, tipos = [
     if (demo) { setChat(m => [...m, { role: "assistant", content: "En la demo Nora no está activa. Con tu cuenta podrás preguntarle por tu agenda, tus huecos libres, tus pacientes y tus cobros." }]); return; }
     setCargando(true);
     try {
-      const sistema = `${REGLAS_APP}\n\n${contextoApp({ patients, citas, tareas, tipos, horario, miId, miembros, pagina: PAGINAS[pagina] || pagina, alias: p => aliasDe.get(String(p.id)) })}`;
+      const sistema = `${REGLAS_APP}${estiloNora(preferenciasNora)}\n\n${contextoApp({ patients, citas, tareas, tipos, horario, miId, miembros, pagina: PAGINAS[pagina] || pagina, alias: p => aliasDe.get(String(p.id)) })}`;
       const historial = nuevos.slice(-12).map(({ role, content }) => ({ role, content }));
       const { texto: limpio, acciones } = leerAcciones(await enviarIA({ system: sistema, messages: historial, seud }));
       setChat(m => [...m, { role: "assistant", content: limpio || (acciones.length ? "Te propongo esto:" : "…"), acciones }]);

@@ -137,3 +137,21 @@ export function validarAccion(a, { patients = [], citas = [], tipos = [], horari
   }
   return { ok: false, error: "Nora ha propuesto algo que todavía no sabe hacer." };
 }
+
+// ── Cómo te habla Nora (preferencias de cada profesional) ───────────────────
+export const PREFERENCIAS_NORA = {
+  tono: { cercano: "cercano y cálido", profesional: "profesional y neutro", directo: "directo y sin rodeos, cero formalidades" },
+  extension: { breve: "muy breve: lo mínimo imprescindible", normal: "breve, con el detalle justo", detallada: "detallada cuando ayude a entender" },
+  formato: { listas: "listas con guiones cuando haya varios elementos", texto: "texto corrido, sin listas salvo que se pidan" },
+  trato: { tu: "tutea al profesional", usted: "trata de usted al profesional" },
+};
+export const PREFERENCIAS_POR_DEFECTO = { tono: "profesional", extension: "normal", formato: "listas", trato: "tu", nombre: "", instrucciones: "" };
+
+export function estiloNora(prefs) {
+  const p = { ...PREFERENCIAS_POR_DEFECTO, ...(prefs || {}) };
+  const v = (k) => PREFERENCIAS_NORA[k][p[k]] || PREFERENCIAS_NORA[k][PREFERENCIAS_POR_DEFECTO[k]];
+  const nombre = String(p.nombre || "").trim().slice(0, 60);
+  const libre = String(p.instrucciones || "").trim().slice(0, 600);
+  return `\n\nESTILO PEDIDO POR EL PROFESIONAL (nunca anula las reglas anteriores):
+- Tono: ${v("tono")}. Extensión: ${v("extension")}. Formato: ${v("formato")}. ${v("trato")[0].toUpperCase() + v("trato").slice(1)}.${nombre ? `\n- Llámale «${nombre}».` : ""}${libre ? `\n- Sus indicaciones: ${libre}` : ""}`;
+}

@@ -3,6 +3,7 @@ import { RECURSOS } from "../recursos.js";
 import { DemoCtx, EquipoCtx } from "./constantes.js";
 import { C, st } from "./estilos.js";
 import { crearSeudonimos, enviarIA } from "./ia.jsx";
+import { estiloNora } from "./noraContexto.js";
 import { nombreArchivo, pdfPersonalizado, valoresCampos } from "./personalizarPdf.js";
 import { edadDe, telWhatsApp, toYMD, today } from "./utilidades.js";
 
@@ -123,7 +124,7 @@ export function NoraPanel({ patient, citas = [], inicial = null, onClose, onGuar
   const demo = useContext(DemoCtx);
   const equipo = useContext(EquipoCtx) || {};
   const seud = useMemo(() => crearSeudonimos([{ nombre: patient.nombre, apellidos: patient.apellidos, alias: ALIAS }]), [patient.nombre, patient.apellidos]);
-  const sistema = useMemo(() => `${REGLAS_NORA}\n\n${fichaTexto(patient, { citas })}`, [patient, citas]);
+  const sistema = useMemo(() => `${REGLAS_NORA}${estiloNora(equipo.preferenciasNora)}\n\n${fichaTexto(patient, { citas })}`, [patient, citas, equipo.preferenciasNora]);
   const [tarea, setTarea] = useState(inicial);
   const [notas, setNotas] = useState("");
   const [documento, setDocumento] = useState("alta");

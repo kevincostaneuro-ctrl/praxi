@@ -1,8 +1,52 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { supabase } from "../supabase.js";
 import { C, st } from "./estilos.js";
 import { Field } from "./ui.jsx";
 import { hourLabel, traducirError } from "./utilidades.js";
+import { DemoCtx } from "./constantes.js";
+import { NORA, NoraMarca } from "./nora.jsx";
+import { PREFERENCIAS_POR_DEFECTO } from "./noraContexto.js";
+
+// Cómo te habla Nora: preferencias de cada profesional (se guardan en su ficha de miembro)
+function NoraPreferencias({inicial,onGuardada}){
+  const demo=useContext(DemoCtx);
+  const[p,setP]=useState({...PREFERENCIAS_POR_DEFECTO,...(inicial||{})});
+  const[estado,setEstado]=useState("");
+  const opciones=(k,ops)=>(
+    <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+      {ops.map(([v,l])=><button key={v} type="button" onClick={()=>{setP(x=>({...x,[k]:v}));setEstado("");}} style={{...st.btn("sm"),background:p[k]===v?NORA.tinteTexto:C.bone,color:p[k]===v?"#fff":C.text,border:`1px solid ${p[k]===v?NORA.tinteTexto:C.border}`}}>{l}</button>)}
+    </div>
+  );
+  const guardar=async()=>{
+    if(demo){setEstado("En la demo no se guarda.");return;}
+    setEstado("Guardando…");
+    const limpio={...p,nombre:String(p.nombre||"").slice(0,60),instrucciones:String(p.instrucciones||"").slice(0,600)};
+    const{error}=await supabase.rpc("guardar_mis_preferencias_nora",{p:limpio});
+    if(error){setEstado(traducirError(error));return;}
+    onGuardada?.(limpio);setEstado("Guardado ✓ Nora ya te habla así.");
+  };
+  return(
+    <div style={{...st.card,padding:"22px 26px",marginBottom:20}}>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:4}}><NoraMarca size={26}/><div style={{fontSize:15,fontWeight:700}}>Cómo te habla Nora</div></div>
+      <div style={{fontSize:12.5,color:C.muted,marginBottom:18}}>Solo para ti: cada profesional de la clínica tiene sus propias preferencias.</div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:16}}>
+        <Field label="Tono">{opciones("tono",[["cercano","Cercano"],["profesional","Profesional"],["directo","Directo, sin rodeos"]])}</Field>
+        <Field label="Extensión">{opciones("extension",[["breve","Muy breve"],["normal","Normal"],["detallada","Detallada"]])}</Field>
+        <Field label="Formato">{opciones("formato",[["listas","Listas"],["texto","Texto corrido"]])}</Field>
+        <Field label="Trato">{opciones("trato",[["tu","Tú"],["usted","Usted"]])}</Field>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) minmax(0,2fr)",gap:16,marginTop:16}}>
+        <Field label="Cómo quieres que te llame"><input style={st.input} maxLength={60} value={p.nombre} onChange={e=>{setP(x=>({...x,nombre:e.target.value}));setEstado("");}} placeholder="Por ejemplo, Kevin"/></Field>
+        <Field label="Tus indicaciones (opcional)"><textarea style={{...st.textarea,minHeight:70}} maxLength={600} value={p.instrucciones} onChange={e=>{setP(x=>({...x,instrucciones:e.target.value}));setEstado("");}} placeholder="Ej.: horas en formato 24 h; nombra a los pacientes por su nombre de pila; termina siempre con el siguiente paso."/></Field>
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:12,marginTop:14,flexWrap:"wrap"}}>
+        <button style={{...st.btn(),background:NORA.tinteTexto,color:"#fff"}} onClick={guardar}>Guardar</button>
+        {estado&&<span style={{fontSize:12.5,color:C.muted}}>{estado}</span>}
+        <span style={{fontSize:11.5,color:C.muted,flexBasis:"100%"}}>Tus preferencias cambian la forma, nunca las reglas: Nora seguirá sin diagnosticar ni valorar riesgos, y siempre te pedirá confirmación antes de tocar tu agenda.</span>
+      </div>
+    </div>
+  );
+}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // DASHBOARD
@@ -10,7 +54,7 @@ import { hourLabel, traducirError } from "./utilidades.js";
 // ══════════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN
 // ══════════════════════════════════════════════════════════════════════════════
-export function Configuracion({horario,setHorario,tipos,setTipos}){
+export function Configuracion({esAdmin=true,horario,setHorario,tipos,setTipos,preferenciasNora,onNoraGuardada}){
   const[editTipo,setEditTipo]=useState(null);
   const[tipoForm,setTipoForm]=useState({nombre:"",duracion:60});
   const[horarioForm,setHorarioForm]=useState({start:horario.start,end:horario.end});
@@ -33,9 +77,11 @@ export function Configuracion({horario,setHorario,tipos,setTipos}){
     <div>
       <div style={{marginBottom:28}}>
         <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Configuración</div>
-        <div style={{color:C.muted,fontSize:13,marginTop:2}}>Horario y tipos de cita del consultorio</div>
+        <div style={{color:C.muted,fontSize:13,marginTop:2}}>Cómo te habla Nora, horario y tipos de cita</div>
       </div>
 
+      <NoraPreferencias inicial={preferenciasNora} onGuardada={onNoraGuardada}/>
+      {esAdmin?<>
       {/* Horario */}
       <div style={{...st.card,padding:"22px 26px",marginBottom:20}}>
         <div style={{fontSize:15,fontWeight:600,marginBottom:4}}>Horario del calendario</div>
@@ -91,6 +137,7 @@ export function Configuracion({horario,setHorario,tipos,setTipos}){
           </div>
         )}
       </div>
+      </>:<div style={{...st.card,padding:"18px 22px",fontSize:13,color:C.muted}}>El horario y los tipos de cita los gestiona el administrador de la clínica.</div>}
     </div>
   );
 }

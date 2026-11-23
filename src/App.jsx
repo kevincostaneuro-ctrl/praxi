@@ -195,7 +195,7 @@ export default function App({demo=false}){
   }
   return(
     <DemoCtx.Provider value={demo}>
-    <EquipoCtx.Provider value={{miNombre:currentUser.nombre,clinicaNombre:currentClinica?.nombre,esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id,registrarVista,guardarMisDatosFact:d=>{setCurrentUser(u=>({...u,datos_facturacion:d}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,datos_facturacion:d}:m));}}}>
+    <EquipoCtx.Provider value={{preferenciasNora:currentUser.preferencias_nora,miNombre:currentUser.nombre,clinicaNombre:currentClinica?.nombre,esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id,registrarVista,guardarMisDatosFact:d=>{setCurrentUser(u=>({...u,datos_facturacion:d}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,datos_facturacion:d}:m));}}}>
     <div style={st.app} className="praxi-app">
       {/* Móvil: barra superior con menú (en ordenador no se ve) */}
       <div className="praxi-topbar">
@@ -337,9 +337,9 @@ export default function App({demo=false}){
           <div data-nav style={st.navItem(page==="admin")} onClick={()=>setPage("admin")}>▪ Equipo</div>
         )}
         
-        {currentUser.rol==="admin"&&<div style={{marginTop:16,borderTop:`1px solid ${C.border}`,paddingTop:8}}>
+        <div style={{marginTop:16,borderTop:`1px solid ${C.border}`,paddingTop:8}}>
           <div data-nav style={st.navItem(page==="configuracion")} onClick={()=>setPage("configuracion")}>▪ Configuración</div>
-        </div>}
+        </div>
         <div style={{flex:1}}/>
         <div style={{padding:"12px 20px",borderTop:`1px solid ${C.border}`,display:"flex",flexDirection:"column",gap:5}}>
           <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:8}}>
@@ -366,7 +366,7 @@ export default function App({demo=false}){
         {page==="facturas"&&<Facturas patients={patients} setPatients={setPatients}/>}
         {page==="recursos"&&<Recursos patients={patients} citas={citas} clinica={currentClinica} yo={currentUser}/>}
         {page==="admin"&&currentUser.rol==="admin"&&<EquipoPanel clinica={currentClinica} miembros={profesionales} yo={currentUser} patients={patients} citas={citas} demo={demo} onCambio={cargarTodo} bloquearDemo={()=>setDemoToast(true)} setAviso={setAviso} onBorrada={cerrarSesion}/>}
-        {page==="configuracion"&&currentUser.rol==="admin"&&<Configuracion horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos}/>}
+        {page==="configuracion"&&<Configuracion esAdmin={currentUser.rol==="admin"} horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos} preferenciasNora={currentUser.preferencias_nora} onNoraGuardada={p=>setCurrentUser(u=>({...u,preferencias_nora:p}))}/>}
       </div>
       {showInforme&&<InformeMensual patients={patients} citas={citas} onClose={()=>setShowInforme(false)}/>}
       {editCitaDash&&<CitaModal cita={editCitaDash} patients={patients} tipos={tipos} defaultFecha={editCitaDash.fecha} defaultHora={editCitaDash.hora} defaultTipoId={editCitaDash.tipoId} makeUrl={config.makeOut} onClose={()=>setEditCitaDash(null)} onSave={form=>{setCitas(cs=>cs.map(c=>c.id===form.id?{...c,...form}:c));setEditCitaDash(null);}} onDelete={id=>{setCitas(cs=>cs.filter(c=>c.id!==id));setEditCitaDash(null);}}/>}
