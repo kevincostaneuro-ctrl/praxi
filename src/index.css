@@ -25,6 +25,7 @@ html {
 .praxi-topbar { display: none; }
 @media (max-width: 767px) {
   .praxi-nora-fab{right:14px!important;bottom:14px!important;padding:8px!important;}
+  .praxi-nora{left:8px!important;right:8px!important;top:auto!important;bottom:8px!important;width:auto!important;height:72vh!important;resize:none!important;}
   .praxi-nora-fab-txt{display:none;}
   .praxi-app { flex-direction: column; }
   .praxi-topbar {
@@ -74,3 +75,8 @@ html {
 .nora-respira{animation:noraRespira 2.6s ease-in-out infinite;}
 @keyframes noraRespira{0%,100%{box-shadow:0 0 0 2px rgba(240,113,90,.16);transform:scale(1);}50%{box-shadow:0 0 0 7px rgba(240,113,90,.10);transform:scale(1.05);}}
 @media (prefers-reduced-motion: reduce){.nora-respira,.praxi-nora-fab{animation:none;}}
+
+/* Destello de Nora: late suave mientras escribe */
+.nora-destello{animation:noraDestello 1.6s ease-in-out infinite;}
+@keyframes noraDestello{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+@media (prefers-reduced-motion: reduce){.nora-destello{animation:none;}}

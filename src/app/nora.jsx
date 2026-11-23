@@ -103,9 +103,10 @@ export const NORA_ESTILOS = {
   A: { nombre: "Aurora", fondo: "linear-gradient(135deg,#7B5CF0,#1FB5A8)", texto: "#fff", tinte: "#ECE8FB", tinteTexto: "#4B3BB0" },
   B: { nombre: "Verde salvia", fondo: "#2E6F68", texto: "#F4EEE3", tinte: "#DCEBE6", tinteTexto: "#2E6F68" },
   C: { nombre: "Burbuja", fondo: "#4B4FD1", texto: "#fff", tinte: "#E4E4FA", tinteTexto: "#3B3FB0" },
+  E: { nombre: "Destello", fondo: "#E2604F", texto: "#fff", tinte: "#FBE3DC", tinteTexto: "#B23D52", fab: "#fff", fabTexto: "#B23D52", fabBorde: "#F3B9A8" },
   D: { nombre: "Orbe vivo", fondo: "radial-gradient(circle at 35% 30%,#FFD3B8,#F0715A 55%,#C2405F)", texto: "#fff", tinte: "#FBE3DC", tinteTexto: "#B23D52", fab: "#fff", fabTexto: "#B23D52", fabBorde: "#F3B9A8" },
 };
-export const NORA_ESTILO = "D";
+export const NORA_ESTILO = "E";
 export const NORA = NORA_ESTILOS[NORA_ESTILO];
 
 export function NoraMarca({ size = 26, vivo = false }) {
@@ -115,7 +116,51 @@ export function NoraMarca({ size = 26, vivo = false }) {
       ? <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 64 64"><path d="M10 12h44a6 6 0 0 1 6 6v22a6 6 0 0 1-6 6H30l-12 10V46h-8a6 6 0 0 1-6-6V18a6 6 0 0 1 6-6z" fill="#fff" /></svg>
       : NORA_ESTILO === "D" ? null
         : <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 64 64"><path d="M32 4c3 17 11 25 28 28-17 3-25 11-28 28-3-17-11-25-28-28 17-3 25-11 28-28z" fill="#fff" /></svg>;
+  if (NORA_ESTILO === "E") return (
+    <span aria-hidden="true" className={vivo ? "nora-destello" : undefined} style={{ width: size, height: size, borderRadius: size * 0.3, background: NORA.fondo, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <svg width={size * 0.72} height={size * 0.72} viewBox="0 0 64 64"><path d="M30 8c2.6 13 8.6 19 21.6 21.6C38.6 32.2 32.6 38.2 30 51.2 27.4 38.2 21.4 32.2 8.4 29.6 21.4 27 27.4 21 30 8z" fill="#fff" /><circle cx="51" cy="12" r="4.5" fill="#fff" opacity=".85" /></svg>
+    </span>
+  );
   return <span aria-hidden="true" className={vivo && NORA_ESTILO === "D" ? "nora-respira" : undefined} style={{ width: size, height: size, borderRadius: NORA_ESTILO === "C" ? size * 0.32 : "50%", background: NORA.fondo, color: NORA.texto, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: NORA_ESTILO === "D" ? `0 0 0 ${Math.max(2, size * 0.12)}px rgba(240,113,90,.18)` : "none" }}>{glifo}</span>;
+}
+
+// Ventana flotante de Nora: se arrastra desde la cabecera ([data-asa]), se puede
+// redimensionar y recuerda su sitio. En el móvil ocupa la parte de abajo.
+const CLAVE_VENTANA = "praxi_nora_ventana";
+export function VentanaNora({ zIndex = 110, children }) {
+  const caja = useRef(null);
+  const [rect, setRect] = useState(() => {
+    const W = Math.min(380, window.innerWidth - 16), H = Math.min(540, window.innerHeight - 32);
+    let r = { x: window.innerWidth - W - 24, y: window.innerHeight - H - 24, w: W, h: H };
+    try { const g = JSON.parse(localStorage.getItem(CLAVE_VENTANA) || "null"); if (g && g.w > 0) r = { ...r, ...g }; } catch { /* sin almacenamiento */ }
+    return r;
+  });
+  const encajar = r => {
+    const w = Math.min(Math.max(r.w, 300), window.innerWidth - 16), h = Math.min(Math.max(r.h, 320), window.innerHeight - 16);
+    return { w, h, x: Math.min(Math.max(r.x, 8), window.innerWidth - w - 8), y: Math.min(Math.max(r.y, 8), window.innerHeight - h - 8) };
+  };
+  const guardar = r => { try { localStorage.setItem(CLAVE_VENTANA, JSON.stringify(r)); } catch { /* sin almacenamiento */ } };
+  useEffect(() => { const f = () => setRect(r => encajar(r)); f(); window.addEventListener("resize", f); return () => window.removeEventListener("resize", f); }, []);
+  // Guarda el tamaño cuando se redimensiona desde la esquina
+  useEffect(() => {
+    if (!caja.current || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(([e]) => { const w = e.target.offsetWidth, h = e.target.offsetHeight; setRect(r => { if (Math.abs(r.w - w) < 2 && Math.abs(r.h - h) < 2) return r; const n = { ...r, w, h }; guardar(n); return n; }); });
+    ro.observe(caja.current); return () => ro.disconnect();
+  }, []);
+  const empezar = e => {
+    if (!e.target.closest("[data-asa]") || e.target.closest("button,input,select,textarea,a") || window.innerWidth < 768) return;
+    e.preventDefault();
+    const x0 = e.clientX, y0 = e.clientY, r0 = rect;
+    const mover = ev => setRect(encajar({ ...r0, x: r0.x + ev.clientX - x0, y: r0.y + ev.clientY - y0 }));
+    const soltar = () => { window.removeEventListener("pointermove", mover); window.removeEventListener("pointerup", soltar); setRect(r => { guardar(r); return r; }); };
+    window.addEventListener("pointermove", mover); window.addEventListener("pointerup", soltar);
+  };
+  return (
+    <div ref={caja} className="praxi-nora" role="dialog" aria-label="Nora" onPointerDown={empezar}
+      style={{ position: "fixed", left: rect.x, top: rect.y, width: rect.w, height: rect.h, minWidth: 300, minHeight: 320, resize: "both", overflow: "hidden", background: C.bone, border: `1px solid ${C.border}`, borderRadius: 18, zIndex, display: "flex", flexDirection: "column", boxShadow: "0 18px 50px rgba(40,25,20,0.24)" }}>
+      {children}
+    </div>
+  );
 }
 
 const copiar = t => navigator.clipboard?.writeText(t).catch(() => {});
@@ -178,8 +223,8 @@ export function NoraPanel({ patient, citas = [], inicial = null, onClose, onGuar
   const area = { ...st.textarea, minHeight: 110, fontSize: 13 };
 
   return (
-    <div className="praxi-nora" role="dialog" aria-label="Nora" style={{ position: "fixed", top: 0, right: 0, width: 420, maxWidth: "100vw", height: "100vh", background: C.bone, borderLeft: `1px solid ${C.border}`, zIndex: 100, display: "flex", flexDirection: "column", boxShadow: "-4px 0 24px rgba(59,42,30,0.12)" }}>
-      <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: NORA.tinte }}>
+    <VentanaNora zIndex={100}>
+      <div data-asa title="Arrastra para mover" style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: NORA.tinte, cursor: "move", userSelect: "none" }}>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <NoraMarca size={32} />
           <div>
@@ -278,7 +323,7 @@ export function NoraPanel({ patient, citas = [], inicial = null, onClose, onGuar
         <input style={{ ...st.input, flex: 1, fontSize: 13 }} value={pregunta} onChange={e => setPregunta(e.target.value)} onKeyDown={e => e.key === "Enter" && !e.shiftKey && preguntar()} placeholder="Pregúntale algo sobre la ficha…" aria-label="Pregunta para Nora" />
         <button style={{ ...st.btn(), padding: "0 16px" }} onClick={preguntar} disabled={cargando || !pregunta.trim()} aria-label="Enviar">↑</button>
       </div>
-    </div>
+    </VentanaNora>
   );
 }
 

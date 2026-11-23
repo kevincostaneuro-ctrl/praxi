@@ -2,7 +2,7 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { DemoCtx, EquipoCtx } from "./constantes.js";
 import { C, st } from "./estilos.js";
 import { crearSeudonimos, enviarIA } from "./ia.jsx";
-import { NORA, NoraMarca } from "./nora.jsx";
+import { NORA, NoraMarca, VentanaNora } from "./nora.jsx";
 import { contextoApp, estiloNora, leerAcciones, REGLAS_APP, validarAccion } from "./noraContexto.js";
 import { fechaDe } from "./utilidades.js";
 
@@ -95,18 +95,19 @@ export function NoraGlobal({ pagina, patients, citas, tareas, horario, tipos = [
   );
 
   return (
-    <div className="praxi-nora" role="dialog" aria-label="Nora" style={{ position: "fixed", top: 0, right: 0, width: 420, maxWidth: "100vw", height: "100vh", background: C.bone, borderLeft: `1px solid ${C.border}`, zIndex: 110, display: "flex", flexDirection: "column", boxShadow: "-4px 0 24px rgba(59,42,30,0.12)" }}>
-      <div style={{ padding: "14px 18px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: NORA.tinte }}>
+    <VentanaNora zIndex={110}>
+      <div data-asa title="Arrastra para mover" style={{ padding: "12px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: NORA.tinte, cursor: "move", userSelect: "none" }}>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <NoraMarca size={32} />
           <div>
             <div style={{ fontSize: 16, fontWeight: 700, color: C.text }}>Nora</div>
-            <div style={{ fontSize: 11.5, color: C.muted }}>Agenda, huecos, pacientes y cobros</div>
+            <div style={{ fontSize: 11.5, color: C.muted }}>Tu asistente en Praxi</div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           {chat.length > 0 && <button onClick={() => setChat([])} style={{ ...st.btn("ghost"), fontSize: 12 }}>Nueva</button>}
-          <button onClick={() => setAbierta(false)} aria-label="Cerrar Nora" style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.muted }}>✕</button>
+          <button onClick={() => setAbierta(false)} aria-label="Minimizar Nora" title="Minimizar (la conversación se guarda)" style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.muted, padding: "0 4px" }}>—</button>
+          <button onClick={() => { setAbierta(false); setChat([]); }} aria-label="Cerrar Nora" title="Cerrar y empezar de cero" style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: C.muted, padding: "0 4px" }}>✕</button>
         </div>
       </div>
       <div style={{ flex: 1, overflowY: "auto", padding: "16px 18px", display: "flex", flexDirection: "column", gap: 10 }}>
@@ -130,6 +131,6 @@ export function NoraGlobal({ pagina, patients, citas, tareas, horario, tipos = [
         <input autoFocus style={{ ...st.input, flex: 1, fontSize: 13 }} value={pregunta} onChange={e => setPregunta(e.target.value)} onKeyDown={e => e.key === "Enter" && !e.shiftKey && enviar()} placeholder="Pregúntale a Nora…" aria-label="Pregunta para Nora" />
         <button style={{ ...st.btn(), padding: "0 16px", background: NORA.tinteTexto, color: "#fff" }} onClick={() => enviar()} disabled={cargando || !pregunta.trim()} aria-label="Enviar">↑</button>
       </div>
-    </div>
+    </VentanaNora>
   );
 }
