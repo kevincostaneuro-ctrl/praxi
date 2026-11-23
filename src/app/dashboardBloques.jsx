@@ -13,9 +13,6 @@ export const MARCA_FACTURA = "praxi_factura_generada";
 export const MARCA_GUIA = "praxi_guia_leida";
 const URL_GUIA = "/recursos/guias/como-abrir-tu-consulta.pdf";
 
-export const LIMITE_BASICO = 10;
-export const DIAS_PRUEBA = 90;
-
 const Titulo = ({ children, extra }) => (
   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
     <div style={{ fontSize: 12, color: C.walnut, textTransform: "uppercase", letterSpacing: "0.07em", fontWeight: 600 }}>{children}</div>
@@ -162,39 +159,6 @@ export function CobrosPendientes({ patients, setPatients, onIr }) {
         return <GenerarFacturaModal patient={pa} sesion={se} onClose={() => setFactura(null)}
           onGuardarNumero={n => setPatients(ps => ps.map(x => x.id === pa.id ? { ...x, sesiones: x.sesiones.map(y => y.id === se.id ? { ...y, factura: n } : y) } : x))} />;
       })()}
-    </div>
-  );
-}
-
-// ── 6 · Tu plan ─────────────────────────────────────────────────────────────
-// Paciente activo: con una cita o una sesión en los últimos 90 días, o con una cita futura
-export function pacientesActivosPlan(patients, citas) {
-  const hoy = today();
-  const desde = toYMD(new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() - 90));
-  const ids = new Set();
-  citas.forEach(c => { if (c.pacienteId && c.fecha >= desde) ids.add(String(c.pacienteId)); });
-  patients.forEach(p => { if ((p.sesiones || []).some(s => (s.fecha || "") >= desde)) ids.add(String(p.id)); });
-  return patients.filter(p => ids.has(String(p.id))).length;
-}
-
-export function TuPlan({ clinica, patients, citas, demo }) {
-  const activos = pacientesActivosPlan(patients, citas);
-  const inicio = clinica?.creado_en ? new Date(clinica.creado_en) : null;
-  const quedan = inicio ? DIAS_PRUEBA - diasEntre(inicio, today()) : (demo ? DIAS_PRUEBA : null);
-  const enPrueba = quedan != null && quedan > 0;
-  const pct = Math.min(100, Math.round(activos / LIMITE_BASICO * 100));
-  const cerca = activos >= LIMITE_BASICO - 2;
-  const supera = activos > LIMITE_BASICO;
-  return (
-    <div style={{ ...st.card, padding: "16px 20px" }}>
-      <Titulo extra={enPrueba && <span style={st.badge(C.green, C.gD)}>{quedan} {quedan === 1 ? "día" : "días"} de prueba</span>}>Tu plan</Titulo>
-      <div style={{ fontSize: 15, fontWeight: 700, color: C.ink, marginTop: 2 }}>{enPrueba ? "Prueba gratuita · todo incluido" : "Acceso anticipado"}</div>
-      <div style={{ fontSize: 13, color: C.text, marginTop: 12 }}><b>{activos}</b> de {LIMITE_BASICO} pacientes activos <span style={{ color: C.muted }}>(límite del plan Básico)</span></div>
-      <div style={{ height: 6, background: C.sand, borderRadius: 3, marginTop: 8 }}><div style={{ width: `${pct}%`, height: 6, background: cerca ? C.amber : C.accent, borderRadius: 3 }} /></div>
-      <div style={{ fontSize: 12, color: C.muted, marginTop: 10, lineHeight: 1.5 }}>
-        Cuenta como activo quien ha tenido cita o sesión en los últimos 90 días.
-        {supera ? " Superas el límite de Básico: al terminar la prueba te corresponde Profesional (ilimitado)." : cerca ? " Estás cerca del límite de Básico: con Profesional los pacientes son ilimitados." : " Básico: hasta 10 pacientes activos · Profesional: ilimitados."}
-      </div>
     </div>
   );
 }

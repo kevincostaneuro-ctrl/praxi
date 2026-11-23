@@ -42,6 +42,7 @@ export async function consumirCuota(token, fetchImpl = fetch) {
   });
   if (r.ok) return { ok: true };
   const e = await r.json().catch(() => ({}));
+  if (/plan caducado/i.test(e?.message || "")) return { ok: false, status: 402, error: "Tu periodo de prueba ha terminado. Elige un plan en Equipo → Tu plan para seguir usando Nora." };
   if (/límite diario/i.test(e?.message || "")) return { ok: false, status: 429, error: "Has alcanzado el límite diario del asistente. Mañana vuelve a estar disponible." };
   return { ok: false, status: 503, error: "El asistente no está disponible ahora mismo." };
 }

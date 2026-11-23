@@ -17,6 +17,8 @@ import { Acceso, Enlace, Onboarding, PantallaEstado } from "./app/acceso.jsx";
 import { Calendario } from "./app/calendario.jsx";
 import { CitaModal, TareaModal, useReminders } from "./app/citas.jsx";
 import { Configuracion } from "./app/configuracion.jsx";
+import { estadoPlan, superaLimitePacientes } from "./app/plan.js";
+import { AvisoPlan, BannerPlan } from "./app/planUI.jsx";
 import { CLINICA_STORE, DEFAULT_TIPOS_CITA, DemoCtx, EquipoCtx, IA_VISIBLE, PRAXI_LOGO, WORK_END, WORK_START } from "./app/constantes.js";
 import { Dashboard } from "./app/dashboard.jsx";
 import { DEMO_MIEMBROS, DEMO_USER, SAMPLE_CITAS, demoPacientes, mkPatient } from "./app/demo.js";
@@ -67,12 +69,27 @@ export default function App({demo=false}){
 
   // ── Datos ──
   const[patients,setPatientsSync,cargarPatients,cambioPatients,patientsRef]=useEstadoSincronizado(demo?demoPacientes():[]);
-  const[citas,setCitasSync,cargarCitas,cambioCitas]=useEstadoSincronizado(demo?SAMPLE_CITAS.filter(c=>![7,10,12].includes(c.pacienteId)):[]);
+  const[citas,setCitasSync,cargarCitas,cambioCitas,citasRef]=useEstadoSincronizado(demo?SAMPLE_CITAS.filter(c=>![7,10,12].includes(c.pacienteId)):[]);
   const[tareas,setTareasSync,cargarTareas,cambioTareas]=useEstadoSincronizado([]);
   const[tipos,setTiposSync,cargarTipos,cambioTipos,tiposRef]=useEstadoSincronizado(DEFAULT_TIPOS_CITA);
   const[horario,setHorarioSync,cargarHorario,cambioHorario,horarioRef]=useEstadoSincronizado({start:WORK_START,end:WORK_END});
-  const setPatients=ro(setPatientsSync);
-  const setCitas=ro(setCitasSync);
+  // Plan: en solo lectura no se crea ni se modifica; en Básico, máximo 10 pacientes activos
+  const[suscripcion,setSuscripcion]=useState(null);
+  const[avisoPlan,setAvisoPlan]=useState(null);
+  const[abrirPlanes,setAbrirPlanes]=useState(false);
+  const planRef=useRef(null);
+  const conPlan=(setSync,tipo)=>upd=>{
+    const p=planRef.current;
+    if(!p)return setSync(upd);
+    if(p.soloLectura){setAvisoPlan("lectura");return;}
+    if(!p.limitePacientes)return setSync(upd);
+    const antesC=citasRef.current,antesP=patientsRef.current;
+    const next=typeof upd==="function"?upd(tipo==="citas"?antesC:antesP):upd;
+    if(superaLimitePacientes({limite:p.limitePacientes,citasAntes:antesC,citasDespues:tipo==="citas"?next:antesC,pacientesAntes:antesP,pacientesDespues:tipo==="pacientes"?next:antesP})){setAvisoPlan("limite");return;}
+    setSync(next);
+  };
+  const setPatients=ro(conPlan(setPatientsSync,"pacientes"));
+  const setCitas=ro(conPlan(setCitasSync,"citas"));
   const setTareas=ro(setTareasSync);
   const setTipos=ro(setTiposSync);
   const setHorario=ro(setHorarioSync);
@@ -105,6 +122,9 @@ export default function App({demo=false}){
         leerTodo("pacientes",c),leerTodo("citas",c),leerTodo("tareas",c),
       ]);
       if(e1||e2)throw(e1||e2);
+      // Suscripción (si la tabla aún no existe, se sigue como prueba)
+      const{data:sus}=await supabase.from("suscripciones").select("*").eq("clinica_id",c).maybeSingle().then(r=>r,()=>({data:null}));
+      setSuscripcion(sus||null);
       setCurrentUser(yo);setCurrentClinica(cl);setProfesionales(ms);
       cargarPatients(ps.map(r=>({...mkPatient(),...r.datos,id:Number(r.id),profesionalId:r.profesional_id})));
       cargarCitas(cs.map(r=>({...r.datos,id:Number(r.id),profesionalId:r.profesional_id})));
@@ -159,6 +179,17 @@ export default function App({demo=false}){
   const registrarVista=useCallback(id=>{if(!demo&&cid)supabase.rpc("registrar_vista",{p_clinica:cid,p_paciente:id}).then(()=>{},()=>{});},[demo,cid]);
   const cerrarSesion=async()=>{if(demo){window.location.href="/";return;}await supabase.auth.signOut();};
   const[page,setPage]=useState("dashboard");
+  const plan=estadoPlan({clinica:currentClinica,suscripcion,demo});
+  planRef.current=plan;
+  const verPlanes=()=>{setAbrirPlanes(true);setPage("admin");setSelectedId(null);};
+  // Vuelta desde la página de pago de Stripe
+  useEffect(()=>{
+    if(demo)return;
+    const q=new URLSearchParams(window.location.search).get("pago");
+    if(!q)return;
+    window.history.replaceState(null,"",window.location.pathname);
+    if(q==="ok"){setAviso("¡Pago recibido! Tu plan se activa en unos segundos.");setTimeout(()=>cargarTodo(),4000);}
+  },[demo,cargarTodo]);
   const[menuMovil,setMenuMovil]=useState(false);
   const[selectedId,setSelectedId]=useState(null);
   const[showInforme,setShowInforme]=useState(false);
@@ -360,15 +391,17 @@ export default function App({demo=false}){
           <span><strong style={{color:C.accent}}>Modo demo</strong> · Navega por todas las secciones con pacientes de ejemplo. Los cambios no se guardan.</span>
           <a href="/" style={{...st.btn("sm"),textDecoration:"none"}}>Solicitar acceso</a>
         </div>}
+        {!demo&&<BannerPlan plan={plan} esAdmin={esAdmin} onVerPlanes={verPlanes}/>}
         {page==="dashboard"&&<Dashboard tipos={tipos} patients={patients} setPatients={setPatients} clinica={currentClinica} yo={currentUser} esAdmin={esAdmin} demo={demo} onIr={id=>{setPage(id);setSelectedId(null);}} onVideo={()=>setShowVideo(true)} citas={citas} setCitas={setCitas} tareas={tareas} setTareas={setTareas} onInforme={()=>setShowInforme(true)} onEditCita={c=>setEditCitaDash(c)} onEditTarea={t=>setEditTareaDash(t)} onNuevaCita={()=>setNewCitaDash(true)} onAgendar={id=>setNewCitaDash({pacienteId:id})} onAbrirPaciente={selectPatient} horario={horario} onNuevoPaciente={()=>{setAutoNewPaciente(true);setPage("pacientes");}} onVerCalendario={()=>setPage("calendario")}/>}
         {page==="calendario"&&<Calendario patients={patients} citas={citas} setCitas={setCitas} config={config} setConfig={setConfig} tipos={tipos} horario={horario} tareas={tareas} setTareas={setTareas}/>}
         {page==="pacientes"&&<Pacientes patients={patients} setPatients={setPatients} onSelect={selectPatient} autoNew={autoNewPaciente} onAutoNewDone={()=>setAutoNewPaciente(false)}/>}
         {page==="ficha"&&selectedPatient&&<FichaPaciente patient={selectedPatient} setPatients={setPatients} onBack={goBack} citas={citas} setCitas={setCitas} profesionales={profesionales} tipos={tipos}/>}
         {page==="facturas"&&<Facturas patients={patients} setPatients={setPatients}/>}
         {page==="recursos"&&<Recursos patients={patients} citas={citas} clinica={currentClinica} yo={currentUser}/>}
-        {page==="admin"&&currentUser.rol==="admin"&&<EquipoPanel clinica={currentClinica} miembros={profesionales} yo={currentUser} patients={patients} citas={citas} demo={demo} onCambio={cargarTodo} bloquearDemo={()=>setDemoToast(true)} setAviso={setAviso} onBorrada={cerrarSesion}/>}
+        {page==="admin"&&currentUser.rol==="admin"&&<EquipoPanel plan={plan} suscripcion={suscripcion} abrirPlanes={abrirPlanes} clinica={currentClinica} miembros={profesionales} yo={currentUser} patients={patients} citas={citas} demo={demo} onCambio={cargarTodo} bloquearDemo={()=>setDemoToast(true)} setAviso={setAviso} onBorrada={cerrarSesion}/>}
         {page==="configuracion"&&<Configuracion esAdmin={currentUser.rol==="admin"} horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos} preferenciasNora={currentUser.preferencias_nora} onNoraGuardada={p=>setCurrentUser(u=>({...u,preferencias_nora:p}))}/>}
       </div>
+      {avisoPlan&&<AvisoPlan tipo={avisoPlan} esAdmin={esAdmin} onVerPlanes={verPlanes} onClose={()=>setAvisoPlan(null)}/>}
       {showInforme&&<InformeMensual patients={patients} citas={citas} onClose={()=>setShowInforme(false)}/>}
       {editCitaDash&&<CitaModal cita={editCitaDash} patients={patients} tipos={tipos} defaultFecha={editCitaDash.fecha} defaultHora={editCitaDash.hora} defaultTipoId={editCitaDash.tipoId} makeUrl={config.makeOut} onClose={()=>setEditCitaDash(null)} onSave={form=>{setCitas(cs=>cs.map(c=>c.id===form.id?{...c,...form}:c));setEditCitaDash(null);}} onDelete={id=>{setCitas(cs=>cs.filter(c=>c.id!==id));setEditCitaDash(null);}}/>}
       {showVideo&&<MiVideollamadaModal yo={currentUser} demo={demo} onClose={()=>setShowVideo(false)} onDemo={()=>{setShowVideo(false);setDemoToast(true);}}
