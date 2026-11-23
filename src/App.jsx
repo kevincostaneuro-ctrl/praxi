@@ -165,6 +165,7 @@ export default function App({demo=false}){
   const[editCitaDash,setEditCitaDash]=useState(null);
   const[editTareaDash,setEditTareaDash]=useState(null);
   const[newCitaDash,setNewCitaDash]=useState(false);
+  const[noraAbierta,setNoraAbierta]=useState(false);
   const[showVideo,setShowVideo]=useState(false);
   const[autoNewPaciente,setAutoNewPaciente]=useState(false);
   const[globalSearch,setGlobalSearch]=useState("");
@@ -195,7 +196,7 @@ export default function App({demo=false}){
   }
   return(
     <DemoCtx.Provider value={demo}>
-    <EquipoCtx.Provider value={{preferenciasNora:currentUser.preferencias_nora,miNombre:currentUser.nombre,clinicaNombre:currentClinica?.nombre,esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id,registrarVista,guardarMisDatosFact:d=>{setCurrentUser(u=>({...u,datos_facturacion:d}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,datos_facturacion:d}:m));}}}>
+    <EquipoCtx.Provider value={{abrirNora:IA_VISIBLE?()=>setNoraAbierta(true):null,preferenciasNora:currentUser.preferencias_nora,miNombre:currentUser.nombre,clinicaNombre:currentClinica?.nombre,esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id,registrarVista,guardarMisDatosFact:d=>{setCurrentUser(u=>({...u,datos_facturacion:d}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,datos_facturacion:d}:m));}}}>
     <div style={st.app} className="praxi-app">
       {/* Móvil: barra superior con menú (en ordenador no se ve) */}
       <div className="praxi-topbar">
@@ -373,7 +374,7 @@ export default function App({demo=false}){
       {showVideo&&<MiVideollamadaModal yo={currentUser} demo={demo} onClose={()=>setShowVideo(false)} onDemo={()=>{setShowVideo(false);setDemoToast(true);}}
         onGuardado={e=>{setCurrentUser(u=>({...u,enlace_videollamada:e}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,enlace_videollamada:e}:m));setShowVideo(false);}}/>}
       {newCitaDash&&<CitaModal cita={null} defaultPacienteId={newCitaDash?.pacienteId} patients={patients} tipos={tipos} defaultFecha={newCitaDash?.fecha||toYMD(today())} defaultHora={newCitaDash?.hora||"09:00"} defaultTipoId={newCitaDash?.tipoId||tipos[0]?.id} makeUrl={config.makeOut} onClose={()=>setNewCitaDash(false)} onSave={form=>{setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:form.pacienteId?Number(form.pacienteId):null}]);setNewCitaDash(false);}} onDelete={()=>setNewCitaDash(false)}/>}
-      {IA_VISIBLE&&<NoraGlobal pagina={page} patients={patients} citas={citas} tareas={tareas} horario={horario} tipos={tipos} setCitas={setCitas} setTareas={setTareas} onNuevaCita={c=>setNewCitaDash(c)} onEditarCita={c=>setEditCitaDash(c)}/>}
+      {IA_VISIBLE&&<NoraGlobal abierta={noraAbierta} setAbierta={setNoraAbierta} pagina={page} patients={patients} citas={citas} tareas={tareas} horario={horario} tipos={tipos} setCitas={setCitas} setTareas={setTareas} onNuevaCita={c=>setNewCitaDash(c)} onEditarCita={c=>setEditCitaDash(c)}/>}
       {editTareaDash&&<TareaModal tarea={editTareaDash} onClose={()=>setEditTareaDash(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTareaDash(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTareaDash(null);}}/>}
     </div>
     </EquipoCtx.Provider>

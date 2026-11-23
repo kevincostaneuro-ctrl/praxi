@@ -1,4 +1,5 @@
 import { useContext, useMemo, useState } from "react";
+import { BotonNora } from "./noraGlobal.jsx";
 import { supabase } from "../supabase.js";
 import { Aviso } from "./acceso.jsx";
 import { DATOS_FACT_VACIOS, DemoCtx, EXENCION_IVA, EquipoCtx } from "./constantes.js";
@@ -276,6 +277,7 @@ export function Facturas({patients,setPatients}){
           <div style={{fontSize:13,color:C.muted,marginTop:2}}>{todasFacturas.length} facturas emitidas</div>
         </div>
         <div style={{display:"flex",gap:8}}>
+          <BotonNora/>
           <button style={{...st.btn("sm"),background:C.bone,color:C.walnut}} onClick={()=>setMisDatos(true)}>{yo.datos_facturacion?.nif?"Mis datos de facturación":"⚠ Añadir mis datos de facturación"}</button>
           <button style={st.btn("sm")} onClick={()=>setNueva(true)}>+ Nueva factura</button>
         </div>

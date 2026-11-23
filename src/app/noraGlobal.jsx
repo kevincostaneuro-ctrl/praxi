@@ -46,10 +46,20 @@ function TarjetaAccion({ accion, estado, datos, onConfirmar, onDescartar }) {
   );
 }
 
-export function NoraGlobal({ pagina, patients, citas, tareas, horario, tipos = [], setCitas, setTareas, onNuevaCita, onEditarCita }) {
+// Botón «Nora» para la cabecera de cada página (a la izquierda de «+ Nueva cita», «+ Nuevo paciente»…)
+export function BotonNora() {
+  const { abrirNora } = useContext(EquipoCtx) || {};
+  if (!abrirNora) return null;
+  return (
+    <button onClick={abrirNora} title="Pregúntale a Nora: agenda, huecos, pacientes, cobros…" style={{ ...st.btn("sm"), background: NORA.tinte, color: NORA.tinteTexto, display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 700 }}>
+      <NoraMarca size={16} />Nora
+    </button>
+  );
+}
+
+export function NoraGlobal({ abierta, setAbierta, pagina, patients, citas, tareas, horario, tipos = [], setCitas, setTareas, onNuevaCita, onEditarCita }) {
   const demo = useContext(DemoCtx);
   const { miId, miembros = [], preferenciasNora } = useContext(EquipoCtx) || {};
-  const [abierta, setAbierta] = useState(false);
   const [chat, setChat] = useState([]);
   const [pregunta, setPregunta] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -86,13 +96,7 @@ export function NoraGlobal({ pagina, patients, citas, tareas, horario, tipos = [
 
   const sugerencias = SUGERENCIAS[pagina] || SUGERENCIAS.dashboard;
 
-  if (!abierta) return (
-    <button className="praxi-nora-fab" onClick={() => setAbierta(true)} aria-label="Pregúntale a Nora"
-      style={{ position: "fixed", right: 22, bottom: 22, zIndex: 90, display: "inline-flex", alignItems: "center", gap: 9, padding: "8px 18px 8px 8px", border: NORA.fabBorde ? `1.5px solid ${NORA.fabBorde}` : "none", borderRadius: 999, background: NORA.fab || NORA.fondo, color: NORA.fabTexto || NORA.texto, fontWeight: 700, fontSize: 14, fontFamily: "inherit", cursor: "pointer", boxShadow: "0 8px 24px rgba(40,30,70,.22)" }}>
-      <span style={{ width: 30, height: 30, borderRadius: "50%", display: "inline-flex", alignItems: "center", justifyContent: "center" }}><NoraMarca size={26} vivo /></span>
-      <span className="praxi-nora-fab-txt">Pregúntale a Nora</span>
-    </button>
-  );
+  if (!abierta) return null;
 
   return (
     <VentanaNora zIndex={110}>

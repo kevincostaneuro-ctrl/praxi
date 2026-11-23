@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { BotonNora } from "./noraGlobal.jsx";
 import { AgendaPersonalPanel, CitaModal, TareaModal } from "./citas.jsx";
 import { DAYS_ES, MONTHS_ES, SLOT_H, pad } from "./constantes.js";
 import { C, st } from "./estilos.js";
@@ -251,7 +252,7 @@ export function Calendario({patients,citas,setCitas,config,setConfig,tipos,horar
     <div style={{maxWidth:1280}}>{/* ancho máximo: en pantallas grandes la vista día quedaba demasiado ancha */}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
         <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Calendario</div>
-        <button style={st.btn()} onClick={()=>openNew(date,"09:00",tipos[0]?.id)}>+ Añadir</button>
+        <div style={{display:"flex",gap:8,alignItems:"center"}}><BotonNora/><button style={st.btn()} onClick={()=>openNew(date,"09:00",tipos[0]?.id)}>+ Nueva cita</button></div>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) 280px",gap:16,marginBottom:16,alignItems:"center"}}>
        <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",alignItems:"center",gap:10}}>

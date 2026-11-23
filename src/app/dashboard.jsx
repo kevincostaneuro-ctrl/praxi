@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AgendaPersonalPanel } from "./citas.jsx";
 import { DAYS_ES, IA_VISIBLE, MONTHS_ES, WORK_END, WORK_START } from "./constantes.js";
 import { anadirNota, NORA, NoraMarca, NoraPanel } from "./nora.jsx";
+import { BotonNora } from "./noraGlobal.jsx";
 import { C, PRIORIDAD_T, st } from "./estilos.js";
 import { CitasHoy, PrimerosPasos } from "./dashboardBloques.jsx";
 import { colorTipo } from "./calendario.jsx";
@@ -102,6 +103,7 @@ export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,
           <div style={{fontSize:13.5,color:C.muted,marginTop:4}}>{fechaLarga} · {resumenHoy}</div>
         </div>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          <BotonNora/>
           <button style={st.btn("sm")} onClick={onNuevoPaciente}>+ Nuevo paciente</button>
           <button style={st.btn("sm")} onClick={onNuevaCita}>+ Nueva cita</button>
           <button style={{...st.btn("sm"),background:C.gD,color:C.green}} onClick={onInforme}>📊 Informe mensual</button>
