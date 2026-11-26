@@ -105,7 +105,7 @@ export function SeguridadCuenta({ demo }) {
         {estado === "inactiva" && <span style={st.badge(C.amber, C.amD)}>Recomendada</span>}
       </div>
       <div style={{ fontSize: 13, color: C.muted, marginTop: 4, lineHeight: 1.6, maxWidth: 620 }}>
-        Además de la contraseña, al entrar se pide un código de tu móvil. Si alguien consigue tu contraseña, no podrá ver los datos de tus pacientes.
+        Al iniciar sesión, además de tu contraseña, te pediremos un código de 6 cifras que genera una app en tu móvil. Así, aunque alguien consiga tu contraseña, no podrá ver los datos de tus pacientes.
       </div>
 
       {estado === "inactiva" && <button style={{ ...st.btn(), marginTop: 16, opacity: ocupado ? 0.6 : 1 }} disabled={ocupado} onClick={empezar}>{ocupado ? "Preparando…" : "Activar"}</button>}
