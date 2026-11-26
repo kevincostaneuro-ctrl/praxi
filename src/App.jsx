@@ -86,7 +86,13 @@ export default function App({demo=false}){
   const conPlan=(setSync,tipo)=>upd=>{
     const p=planRef.current;
     if(!p)return setSync(upd);
-    if(p.soloLectura){setAvisoPlan("lectura");return;}
+    if(p.soloLectura){
+      // En solo lectura se puede borrar (derecho de supresión), pero no crear ni modificar
+      const antes=tipo==="citas"?citasRef.current:patientsRef.current;
+      const next=typeof upd==="function"?upd(antes):upd;
+      if(next.length<antes.length&&next.every(x=>antes.includes(x)))return setSync(next);
+      setAvisoPlan("lectura");return;
+    }
     if(!p.limitePacientes)return setSync(upd);
     const antesC=citasRef.current,antesP=patientsRef.current;
     const next=typeof upd==="function"?upd(tipo==="citas"?antesC:antesP):upd;

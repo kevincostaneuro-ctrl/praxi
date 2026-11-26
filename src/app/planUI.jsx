@@ -41,7 +41,7 @@ export function AvisoPlan({ tipo, esAdmin, onVerPlanes, onClose }) {
     <Modal title={lectura ? "Praxi está en solo lectura" : "Has llegado a 10 pacientes activos"} onClose={onClose} width={440}>
       <div style={{ fontSize: 14, color: C.text, lineHeight: 1.6 }}>
         {lectura
-          ? <>Tu prueba gratuita ha terminado. Tus datos siguen aquí y puedes exportarlos cuando quieras desde Configuración. Para volver a crear y modificar, elige un plan.</>
+          ? <>Tu prueba gratuita ha terminado. Tus datos siguen aquí: puedes consultarlos, exportarlos y borrarlos cuando quieras. Para volver a crear y modificar, elige un plan.</>
           : <>El plan Básico incluye hasta 10 pacientes activos a la vez. Con Profesional no hay límite de pacientes.</>}
       </div>
       <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "flex-end" }}>

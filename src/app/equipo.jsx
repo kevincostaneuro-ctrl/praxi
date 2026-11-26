@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { EMAIL_CONTACTO } from "../legal.js";
 import { supabase } from "../supabase.js";
 import { Aviso } from "./acceso.jsx";
 import { DatosClinica } from "./configuracion.jsx";
@@ -68,7 +69,7 @@ export function EquipoPanel({onClinica,plan,suscripcion,abrirPlanes,clinica,miem
     if(!/^\S+@\S+\.\S+$/.test(e)){setErr("Escribe un email válido.");return;}
     if(miembros.some(m=>m.email===e)){setErr("Esa persona ya forma parte de la clínica.");return;}
     const ocupados=miembros.filter(m=>m.activo).length+invs.length;
-    if(plan?.maxProfesionales&&ocupados>=plan.maxProfesionales){setErr(plan.plan==="clinica"?`Tu plan Clínica incluye ${plan.maxProfesionales} profesionales. Para añadir más (19 €/mes cada uno), contacta con Praxi.`:"Tu plan es para un solo profesional. Pasa al plan Clínica para trabajar en equipo.");return;}
+    if(plan?.maxProfesionales&&ocupados>=plan.maxProfesionales){setErr(plan.plan==="clinica"?`Tu plan Clínica incluye ${plan.maxProfesionales} profesionales. Para añadir más (19 €/mes cada uno), escríbenos a ${EMAIL_CONTACTO}.`:"Tu plan es para un solo profesional. Pasa al plan Clínica para trabajar en equipo.");return;}
     setEnviando(true);
     const{data,error}=await supabase.from("invitaciones").insert({clinica_id:clinica.id,email:e,rol}).select().single();
     setEnviando(false);
