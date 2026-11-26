@@ -21,8 +21,9 @@ const P = ({ children }) => <p style={{ margin: "0 0 12px" }}>{children}</p>;
 const L = ({ children }) => <ul style={{ margin: "0 0 12px", paddingLeft: 22 }}>{children}</ul>;
 const A = ({ href, children }) => <a href={href} style={{ color: C.accent }}>{children}</a>;
 const Mail = () => <A href={`mailto:${EMAIL_CONTACTO}`}>{EMAIL_CONTACTO}</A>;
+// El NIF y el domicilio solo aparecen en el Aviso legal; el resto de textos remiten a él
 const Titular = () => (
-  <><strong>{TITULAR}</strong>{NIF ? `, con NIF ${NIF}` : ""}{DOMICILIO ? ` y domicilio en ${DOMICILIO}` : ""}</>
+  <><strong>{TITULAR}</strong> (datos identificativos completos en el <A href="/aviso-legal">Aviso legal</A>)</>
 );
 
 // Copia para imprimir del contrato aceptado (la prepara la app en Equipo → Protección de datos)
@@ -34,6 +35,13 @@ function leerCopia() {
 function PaginaLegal({ titulo, children }) {
   const [copia] = useState(leerCopia);
   // Ir a la sección del enlace (#encargo, #medidas…) al abrir la página
+  // Que los buscadores no indexen las páginas legales
+  useEffect(() => {
+    const m = document.createElement("meta");
+    m.name = "robots"; m.content = "noindex, nofollow";
+    document.head.appendChild(m);
+    return () => m.remove();
+  }, []);
   useEffect(() => {
     if (copia) { window.scrollTo(0, 0); setTimeout(() => window.print(), 600); return; }
     const id = window.location.hash.slice(1);
