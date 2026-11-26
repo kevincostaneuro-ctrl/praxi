@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { RECURSOS } from "../recursos.js";
-import { DemoCtx, EquipoCtx } from "./constantes.js";
+import { DemoCtx, EquipoCtx, IA_VISIBLE } from "./constantes.js";
 import { C, st } from "./estilos.js";
 import { crearSeudonimos, enviarIA } from "./ia.jsx";
 import { estiloNora } from "./noraContexto.js";
@@ -339,4 +339,10 @@ export function anadirNota(p, texto, sesionId) {
 export async function notaSOAP(patient, notas) {
   const seud = crearSeudonimos([{ nombre: patient.nombre, apellidos: patient.apellidos, alias: ALIAS }]);
   return enviarIA({ system: `${REGLAS_NORA}\n\n${fichaTexto(patient)}`, messages: [{ role: "user", content: instruccion("nota", { notas }) }], seud });
+}
+
+// ¿Nora está disponible en esta clínica? (el administrador la puede apagar en Equipo)
+export function useNoraActiva() {
+  const equipo = useContext(EquipoCtx);
+  return IA_VISIBLE && equipo?.noraActiva !== false;
 }

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
+import { EMAIL_CONTACTO } from "../legal.js";
 import { supabase } from "../supabase.js";
 import { Aviso } from "./acceso.jsx";
 import { DatosClinica } from "./configuracion.jsx";
+import { ProteccionDatos } from "./proteccionDatos.jsx";
 import { C, st } from "./estilos.js";
 import { Field, MFooter, Modal } from "./ui.jsx";
 import { traducirError } from "./utilidades.js";
-import { TuPlan } from "./dashboardBloques.jsx";
+import { TuPlan } from "./planUI.jsx";
 
 // ── Mi videollamada: cada profesional guarda su enlace fijo ───────────────────
 export function MiVideollamadaModal({yo,demo,onClose,onGuardado,onDemo}){
@@ -44,7 +46,7 @@ export function MiVideollamadaModal({yo,demo,onClose,onGuardado,onDemo}){
 // ══════════════════════════════════════════════════════════════════════════════
 // EQUIPO — miembros, roles e invitaciones (solo administrador)
 // ══════════════════════════════════════════════════════════════════════════════
-export function EquipoPanel({clinica,miembros,yo,patients,citas,demo,onCambio,bloquearDemo,setAviso,onBorrada}){
+export function EquipoPanel({onClinica,plan,suscripcion,abrirPlanes,clinica,miembros,yo,patients,citas,demo,onCambio,bloquearDemo,setAviso,onBorrada}){
   const[invs,setInvs]=useState([]);
   const[email,setEmail]=useState("");
   const[rol,setRol]=useState("profesional");
@@ -66,6 +68,8 @@ export function EquipoPanel({clinica,miembros,yo,patients,citas,demo,onCambio,bl
     const e=email.trim().toLowerCase();
     if(!/^\S+@\S+\.\S+$/.test(e)){setErr("Escribe un email válido.");return;}
     if(miembros.some(m=>m.email===e)){setErr("Esa persona ya forma parte de la clínica.");return;}
+    const ocupados=miembros.filter(m=>m.activo).length+invs.length;
+    if(plan?.maxProfesionales&&ocupados>=plan.maxProfesionales){setErr(plan.plan==="clinica"?`Tu plan Clínica incluye ${plan.maxProfesionales} profesionales. Para añadir más (19 €/mes cada uno), escríbenos a ${EMAIL_CONTACTO}.`:"Tu plan es para un solo profesional. Pasa al plan Clínica para trabajar en equipo.");return;}
     setEnviando(true);
     const{data,error}=await supabase.from("invitaciones").insert({clinica_id:clinica.id,email:e,rol}).select().single();
     setEnviando(false);
@@ -89,7 +93,7 @@ export function EquipoPanel({clinica,miembros,yo,patients,citas,demo,onCambio,bl
       <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Equipo</div>
       <div style={{color:C.muted,fontSize:13,marginTop:2,marginBottom:20}}>{clinica?.nombre} · {miembros.filter(m=>m.activo).length} miembros activos</div>
 
-      <div style={{marginBottom:16}}><TuPlan clinica={clinica} patients={patients} citas={citas} demo={demo}/></div>
+      <div style={{marginBottom:16}}><TuPlan key={abrirPlanes?"abierto":"cerrado"} plan={plan} suscripcion={suscripcion} abrir={abrirPlanes} patients={patients} citas={citas} demo={demo}/></div>
 
       <div style={{...st.card,padding:"18px 20px",marginBottom:16}}>
         <div style={{...seccion,marginBottom:12}}>Invitar a un profesional</div>
@@ -155,6 +159,7 @@ export function EquipoPanel({clinica,miembros,yo,patients,citas,demo,onCambio,bl
           })}
         </div>
       )}
+      <ProteccionDatos clinica={clinica} miembros={miembros} demo={demo} onClinica={onClinica}/>
       <RegistroAccesos clinica={clinica} miembros={miembros} patients={patients} demo={demo}/>
       <DatosClinica clinica={clinica} miembros={miembros} patients={patients} citas={citas} demo={demo} bloquearDemo={bloquearDemo} onBorrada={onBorrada}/>
     </div>

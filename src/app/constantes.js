@@ -48,7 +48,8 @@ Yo, [NOMBRE DEL PACIENTE], con DNI _________________, declaro haber sido informa
    Toda la información compartida durante las sesiones es estrictamente confidencial y está protegida por el secreto profesional, salvo en los casos en que la ley obligue a su revelación (riesgo grave para el paciente u otras personas).
 
 4. PROTECCIÓN DE DATOS
-   Los datos personales serán tratados conforme al Reglamento General de Protección de Datos (RGPD) y la Ley Orgánica 3/2018. Serán utilizados exclusivamente para la gestión del tratamiento.
+   Los datos personales serán tratados conforme al Reglamento General de Protección de Datos (RGPD) y la Ley Orgánica 3/2018. Serán utilizados exclusivamente para la gestión del tratamiento y se conservarán durante el tiempo que exige la normativa sanitaria (como mínimo, 5 años desde el alta).
+   Para gestionar la historia clínica, la agenda y la facturación, el/la profesional utiliza un software de gestión clínica (Praxi) que guarda los datos en servidores de la Unión Europea con medidas de seguridad, actuando como encargado del tratamiento. Este software incluye un asistente de inteligencia artificial que el/la profesional puede usar como apoyo para redactar u ordenar notas; cuando lo hace, el nombre y los apellidos se sustituyen por un alias antes de enviar la información, y las decisiones clínicas las toma siempre el/la profesional.
 
 5. FORMATO DE LAS SESIONES
    Las sesiones se realizarán en formato online a través de plataformas seguras (Zoom). Cada sesión tendrá una duración de 60 minutos con frecuencia semanal o según acuerdo.

@@ -87,10 +87,10 @@ describe("seudónimos", () => {
 import { estiloNora } from "../src/app/noraContexto.js";
 describe("estilo de Nora", () => {
   it("aplica las preferencias y avisa de que no anulan las reglas", () => {
-    const t = estiloNora({ tono: "directo", extension: "breve", formato: "texto", trato: "tu", nombre: "Kevin", instrucciones: "Horas en 24 h" });
+    const t = estiloNora({ tono: "directo", extension: "breve", formato: "texto", trato: "tu", nombre: "Laura", instrucciones: "Horas en 24 h" });
     expect(t).toMatch(/nunca anula las reglas/);
     expect(t).toMatch(/directo y sin rodeos/);
-    expect(t).toMatch(/Llámale «Kevin»/);
+    expect(t).toMatch(/Llámale «Laura»/);
     expect(t).toMatch(/Horas en 24 h/);
     expect(estiloNora(null)).toMatch(/profesional y neutro/);
   });
@@ -99,13 +99,13 @@ describe("estilo de Nora", () => {
 import { saludoNora } from "../src/app/noraContexto.js";
 describe("saludo de Nora", () => {
   it("cambia según la hora y usa el nombre de pila", () => {
-    expect(saludoNora({ nombre: "Kevin Costa", ahora: new Date(2026, 10, 24, 9, 0), azar: () => 0 }).titulo).toBe("Buenos días, Kevin");
-    expect(saludoNora({ nombre: "Kevin", ahora: new Date(2026, 10, 24, 17, 0), azar: () => 0 }).titulo).toBe("Buenas tardes, Kevin");
+    expect(saludoNora({ nombre: "Laura Martín", ahora: new Date(2026, 10, 24, 9, 0), azar: () => 0 }).titulo).toBe("Buenos días, Laura");
+    expect(saludoNora({ nombre: "Laura", ahora: new Date(2026, 10, 24, 17, 0), azar: () => 0 }).titulo).toBe("Buenas tardes, Laura");
     expect(saludoNora({ nombre: "", ahora: new Date(2026, 10, 24, 22, 0), azar: () => 0 }).titulo).toBe("Buenas noches");
   });
   it("tiene saludos propios del día de la semana", () => {
-    const viernes = new Set(Array.from({ length: 40 }, (_, i) => saludoNora({ nombre: "Kevin", ahora: new Date(2026, 10, 27, 12, 0), azar: () => i / 40 }).titulo));
-    expect(viernes.has("¡Viernes ya, Kevin!")).toBe(true);
-    expect(viernes.has("¿Qué tal va la semana, Kevin?")).toBe(true);
+    const viernes = new Set(Array.from({ length: 40 }, (_, i) => saludoNora({ nombre: "Laura", ahora: new Date(2026, 10, 27, 12, 0), azar: () => i / 40 }).titulo));
+    expect(viernes.has("¡Viernes ya, Laura!")).toBe(true);
+    expect(viernes.has("¿Qué tal va la semana, Laura?")).toBe(true);
   });
 });

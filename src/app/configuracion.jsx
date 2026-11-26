@@ -1,4 +1,6 @@
 import { useContext, useState } from "react";
+import { SeguridadCuenta } from "./seguridad.jsx";
+import { marcarCopia } from "./proteccionDatos.jsx";
 import { supabase } from "../supabase.js";
 import { C, st } from "./estilos.js";
 import { Field } from "./ui.jsx";
@@ -54,7 +56,7 @@ function NoraPreferencias({inicial,onGuardada}){
 // ══════════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN
 // ══════════════════════════════════════════════════════════════════════════════
-export function Configuracion({esAdmin=true,horario,setHorario,tipos,setTipos,preferenciasNora,onNoraGuardada}){
+export function Configuracion({demo=false,esAdmin=true,horario,setHorario,tipos,setTipos,preferenciasNora,onNoraGuardada}){
   const[editTipo,setEditTipo]=useState(null);
   const[tipoForm,setTipoForm]=useState({nombre:"",duracion:60});
   const[horarioForm,setHorarioForm]=useState({start:horario.start,end:horario.end});
@@ -77,9 +79,10 @@ export function Configuracion({esAdmin=true,horario,setHorario,tipos,setTipos,pr
     <div>
       <div style={{marginBottom:28}}>
         <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Configuración</div>
-        <div style={{color:C.muted,fontSize:13,marginTop:2}}>Cómo te habla Nora, horario y tipos de cita</div>
+        <div style={{color:C.muted,fontSize:13,marginTop:2}}>Seguridad de tu cuenta, cómo te habla Nora, horario y tipos de cita</div>
       </div>
 
+      <SeguridadCuenta demo={demo}/>
       <NoraPreferencias inicial={preferenciasNora} onGuardada={onNoraGuardada}/>
       {esAdmin?<>
       {/* Horario */}
@@ -161,6 +164,7 @@ export function DatosClinica({clinica,miembros,patients,citas,demo,bloquearDemo,
     a.href=URL.createObjectURL(blob);
     a.download=`praxi-${(clinica.nombre||"clinica").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-")}-${new Date().toISOString().slice(0,10)}.json`;
     a.click();URL.revokeObjectURL(a.href);
+    marcarCopia(clinica.id);
   };
   const borrar=async()=>{
     if(demo)return bloquearDemo();
@@ -179,7 +183,7 @@ export function DatosClinica({clinica,miembros,patients,citas,demo,bloquearDemo,
       <div style={{...st.card,marginTop:16,padding:"16px 20px"}}>
         <div style={{...seccion,marginBottom:8}}>Exportar los datos de la clínica</div>
         <div style={{fontSize:13,color:C.muted,lineHeight:1.6,marginBottom:12}}>Descarga en un archivo todos los pacientes (con su historia, sesiones, evolución y documentos), las citas y el equipo. Úsalo como copia propia, para conservar la historia clínica o para llevarte tus datos a otro sistema.</div>
-        <button style={st.btn()} onClick={exportar}>Descargar todo (JSON)</button>
+        <button id="descargar-copia" style={st.btn()} onClick={exportar}>Descargar todo (JSON)</button>
       </div>
       <div style={{...st.card,marginTop:16,padding:"16px 20px",border:`1px solid ${C.red}`}}>
         <div style={{...seccion,color:C.red,marginBottom:8}}>Borrar la clínica</div>

@@ -178,10 +178,10 @@ function Demo() {
               }}>{label}</div>
             ))}
             <div style={{marginTop:"auto",padding:"14px 20px",borderTop:`1px solid ${D.border}`,display:"flex",alignItems:"center",gap:10}}>
-              <Avatar letter="K"/>
+              <Avatar letter="L"/>
               <div>
-                <div style={{fontSize:12,fontWeight:600,color:D.text}}>Kevin Costa</div>
-                <div style={{fontSize:10,color:D.muted}}>Neuropsicólogo</div>
+                <div style={{fontSize:12,fontWeight:600,color:D.text}}>Laura Martín</div>
+                <div style={{fontSize:10,color:D.muted}}>Psicóloga sanitaria</div>
               </div>
             </div>
           </div>
