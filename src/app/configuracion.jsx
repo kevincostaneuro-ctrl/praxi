@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { SeguridadCuenta } from "./seguridad.jsx";
 import { supabase } from "../supabase.js";
 import { C, st } from "./estilos.js";
 import { Field } from "./ui.jsx";
@@ -54,7 +55,7 @@ function NoraPreferencias({inicial,onGuardada}){
 // ══════════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN
 // ══════════════════════════════════════════════════════════════════════════════
-export function Configuracion({esAdmin=true,horario,setHorario,tipos,setTipos,preferenciasNora,onNoraGuardada}){
+export function Configuracion({demo=false,esAdmin=true,horario,setHorario,tipos,setTipos,preferenciasNora,onNoraGuardada}){
   const[editTipo,setEditTipo]=useState(null);
   const[tipoForm,setTipoForm]=useState({nombre:"",duracion:60});
   const[horarioForm,setHorarioForm]=useState({start:horario.start,end:horario.end});
@@ -77,9 +78,10 @@ export function Configuracion({esAdmin=true,horario,setHorario,tipos,setTipos,pr
     <div>
       <div style={{marginBottom:28}}>
         <div style={{fontSize:36,fontWeight:400,fontFamily:"'Instrument Serif',serif",letterSpacing:"-0.02em"}}>Configuración</div>
-        <div style={{color:C.muted,fontSize:13,marginTop:2}}>Cómo te habla Nora, horario y tipos de cita</div>
+        <div style={{color:C.muted,fontSize:13,marginTop:2}}>Seguridad de tu cuenta, cómo te habla Nora, horario y tipos de cita</div>
       </div>
 
+      <SeguridadCuenta demo={demo}/>
       <NoraPreferencias inicial={preferenciasNora} onGuardada={onNoraGuardada}/>
       {esAdmin?<>
       {/* Horario */}

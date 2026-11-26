@@ -127,7 +127,7 @@ export function TuPlan({ plan, suscripcion, patients, citas, demo, abrir = false
   const nActivos = patients.filter(p => activos.has(String(p.id))).length;
   const pagando = suscripcion && ["activa", "impagada"].includes(suscripcion.estado) && suscripcion.stripe_subscription_id;
   const cortesia = suscripcion?.estado === "cortesia";
-  const fundadorAbierto = Date.now() < new Date("2027-04-01T00:00:00+02:00").getTime();
+  const [fundadorAbierto] = useState(() => Date.now() < new Date("2027-04-01T00:00:00+02:00").getTime());
   const [fundadores, setFundadores] = useState(null);
   useEffect(() => {
     if (!verPlanes || !fundadorAbierto) return;

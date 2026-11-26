@@ -19,6 +19,8 @@ import { CitaModal, TareaModal, useReminders } from "./app/citas.jsx";
 import { Configuracion } from "./app/configuracion.jsx";
 import { estadoPlan, superaLimitePacientes } from "./app/plan.js";
 import { AvisoPlan, BannerPlan } from "./app/planUI.jsx";
+import { NuevosTerminos, PasoDos } from "./app/seguridad.jsx";
+import { VERSION_TERMINOS } from "./legal.js";
 import { CLINICA_STORE, DEFAULT_TIPOS_CITA, DemoCtx, EquipoCtx, IA_VISIBLE, PRAXI_LOGO, WORK_END, WORK_START } from "./app/constantes.js";
 import { Dashboard } from "./app/dashboard.jsx";
 import { DEMO_MIEMBROS, DEMO_USER, SAMPLE_CITAS, demoPacientes, mkPatient } from "./app/demo.js";
@@ -77,6 +79,7 @@ export default function App({demo=false}){
   const[suscripcion,setSuscripcion]=useState(null);
   const[avisoPlan,setAvisoPlan]=useState(null);
   const[abrirPlanes,setAbrirPlanes]=useState(false);
+  const[terminosLuego,setTerminosLuego]=useState(false);
   const planRef=useRef(null);
   const conPlan=(setSync,tipo)=>upd=>{
     const p=planRef.current;
@@ -137,7 +140,12 @@ export default function App({demo=false}){
 
   useEffect(()=>{
     if(demo)return;
-    if(uid){setEstado("cargando");cargarTodo();}
+    if(uid){
+      setEstado("cargando");
+      // Con verificación en dos pasos activada, primero se pide el código
+      supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+        .then(({data})=>{if(data?.nextLevel==="aal2"&&data.currentLevel!=="aal2")setEstado("mfa");else cargarTodo();},()=>cargarTodo());
+    }
     else{setCurrentUser(null);setCurrentClinica(null);setProfesionales([]);cargarPatients([]);cargarCitas([]);cargarTareas([]);setEstado("cargando");}
   },[uid]);
 
@@ -220,6 +228,7 @@ export default function App({demo=false}){
     if(!authListo)return <PantallaEstado titulo="Cargando…"/>;
     if(recuperando&&session)return <Acceso recuperando onPasswordCambiada={()=>setRecuperando(false)}/>;
     if(!session)return <Acceso/>;
+    if(estado==="mfa")return <PasoDos onListo={()=>{setEstado("cargando");cargarTodo();}} onSalir={cerrarSesion}/>;
     if(estado==="sin-clinica")return <Onboarding session={session} onListo={()=>{setEstado("cargando");cargarTodo();}}/>;
     if(estado==="desactivado")return <PantallaEstado titulo="Cuenta desactivada" texto="El administrador de tu clínica ha desactivado tu acceso. Si crees que es un error, contacta con él." accion={<Enlace onClick={cerrarSesion}>Cerrar sesión</Enlace>}/>;
     if(estado==="error")return <PantallaEstado titulo="No se han podido cargar los datos" texto="Puede ser un problema de conexión o que la base de datos todavía no esté configurada." accion={<><button style={st.btn()} onClick={()=>{setEstado("cargando");cargarTodo();}}>Reintentar</button><div style={{marginTop:14}}><Enlace onClick={cerrarSesion}>Cerrar sesión</Enlace></div></>}/>;
@@ -399,8 +408,9 @@ export default function App({demo=false}){
         {page==="facturas"&&<Facturas patients={patients} setPatients={setPatients}/>}
         {page==="recursos"&&<Recursos patients={patients} citas={citas} clinica={currentClinica} yo={currentUser}/>}
         {page==="admin"&&currentUser.rol==="admin"&&<EquipoPanel plan={plan} suscripcion={suscripcion} abrirPlanes={abrirPlanes} clinica={currentClinica} miembros={profesionales} yo={currentUser} patients={patients} citas={citas} demo={demo} onCambio={cargarTodo} bloquearDemo={()=>setDemoToast(true)} setAviso={setAviso} onBorrada={cerrarSesion}/>}
-        {page==="configuracion"&&<Configuracion esAdmin={currentUser.rol==="admin"} horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos} preferenciasNora={currentUser.preferencias_nora} onNoraGuardada={p=>setCurrentUser(u=>({...u,preferencias_nora:p}))}/>}
+        {page==="configuracion"&&<Configuracion demo={demo} esAdmin={currentUser.rol==="admin"} horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos} preferenciasNora={currentUser.preferencias_nora} onNoraGuardada={p=>setCurrentUser(u=>({...u,preferencias_nora:p}))}/>}
       </div>
+      {!demo&&esAdmin&&!terminosLuego&&currentClinica&&currentClinica.terminos_version!==VERSION_TERMINOS&&<NuevosTerminos version={VERSION_TERMINOS} onLuego={()=>setTerminosLuego(true)} onAceptados={v=>setCurrentClinica(c=>({...c,terminos_version:v}))}/>}
       {avisoPlan&&<AvisoPlan tipo={avisoPlan} esAdmin={esAdmin} onVerPlanes={verPlanes} onClose={()=>setAvisoPlan(null)}/>}
       {showInforme&&<InformeMensual patients={patients} citas={citas} onClose={()=>setShowInforme(false)}/>}
       {editCitaDash&&<CitaModal cita={editCitaDash} patients={patients} tipos={tipos} defaultFecha={editCitaDash.fecha} defaultHora={editCitaDash.hora} defaultTipoId={editCitaDash.tipoId} makeUrl={config.makeOut} onClose={()=>setEditCitaDash(null)} onSave={form=>{setCitas(cs=>cs.map(c=>c.id===form.id?{...c,...form}:c));setEditCitaDash(null);}} onDelete={id=>{setCitas(cs=>cs.filter(c=>c.id!==id));setEditCitaDash(null);}}/>}

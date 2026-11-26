@@ -9,9 +9,9 @@ export const EMAIL_CONTACTO = "contacto.praxiclinic@gmail.com";
 export const WEB = "www.praxiclinic.com";
 
 // Cambia la versión cada vez que modifiques el texto correspondiente
-export const VERSION_PRIVACIDAD = "2026-10-22";
-export const VERSION_TERMINOS = "2026-10-22.2";
-export const FECHA_TEXTOS = "22 de octubre de 2026";
+export const VERSION_PRIVACIDAD = "2026-11-26";
+export const VERSION_TERMINOS = "2026-11-26";
+export const FECHA_TEXTOS = "26 de noviembre de 2026";
 
 // Ponlo a true cuando contrates el plan Pro de Supabase (copias diarias)
 export const COPIAS_SEGURIDAD = false;
@@ -42,6 +42,14 @@ export const SUBENCARGADOS = [
     nombre: "Anthropic, PBC",
     servicio: "Asistente IA: genera las respuestas cuando un profesional lo usa",
     ubicacion: "EE. UU.",
-    datos: "Solo cuando el profesional usa el asistente: el contenido clínico de la ficha consultada (o los datos de facturación), con el nombre y apellidos sustituidos por un alias y la edad en lugar de la fecha de nacimiento",
+    datos: "Solo cuando el profesional usa el asistente: el contenido clínico de la ficha consultada (o los datos de facturación), con el nombre y apellidos sustituidos por un alias y la edad en lugar de la fecha de nacimiento. Anthropic no los usa para entrenar sus modelos y los borra en un máximo de 30 días",
   },
 ];
+
+// Proveedores que Praxi usa para su propia gestión (no tratan datos clínicos)
+export const PROVEEDOR_PAGOS = {
+  nombre: "Stripe Payments Europe, Ltd.",
+  servicio: "Cobro de las suscripciones, gestión de la tarjeta y emisión de recibos",
+  ubicacion: "Irlanda (UE); grupo con sede en EE. UU.",
+  datos: "Nombre o razón social, email, dirección de facturación, NIF si se facilita y datos de la tarjeta. Praxi nunca ve ni guarda el número completo de la tarjeta. No recibe datos clínicos",
+};

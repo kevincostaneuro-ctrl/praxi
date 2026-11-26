@@ -2,8 +2,11 @@
 import { useEffect } from "react";
 import {
   TITULAR, NIF, DOMICILIO, EMAIL_CONTACTO, WEB, FECHA_TEXTOS,
-  COPIAS_SEGURIDAD, SUBENCARGADOS, DATOS_LEGALES_COMPLETOS,
+  COPIAS_SEGURIDAD, SUBENCARGADOS, DATOS_LEGALES_COMPLETOS, PROVEEDOR_PAGOS,
 } from "./legal.js";
+import { PLANES, DIAS_PRUEBA, DIAS_GRACIA, LIMITE_PACIENTES_BASICO } from "./app/plan.js";
+
+const eur = n => `${Number.isInteger(n) ? n : n.toFixed(2).replace(".", ",")} €`;
 
 const C = {
   bg: "#F5EFE4", bone: "#FBF8F1", border: "#D9C9A8", accent: "#A66B3F",
@@ -92,12 +95,19 @@ export function Privacidad() {
         <li><strong>Base legal:</strong> la ejecución del contrato de servicio (art. 6.1.b RGPD).</li>
         <li><strong>Plazo:</strong> mientras tengas cuenta. Después se eliminan, salvo lo que debamos conservar por obligación legal.</li>
       </L>
+      <H3>Suscripción y pagos</H3>
+      <L>
+        <li><strong>Datos:</strong> nombre o razón social, email, dirección de facturación, NIF si lo facilitas, plan contratado e historial de pagos. Los datos de la tarjeta los recoge y guarda Stripe: Praxi nunca ve ni guarda el número completo.</li>
+        <li><strong>Finalidad:</strong> cobrar la suscripción, emitir los justificantes de pago y facturas, y avisarte de cobros fallidos.</li>
+        <li><strong>Base legal:</strong> la ejecución del contrato (art. 6.1.b RGPD) y el cumplimiento de las obligaciones fiscales y mercantiles (art. 6.1.c).</li>
+        <li><strong>Plazo:</strong> mientras dure la suscripción y, después, durante los plazos que exigen las normas fiscales y mercantiles (en general, 6 años).</li>
+      </L>
       <H3>Registro de accesos</H3>
       <L>
         <li><strong>Datos:</strong> qué usuario consulta, crea, modifica o borra cada ficha o cita, y cuándo.</li>
         <li><strong>Finalidad:</strong> la seguridad de la información clínica y poder demostrar quién accedió a ella.</li>
         <li><strong>Base legal:</strong> el cumplimiento de las obligaciones de seguridad del RGPD (art. 6.1.c y art. 32) y el interés legítimo en proteger el servicio (art. 6.1.f).</li>
-        <li><strong>Plazo:</strong> mientras exista la clínica en Praxi. Solo lo puede consultar el administrador de la clínica.</li>
+        <li><strong>Plazo:</strong> mientras exista la clínica en Praxi; al borrarla se elimina con ella. Solo lo puede consultar el administrador de la clínica.</li>
       </L>
       <H3>Emails que nos envías</H3>
       <L>
@@ -107,6 +117,7 @@ export function Privacidad() {
       <H>4. Con quién compartimos los datos</H>
       <P>No vendemos ni cedemos datos a terceros. Usamos estos proveedores, que los tratan por cuenta nuestra, con contrato y solo siguiendo nuestras instrucciones:</P>
       <TablaSubencargados />
+      <P>Para cobrar las suscripciones usamos <strong>{PROVEEDOR_PAGOS.nombre}</strong> ({PROVEEDOR_PAGOS.ubicacion}). {PROVEEDOR_PAGOS.datos}. Stripe trata además algunos datos como responsable propio, por ejemplo para prevenir el fraude y cumplir la normativa de pagos, según su <A href="https://stripe.com/es/privacy">política de privacidad</A>.</P>
       <P>Solo comunicaremos datos a autoridades cuando una ley nos obligue.</P>
 
       <H>5. Transferencias fuera de la Unión Europea</H>
@@ -119,7 +130,7 @@ export function Privacidad() {
       <P>No usamos cookies de análisis ni de publicidad. La aplicación solo guarda en tu navegador la información técnica imprescindible para mantener tu sesión iniciada, que no requiere consentimiento. Las fuentes tipográficas se sirven desde nuestro propio dominio.</P>
 
       <H>8. Seguridad</H>
-      <P>Aplicamos las medidas descritas en el <A href="/terminos#medidas">Anexo II de los Términos</A>: alojamiento en la UE, cifrado, control de acceso por roles aplicado por la propia base de datos, separación total entre clínicas y registro de accesos.</P>
+      <P>Aplicamos las medidas descritas en el <A href="/terminos#medidas">Anexo II de los Términos</A>: alojamiento en la UE, cifrado, control de acceso por roles aplicado por la propia base de datos, separación total entre clínicas, verificación en dos pasos y registro de accesos.</P>
 
       <H>9. Cambios</H>
       <P>Si cambiamos esta política lo indicaremos con una nueva fecha de actualización y, si el cambio es relevante, te avisaremos por email o dentro de la aplicación.</P>
@@ -139,16 +150,17 @@ export function Terminos() {
       <H id="t1">1. Quién presta el servicio</H>
       <P>Praxi es un software de gestión clínica en la nube ofrecido por <Titular />, contacto <Mail /> (en adelante, <strong>Praxi</strong>).</P>
 
-      <H>2. Acceso anticipado</H>
-      <P>Praxi está en fase de <strong>acceso anticipado</strong>. Durante esta fase:</P>
+      <H>2. Prueba gratuita y fase inicial</H>
       <L>
-        <li>El acceso es gratuito y solo con código o invitación.</li>
-        <li>Las funciones pueden cambiar, fallar o interrumpirse, y el servicio puede finalizar avisando con 30 días de antelación.</li>
+        <li>Cada clínica tiene <strong>{DIAS_PRUEBA} días de prueba gratuita</strong> desde que se crea, con todas las funciones y sin necesidad de tarjeta.</li>
+        <li>Si al terminar la prueba no se ha contratado un plan, la clínica pasa a <strong>solo lectura</strong>: se pueden consultar, exportar y borrar los datos, pero no crear ni modificar pacientes ni citas, y el asistente IA deja de estar disponible. Los datos no se borran: al contratar un plan todo vuelve a funcionar.</li>
+        <li>Por ahora, para crear una clínica hace falta un código de acceso o una invitación.</li>
+        <li>Praxi está en sus primeras versiones: las funciones pueden cambiar o fallar, y el servicio podría finalizar avisando con al menos 30 días de antelación, con tiempo para exportar los datos.</li>
         <li>{COPIAS_SEGURIDAD ? "Se realizan copias de seguridad diarias." : <><strong>No hay copias de seguridad automáticas.</strong> Los datos borrados o perdidos no se pueden recuperar, por lo que se recomienda al Cliente exportar sus datos periódicamente desde la aplicación.</>}</li>
       </L>
 
       <H>3. Cuenta, equipo y credenciales</H>
-      <P>Quien crea la clínica es su <strong>administrador</strong>: puede invitar y desactivar miembros, asignar pacientes y borrar la clínica. El Cliente responde del uso que hagan los miembros que invite. Cada persona tiene credenciales personales e intransferibles y debe avisar a Praxi en cuanto sospeche un uso indebido.</P>
+      <P>Quien crea la clínica es su <strong>administrador</strong>: puede invitar y desactivar miembros, asignar pacientes y borrar la clínica. El Cliente responde del uso que hagan los miembros que invite. Cada persona tiene credenciales personales e intransferibles y debe avisar a Praxi en cuanto sospeche un uso indebido. Praxi ofrece la <strong>verificación en dos pasos</strong> (código de una app de autenticación) y recomienda activarla a todos los miembros.</P>
 
       <H>4. Obligaciones del Cliente</H>
       <L>
@@ -159,11 +171,21 @@ export function Terminos() {
         <li><strong>Facturas:</strong> Praxi genera un documento PDF con los datos que introduce el Cliente (emisor, cliente, número, importes e impuestos). El Cliente es el único responsable de su contenido y de cumplir sus obligaciones de facturación, fiscales y de registro, incluidas, cuando le sean exigibles, las del sistema Verifactu.</li>
       </L>
 
-      <H>5. Precio</H>
-      <P>Durante el acceso anticipado el servicio es gratuito. Cuando haya planes de pago, sus precios se publicarán en la web y se avisará al Cliente con al menos 30 días de antelación. El Cliente podrá entonces contratar un plan o darse de baja.</P>
+      <H>5. Planes, precio y pago</H>
+      <P>Los precios son <strong>finales, con IVA incluido</strong>:</P>
+      <L>
+        <li><strong>Básico:</strong> {eur(PLANES.basico.mensual)}/mes. Un profesional y hasta {LIMITE_PACIENTES_BASICO} pacientes activos a la vez. Es paciente activo quien ha tenido una cita o sesión en los últimos 90 días o tiene una cita programada.</li>
+        <li><strong>Profesional:</strong> {eur(PLANES.profesional.mensual)}/mes o {eur(PLANES.profesional.anual)}/año. Un profesional, pacientes ilimitados.</li>
+        <li><strong>Clínica:</strong> {eur(PLANES.clinica.mensual)}/mes o {eur(PLANES.clinica.anual)}/año, con {PLANES.clinica.profesionales} profesionales incluidos y {eur(PLANES.clinica.extra)}/mes por cada profesional adicional.</li>
+        <li><strong>Fundador:</strong> el plan Profesional por {eur(PLANES.fundador.mensual)}/mes para las 100 primeras clínicas que lo contraten antes del 1 de abril de 2027. El precio se mantiene mientras la suscripción siga activa sin interrupción; si se cancela, no se puede recuperar.</li>
+      </L>
+      <P>El asistente IA está incluido en todos los planes, en las mismas condiciones.</P>
+      <P>El pago se hace con tarjeta a través de Stripe, por adelantado, y la suscripción <strong>se renueva automáticamente</strong> cada mes o cada año. El Cliente puede cancelarla en cualquier momento desde «Gestionar suscripción»: seguirá teniendo acceso hasta el final del periodo ya pagado y no se cobrarán más periodos. No se devuelven los periodos ya empezados.</P>
+      <P>Si un cobro falla, Praxi lo reintentará y avisará al Cliente. Pasados {DIAS_GRACIA} días desde el fin del periodo pagado sin que se resuelva, la clínica pasa a solo lectura hasta que se regularice el pago.</P>
+      <P>Praxi puede cambiar los precios avisando con al menos 30 días de antelación; el nuevo precio se aplicará a partir de la siguiente renovación y el Cliente podrá cancelar antes si no está de acuerdo.</P>
 
       <H>6. Disponibilidad</H>
-      <P>Praxi pondrá medios razonables para que el servicio funcione de forma continua, pero no garantiza una disponibilidad determinada, especialmente durante el acceso anticipado.</P>
+      <P>Praxi pondrá medios razonables para que el servicio funcione de forma continua, pero no garantiza una disponibilidad determinada, especialmente en sus primeras versiones.</P>
       <P>El asistente IA no tiene límite de uso para una actividad profesional normal. Para evitar abusos (por ejemplo, el uso automatizado de una cuenta), se aplica un máximo de 300 consultas al día por profesional.</P>
 
       <H>7. Propiedad</H>
@@ -173,7 +195,7 @@ export function Terminos() {
       <P>Praxi no responde de los daños indirectos ni del lucro cesante, ni de los derivados de un uso contrario a estos términos. Salvo dolo o culpa grave, su responsabilidad total frente al Cliente se limita a lo que este haya pagado por el servicio en los 12 meses anteriores. Nada de lo anterior limita las responsabilidades que la normativa de protección de datos atribuye a cada parte.</P>
 
       <H>9. Duración y baja</H>
-      <P>El contrato dura mientras la clínica exista en Praxi. El administrador puede <strong>exportar todos los datos</strong> y <strong>borrar la clínica</strong> en cualquier momento desde el menú Equipo; al borrarla se eliminan de forma inmediata todos sus datos{COPIAS_SEGURIDAD ? ", y las copias de seguridad desaparecen en su ciclo ordinario (máximo 7 días)" : ""}. Praxi puede suspender una cuenta que incumpla gravemente estos términos, avisando antes salvo urgencia.</P>
+      <P>Cancelar la suscripción no borra los datos: al terminar el periodo pagado la clínica pasa a solo lectura y el Cliente puede seguir exportándolos. El contrato dura mientras la clínica exista en Praxi. El administrador puede <strong>exportar todos los datos</strong> y <strong>borrar la clínica</strong> en cualquier momento desde el menú Equipo; al borrarla se eliminan de forma inmediata todos sus datos{COPIAS_SEGURIDAD ? ", y las copias de seguridad desaparecen en su ciclo ordinario (máximo 7 días)" : ""}. Praxi puede suspender una cuenta que incumpla gravemente estos términos, avisando antes salvo urgencia.</P>
 
       <H>10. Cambios en estos términos</H>
       <P>Si se modifican, se avisará al Cliente por email o dentro de la aplicación. Los cambios relevantes, especialmente en el contrato de encargo, requerirán una nueva aceptación.</P>
@@ -224,11 +246,12 @@ export function Terminos() {
         <li><strong>Ubicación:</strong> base de datos en servidores de la Unión Europea (Fráncfort).</li>
         <li><strong>Cifrado:</strong> todas las conexiones usan HTTPS/TLS y los datos se guardan cifrados en el servidor.</li>
         <li><strong>Contraseñas:</strong> se almacenan con un algoritmo de hash irreversible; nadie puede leerlas.</li>
+        <li><strong>Verificación en dos pasos:</strong> cada usuario puede activarla en Configuración. Cuando está activada, la base de datos no entrega datos clínicos hasta que se introduce el código, aunque alguien conozca la contraseña.</li>
         <li><strong>Control de acceso:</strong> las reglas de acceso las aplica la propia base de datos, no solo la pantalla. Cada clínica solo puede acceder a sus datos. Cada profesional solo a los pacientes que tiene asignados; el administrador, a todos los de su clínica.</li>
         <li><strong>Altas y bajas:</strong> los miembros solo entran por invitación nominativa, que caduca en 7 días y solo vale para el email invitado. El administrador puede desactivar a un miembro y su acceso se corta al momento.</li>
-        <li><strong>Registro de accesos:</strong> queda registrado quién consulta, crea, modifica o borra cada ficha y cita, y cuándo. Nadie puede modificarlo ni borrarlo desde la aplicación.</li>
-        <li><strong>Copias de seguridad:</strong> {COPIAS_SEGURIDAD ? "diarias, conservadas 7 días." : "no hay copias automáticas durante el acceso anticipado; el administrador puede exportar todos los datos de su clínica en cualquier momento desde la aplicación."}</li>
-        <li><strong>Asistente IA:</strong> solo se envía información cuando el profesional lo usa, y solo la de la ficha que está consultando (o los datos de facturación en el asistente de facturas). Antes de salir de su navegador, el nombre y los apellidos de los pacientes se sustituyen por un alias y la fecha de nacimiento por la edad. La clave del servicio está solo en el servidor y solo pueden usarlo miembros activos con sesión iniciada. El contenido de las consultas no se guarda en los registros del servidor.</li>
+        <li><strong>Registro de accesos:</strong> queda registrado quién consulta, crea, modifica o borra cada ficha y cita, y cuándo. Nadie puede modificarlo ni borrarlo desde la aplicación. Se conserva mientras exista la clínica y se elimina al borrarla.</li>
+        <li><strong>Copias de seguridad:</strong> {COPIAS_SEGURIDAD ? "diarias, conservadas 7 días." : "todavía no hay copias automáticas; el administrador puede exportar todos los datos de su clínica en cualquier momento desde la aplicación."}</li>
+        <li><strong>Asistente IA:</strong> solo se envía información cuando el profesional lo usa, y solo la de la ficha que está consultando (o los datos de facturación en el asistente de facturas). Antes de salir de su navegador, el nombre y los apellidos de los pacientes se sustituyen por un alias y la fecha de nacimiento por la edad. La clave del servicio está solo en el servidor y solo pueden usarlo miembros activos con sesión iniciada. El contenido de las consultas no se guarda en los registros del servidor. Según sus condiciones comerciales, Anthropic no usa estos datos para entrenar sus modelos y los borra en un máximo de 30 días.</li>
         <li><strong>Sin terceros innecesarios:</strong> los datos no se envían a servicios de análisis ni de publicidad.</li>
       </L>
 
