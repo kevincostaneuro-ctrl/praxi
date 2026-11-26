@@ -14,6 +14,9 @@ function NoraPreferencias({inicial,onGuardada}){
   const demo=useContext(DemoCtx);
   const[p,setP]=useState({...PREFERENCIAS_POR_DEFECTO,...(inicial||{})});
   const[estado,setEstado]=useState("");
+  const[abierto,setAbierto]=useState(false);
+  const ETQ={cercano:"Cercano",profesional:"Profesional",directo:"Directo",breve:"Muy breve",normal:"Normal",detallada:"Detallada",listas:"Listas",texto:"Texto corrido",tu:"Tú",usted:"Usted"};
+  const resumen=[p.tono,p.extension,p.formato,p.trato].map(v=>ETQ[v]||v).join(" · ");
   const opciones=(k,ops)=>(
     <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
       {ops.map(([v,l])=><button key={v} type="button" onClick={()=>{setP(x=>({...x,[k]:v}));setEstado("");}} style={{...st.btn("sm"),background:p[k]===v?NORA.tinteTexto:C.bone,color:p[k]===v?"#fff":C.text,border:`1px solid ${p[k]===v?NORA.tinteTexto:C.border}`}}>{l}</button>)}
@@ -28,9 +31,16 @@ function NoraPreferencias({inicial,onGuardada}){
     onGuardada?.(limpio);setEstado("Guardado ✓ Nora ya te habla así.");
   };
   return(
-    <div style={{...st.card,padding:"22px 26px",marginBottom:20}}>
-      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:4}}><NoraMarca size={26}/><div style={{fontSize:15,fontWeight:700}}>Cómo te habla Nora</div></div>
-      <div style={{fontSize:12.5,color:C.muted,marginBottom:18}}>Solo para ti: cada profesional de la clínica tiene sus propias preferencias.</div>
+    <div style={{...st.card,padding:"18px 26px",marginBottom:20}}>
+      <button type="button" onClick={()=>setAbierto(a=>!a)} aria-expanded={abierto} style={{all:"unset",cursor:"pointer",display:"flex",alignItems:"center",gap:10,width:"100%"}}>
+        <NoraMarca size={26}/>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:15,fontWeight:700,color:C.ink}}>Cómo te habla Nora</div>
+          <div style={{fontSize:12.5,color:C.muted,marginTop:2}}>{abierto?"Solo para ti: cada profesional de la clínica tiene sus propias preferencias.":resumen}</div>
+        </div>
+        <span style={{fontSize:18,color:C.walnut,transform:abierto?"rotate(180deg)":"none",transition:"transform 200ms"}}>⌄</span>
+      </button>
+      {abierto&&<div style={{marginTop:18}}>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:16}}>
         <Field label="Tono">{opciones("tono",[["cercano","Cercano"],["profesional","Profesional"],["directo","Directo, sin rodeos"]])}</Field>
         <Field label="Extensión">{opciones("extension",[["breve","Muy breve"],["normal","Normal"],["detallada","Detallada"]])}</Field>
@@ -38,7 +48,7 @@ function NoraPreferencias({inicial,onGuardada}){
         <Field label="Trato">{opciones("trato",[["tu","Tú"],["usted","Usted"]])}</Field>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"minmax(0,1fr) minmax(0,2fr)",gap:16,marginTop:16}}>
-        <Field label="Cómo quieres que te llame"><input style={st.input} maxLength={60} value={p.nombre} onChange={e=>{setP(x=>({...x,nombre:e.target.value}));setEstado("");}} placeholder="Por ejemplo, Kevin"/></Field>
+        <Field label="Cómo quieres que te llame"><input style={st.input} maxLength={60} value={p.nombre} onChange={e=>{setP(x=>({...x,nombre:e.target.value}));setEstado("");}} placeholder="Por ejemplo, Laura"/></Field>
         <Field label="Tus indicaciones (opcional)"><textarea style={{...st.textarea,minHeight:70}} maxLength={600} value={p.instrucciones} onChange={e=>{setP(x=>({...x,instrucciones:e.target.value}));setEstado("");}} placeholder="Ej.: horas en formato 24 h; nombra a los pacientes por su nombre de pila; termina siempre con el siguiente paso."/></Field>
       </div>
       <div style={{display:"flex",alignItems:"center",gap:12,marginTop:14,flexWrap:"wrap"}}>
@@ -46,6 +56,7 @@ function NoraPreferencias({inicial,onGuardada}){
         {estado&&<span style={{fontSize:12.5,color:C.muted}}>{estado}</span>}
         <span style={{fontSize:11.5,color:C.muted,flexBasis:"100%"}}>Tus preferencias cambian la forma, nunca las reglas: Nora seguirá sin diagnosticar ni valorar riesgos, y siempre te pedirá confirmación antes de tocar tu agenda.</span>
       </div>
+      </div>}
     </div>
   );
 }
