@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../supabase.js";
 import { Aviso } from "./acceso.jsx";
 import { DatosClinica } from "./configuracion.jsx";
+import { ProteccionDatos } from "./proteccionDatos.jsx";
 import { C, st } from "./estilos.js";
 import { Field, MFooter, Modal } from "./ui.jsx";
 import { traducirError } from "./utilidades.js";
@@ -44,7 +45,7 @@ export function MiVideollamadaModal({yo,demo,onClose,onGuardado,onDemo}){
 // ══════════════════════════════════════════════════════════════════════════════
 // EQUIPO — miembros, roles e invitaciones (solo administrador)
 // ══════════════════════════════════════════════════════════════════════════════
-export function EquipoPanel({plan,suscripcion,abrirPlanes,clinica,miembros,yo,patients,citas,demo,onCambio,bloquearDemo,setAviso,onBorrada}){
+export function EquipoPanel({onClinica,plan,suscripcion,abrirPlanes,clinica,miembros,yo,patients,citas,demo,onCambio,bloquearDemo,setAviso,onBorrada}){
   const[invs,setInvs]=useState([]);
   const[email,setEmail]=useState("");
   const[rol,setRol]=useState("profesional");
@@ -157,6 +158,7 @@ export function EquipoPanel({plan,suscripcion,abrirPlanes,clinica,miembros,yo,pa
           })}
         </div>
       )}
+      <ProteccionDatos clinica={clinica} miembros={miembros} demo={demo} onClinica={onClinica}/>
       <RegistroAccesos clinica={clinica} miembros={miembros} patients={patients} demo={demo}/>
       <DatosClinica clinica={clinica} miembros={miembros} patients={patients} citas={citas} demo={demo} bloquearDemo={bloquearDemo} onBorrada={onBorrada}/>
     </div>

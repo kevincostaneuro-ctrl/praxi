@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AgendaPersonalPanel } from "./citas.jsx";
-import { DAYS_ES, IA_VISIBLE, MONTHS_ES, WORK_END, WORK_START } from "./constantes.js";
-import { anadirNota, NORA, NoraMarca, NoraPanel } from "./nora.jsx";
+import { DAYS_ES, MONTHS_ES, WORK_END, WORK_START } from "./constantes.js";
+import { anadirNota, NORA, NoraMarca, NoraPanel, useNoraActiva } from "./nora.jsx";
 import { BotonNora } from "./noraGlobal.jsx";
 import { C, PRIORIDAD_T, st } from "./estilos.js";
 import { CitasHoy, PrimerosPasos } from "./dashboardBloques.jsx";
@@ -9,6 +9,7 @@ import { colorTipo } from "./calendario.jsx";
 import { addDays, diasEntre, etiquetaDia, etiquetaSemana, fechaDe, startOfWeek, timeToMins, toYMD, today } from "./utilidades.js";
 
 export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,horario,onInforme,onEditCita,onEditTarea,onNuevaCita,onAgendar,onAbrirPaciente,onNuevoPaciente,onVerCalendario,clinica,yo,esAdmin,demo,onIr,onVideo,tipos=[]}){
+  const noraOn=useNoraActiva();
   const[weekStart,setWeekStart]=useState(startOfWeek(today()));
   const ahora=today();
   const todayStr=toYMD(ahora);
@@ -148,7 +149,7 @@ export function Dashboard({patients,setPatients,citas,setCitas,tareas,setTareas,
           </div>
           <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
             {enl&&<a href={enl} target="_blank" rel="noreferrer" style={{...st.btn("sm"),textDecoration:"none"}}>🎥 Entrar</a>}
-            {pProx&&IA_VISIBLE&&<button style={{...st.btn("sm"),background:NORA.tinte,color:NORA.tinteTexto,display:"inline-flex",alignItems:"center",gap:6}} onClick={()=>setNora(pProx.id)}><NoraMarca size={16}/>Resumen de Nora</button>}
+            {pProx&&noraOn&&<button style={{...st.btn("sm"),background:NORA.tinte,color:NORA.tinteTexto,display:"inline-flex",alignItems:"center",gap:6}} onClick={()=>setNora(pProx.id)}><NoraMarca size={16}/>Resumen de Nora</button>}
             {pProx&&<button style={enl?{...st.btn("sm"),background:C.bone,color:C.walnut}:st.btn("sm")} onClick={()=>onAbrirPaciente(pProx.id)}>Abrir ficha</button>}
             <button style={{...st.btn("sm"),background:C.bone,color:C.muted}} onClick={()=>onEditCita(proxima)}>Ver cita</button>
           </div>

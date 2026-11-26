@@ -20,6 +20,7 @@ import { Configuracion } from "./app/configuracion.jsx";
 import { estadoPlan, superaLimitePacientes } from "./app/plan.js";
 import { AvisoPlan, BannerPlan } from "./app/planUI.jsx";
 import { NuevosTerminos, PasoDos } from "./app/seguridad.jsx";
+import { AvisoCopia } from "./app/proteccionDatos.jsx";
 import { VERSION_TERMINOS } from "./legal.js";
 import { CLINICA_STORE, DEFAULT_TIPOS_CITA, DemoCtx, EquipoCtx, IA_VISIBLE, PRAXI_LOGO, WORK_END, WORK_START } from "./app/constantes.js";
 import { Dashboard } from "./app/dashboard.jsx";
@@ -80,6 +81,7 @@ export default function App({demo=false}){
   const[avisoPlan,setAvisoPlan]=useState(null);
   const[abrirPlanes,setAbrirPlanes]=useState(false);
   const[terminosLuego,setTerminosLuego]=useState(false);
+  const[copiaLuego,setCopiaLuego]=useState(false);
   const planRef=useRef(null);
   const conPlan=(setSync,tipo)=>upd=>{
     const p=planRef.current;
@@ -188,6 +190,7 @@ export default function App({demo=false}){
   const cerrarSesion=async()=>{if(demo){window.location.href="/";return;}await supabase.auth.signOut();};
   const[page,setPage]=useState("dashboard");
   const plan=estadoPlan({clinica:currentClinica,suscripcion,demo});
+  const noraActiva=IA_VISIBLE&&!currentClinica?.config?.nora_desactivada;
   planRef.current=plan;
   const verPlanes=()=>{setAbrirPlanes(true);setPage("admin");setSelectedId(null);};
   // Vuelta desde la página de pago de Stripe
@@ -236,7 +239,7 @@ export default function App({demo=false}){
   }
   return(
     <DemoCtx.Provider value={demo}>
-    <EquipoCtx.Provider value={{abrirNora:IA_VISIBLE?()=>setNoraAbierta(true):null,preferenciasNora:currentUser.preferencias_nora,miNombre:currentUser.nombre,clinicaNombre:currentClinica?.nombre,esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id,registrarVista,guardarMisDatosFact:d=>{setCurrentUser(u=>({...u,datos_facturacion:d}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,datos_facturacion:d}:m));}}}>
+    <EquipoCtx.Provider value={{noraActiva,abrirNora:noraActiva?()=>setNoraAbierta(true):null,preferenciasNora:currentUser.preferencias_nora,miNombre:currentUser.nombre,clinicaNombre:currentClinica?.nombre,esAdmin:currentUser.rol==="admin",miembros:profesionales,miId:currentUser.id,registrarVista,guardarMisDatosFact:d=>{setCurrentUser(u=>({...u,datos_facturacion:d}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,datos_facturacion:d}:m));}}}>
     <div style={st.app} className="praxi-app">
       {/* Móvil: barra superior con menú (en ordenador no se ve) */}
       <div className="praxi-topbar">
@@ -401,13 +404,14 @@ export default function App({demo=false}){
           <a href="/" style={{...st.btn("sm"),textDecoration:"none"}}>Solicitar acceso</a>
         </div>}
         {!demo&&<BannerPlan plan={plan} esAdmin={esAdmin} onVerPlanes={verPlanes}/>}
+        {!demo&&esAdmin&&!copiaLuego&&page==="dashboard"&&currentClinica&&<AvisoCopia clinica={currentClinica} onCerrar={()=>setCopiaLuego(true)} onIr={()=>{setPage("admin");setSelectedId(null);setTimeout(()=>document.getElementById("descargar-copia")?.scrollIntoView({behavior:"smooth",block:"center"}),300);}}/>}
         {page==="dashboard"&&<Dashboard tipos={tipos} patients={patients} setPatients={setPatients} clinica={currentClinica} yo={currentUser} esAdmin={esAdmin} demo={demo} onIr={id=>{setPage(id);setSelectedId(null);}} onVideo={()=>setShowVideo(true)} citas={citas} setCitas={setCitas} tareas={tareas} setTareas={setTareas} onInforme={()=>setShowInforme(true)} onEditCita={c=>setEditCitaDash(c)} onEditTarea={t=>setEditTareaDash(t)} onNuevaCita={()=>setNewCitaDash(true)} onAgendar={id=>setNewCitaDash({pacienteId:id})} onAbrirPaciente={selectPatient} horario={horario} onNuevoPaciente={()=>{setAutoNewPaciente(true);setPage("pacientes");}} onVerCalendario={()=>setPage("calendario")}/>}
         {page==="calendario"&&<Calendario patients={patients} citas={citas} setCitas={setCitas} config={config} setConfig={setConfig} tipos={tipos} horario={horario} tareas={tareas} setTareas={setTareas}/>}
         {page==="pacientes"&&<Pacientes patients={patients} setPatients={setPatients} onSelect={selectPatient} autoNew={autoNewPaciente} onAutoNewDone={()=>setAutoNewPaciente(false)}/>}
         {page==="ficha"&&selectedPatient&&<FichaPaciente patient={selectedPatient} setPatients={setPatients} onBack={goBack} citas={citas} setCitas={setCitas} profesionales={profesionales} tipos={tipos}/>}
         {page==="facturas"&&<Facturas patients={patients} setPatients={setPatients}/>}
         {page==="recursos"&&<Recursos patients={patients} citas={citas} clinica={currentClinica} yo={currentUser}/>}
-        {page==="admin"&&currentUser.rol==="admin"&&<EquipoPanel plan={plan} suscripcion={suscripcion} abrirPlanes={abrirPlanes} clinica={currentClinica} miembros={profesionales} yo={currentUser} patients={patients} citas={citas} demo={demo} onCambio={cargarTodo} bloquearDemo={()=>setDemoToast(true)} setAviso={setAviso} onBorrada={cerrarSesion}/>}
+        {page==="admin"&&currentUser.rol==="admin"&&<EquipoPanel onClinica={setCurrentClinica} plan={plan} suscripcion={suscripcion} abrirPlanes={abrirPlanes} clinica={currentClinica} miembros={profesionales} yo={currentUser} patients={patients} citas={citas} demo={demo} onCambio={cargarTodo} bloquearDemo={()=>setDemoToast(true)} setAviso={setAviso} onBorrada={cerrarSesion}/>}
         {page==="configuracion"&&<Configuracion demo={demo} esAdmin={currentUser.rol==="admin"} horario={horario} setHorario={setHorario} tipos={tipos} setTipos={setTipos} preferenciasNora={currentUser.preferencias_nora} onNoraGuardada={p=>setCurrentUser(u=>({...u,preferencias_nora:p}))}/>}
       </div>
       {!demo&&esAdmin&&!terminosLuego&&currentClinica&&currentClinica.terminos_version!==VERSION_TERMINOS&&<NuevosTerminos version={VERSION_TERMINOS} onLuego={()=>setTerminosLuego(true)} onAceptados={v=>setCurrentClinica(c=>({...c,terminos_version:v}))}/>}
@@ -417,7 +421,7 @@ export default function App({demo=false}){
       {showVideo&&<MiVideollamadaModal yo={currentUser} demo={demo} onClose={()=>setShowVideo(false)} onDemo={()=>{setShowVideo(false);setDemoToast(true);}}
         onGuardado={e=>{setCurrentUser(u=>({...u,enlace_videollamada:e}));setProfesionales(ms=>ms.map(m=>m.id===currentUser.id?{...m,enlace_videollamada:e}:m));setShowVideo(false);}}/>}
       {newCitaDash&&<CitaModal cita={null} defaultPacienteId={newCitaDash?.pacienteId} patients={patients} tipos={tipos} defaultFecha={newCitaDash?.fecha||toYMD(today())} defaultHora={newCitaDash?.hora||"09:00"} defaultTipoId={newCitaDash?.tipoId||tipos[0]?.id} makeUrl={config.makeOut} onClose={()=>setNewCitaDash(false)} onSave={form=>{setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:form.pacienteId?Number(form.pacienteId):null}]);setNewCitaDash(false);}} onDelete={()=>setNewCitaDash(false)}/>}
-      {IA_VISIBLE&&<NoraGlobal abierta={noraAbierta} setAbierta={setNoraAbierta} pagina={page} patients={patients} citas={citas} tareas={tareas} horario={horario} tipos={tipos} setCitas={setCitas} setTareas={setTareas} onNuevaCita={c=>setNewCitaDash(c)} onEditarCita={c=>setEditCitaDash(c)}/>}
+      {noraActiva&&<NoraGlobal abierta={noraAbierta} setAbierta={setNoraAbierta} pagina={page} patients={patients} citas={citas} tareas={tareas} horario={horario} tipos={tipos} setCitas={setCitas} setTareas={setTareas} onNuevaCita={c=>setNewCitaDash(c)} onEditarCita={c=>setEditCitaDash(c)}/>}
       {editTareaDash&&<TareaModal tarea={editTareaDash} onClose={()=>setEditTareaDash(null)} onSave={t=>{setTareas(ts=>ts.map(x=>x.id===t.id?t:x));setEditTareaDash(null);}} onDelete={id=>{setTareas(ts=>ts.filter(t=>t.id!==id));setEditTareaDash(null);}}/>}
     </div>
     </EquipoCtx.Provider>

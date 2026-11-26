@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { CitaModal } from "./citas.jsx";
-import { DEFAULT_CONSENT, EquipoCtx, IA_VISIBLE } from "./constantes.js";
+import { DEFAULT_CONSENT, EquipoCtx } from "./constantes.js";
 import { C, st } from "./estilos.js";
 import { TabDatos, TabEvolucion, TabFormulacionCaso, TabHistoriaClinica, TabInformes, TabObjetivos, TabPruebas, TabSesiones } from "./fichaPestanas.jsx";
-import { anadirNota, NORA, NoraMarca, NoraPanel } from "./nora.jsx";
+import { anadirNota, NORA, NoraMarca, NoraPanel, useNoraActiva } from "./nora.jsx";
 import { Avatar, Empty, Field, MFooter, Modal } from "./ui.jsx";
 import { toYMD, today } from "./utilidades.js";
 
@@ -198,6 +198,7 @@ export function TabCitasClinica({patient,citas,profesionales}){
 }
 
 export function FichaPaciente({patient,setPatients,onBack,citas,setCitas,profesionales,tipos}){
+  const noraOn=useNoraActiva();
   const isNew=!patient.motivoConsulta&&patient.sesiones.length===0&&!patient.historiaClinica?.texto&&!(patient.historiaClinica?.entradas||[]).length;
   const[tab,setTab]=useState("evolucion");
   const[showConsent,setShowConsent]=useState(false);
@@ -244,7 +245,7 @@ export function FichaPaciente({patient,setPatients,onBack,citas,setCitas,profesi
           <span style={st.badge(patient.estado==="activo"?C.green:patient.estado==="alta"?C.walnut:C.muted,patient.estado==="activo"?C.gD:patient.estado==="alta"?C.sand:C.card)}>{patient.estado}</span>
           <button style={{...st.btn("sm"),background:C.gD,color:C.green}} onClick={()=>setShowNuevaCita(true)}>+ Nueva cita</button>
           <button style={st.btn("sm")} onClick={()=>exportPatientPDF(patient)}>🖨 Exportar PDF</button>
-          {IA_VISIBLE&&<button style={{...st.btn("sm"),background:NORA.fondo,color:NORA.texto,display:"inline-flex",alignItems:"center",gap:6}} onClick={()=>setShowIA(v=>!v)}><NoraMarca size={18}/>Nora</button>}
+          {noraOn&&<button style={{...st.btn("sm"),background:NORA.fondo,color:NORA.texto,display:"inline-flex",alignItems:"center",gap:6}} onClick={()=>setShowIA(v=>!v)}><NoraMarca size={18}/>Nora</button>}
           {patient.estado==="activo"&&<button style={{...st.btn("sm"),background:C.tD,color:C.teal}} onClick={()=>setShowAlta(true)}>Dar de alta</button>}
           {patient.estado==="alta"&&<span style={{...st.badge(C.walnut,C.sand),fontSize:11}}>✓ Dado de alta</span>}
         </div>
@@ -318,7 +319,7 @@ export function FichaPaciente({patient,setPatients,onBack,citas,setCitas,profesi
 
       {showConsent&&<ConsentModal patient={patient} onClose={()=>setShowConsent(false)} onSave={({texto,firmado})=>{update(p=>({...p,consentimiento:firmado,consentimientoTexto:texto}));setShowConsent(false);}}/>}
       {showAlta&&<AltaModal patient={patient} onClose={()=>setShowAlta(false)} onSave={informe=>{update(p=>({...p,estado:"alta",informeAlta:informe}));setShowAlta(false);}}/>}
-      {IA_VISIBLE&&showIA&&<NoraPanel patient={patient} citas={citas} onClose={()=>setShowIA(false)} onGuardarNota={guardarNota}/>}
+      {noraOn&&showIA&&<NoraPanel patient={patient} citas={citas} onClose={()=>setShowIA(false)} onGuardarNota={guardarNota}/>}
       {showNuevaCita&&<CitaModal soloEstePaciente cita={null} patients={[patient]} tipos={tipos||[]} defaultFecha={toYMD(today())} defaultHora="09:00" makeUrl="" onClose={()=>setShowNuevaCita(false)} onSave={form=>{setCitas&&setCitas(cs=>[...cs,{...form,id:Date.now(),pacienteId:patient.id,origen:"interno"}]);setShowNuevaCita(false);}} onDelete={()=>{}}/>}
     </div>
   );

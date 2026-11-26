@@ -65,6 +65,9 @@ begin
   select * into yo from miembros where user_id = auth.uid() and activo limit 1;
   if not found then raise exception 'No autorizado'; end if;
   if plan_efectivo(yo.clinica_id) = 'caducado' then raise exception 'Plan caducado'; end if;
+  if coalesce((select (config ->> 'nora_desactivada')::boolean from clinicas where id = yo.clinica_id), false) then
+    raise exception 'Nora desactivada';
+  end if;
   insert into uso_ia (miembro_id, clinica_id, dia, consultas)
   values (yo.id, yo.clinica_id, hoy, 0)
   on conflict (miembro_id, dia) do nothing;

@@ -1,5 +1,5 @@
 // Páginas legales: Política de privacidad, Términos (con Contrato de encargo) y Aviso legal
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   TITULAR, NIF, DOMICILIO, EMAIL_CONTACTO, WEB, FECHA_TEXTOS,
   COPIAS_SEGURIDAD, SUBENCARGADOS, DATOS_LEGALES_COMPLETOS, PROVEEDOR_PAGOS,
@@ -25,19 +25,35 @@ const Titular = () => (
   <><strong>{TITULAR}</strong>{NIF ? `, con NIF ${NIF}` : ""}{DOMICILIO ? ` y domicilio en ${DOMICILIO}` : ""}</>
 );
 
+// Copia para imprimir del contrato aceptado (la prepara la app en Equipo → Protección de datos)
+function leerCopia() {
+  if (typeof window === "undefined" || !new URLSearchParams(window.location.search).has("imprimir")) return null;
+  try { const c = JSON.parse(localStorage.getItem("praxi_copia_contrato") || "null"); localStorage.removeItem("praxi_copia_contrato"); return c; } catch { return null; }
+}
+
 function PaginaLegal({ titulo, children }) {
+  const [copia] = useState(leerCopia);
   // Ir a la sección del enlace (#encargo, #medidas…) al abrir la página
   useEffect(() => {
+    if (copia) { window.scrollTo(0, 0); setTimeout(() => window.print(), 600); return; }
     const id = window.location.hash.slice(1);
     if (id) setTimeout(() => document.getElementById(id)?.scrollIntoView(), 50);
     else window.scrollTo(0, 0);
-  }, []);
+  }, [copia]);
   return (
     <div style={{ background: C.bg, minHeight: "100vh", fontFamily: "'Manrope',sans-serif", color: C.text }}>
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "48px 20px 80px", fontSize: 15, lineHeight: 1.75 }}>
         <a href="/" style={{ fontSize: 13, color: C.accent, textDecoration: "none" }}>← Volver a Praxi</a>
         <h1 style={{ fontFamily: "'Instrument Serif',serif", fontWeight: 400, fontSize: 40, color: C.ink, margin: "20px 0 6px", lineHeight: 1.15 }}>{titulo}</h1>
         <div style={{ fontSize: 13, color: C.muted }}>Última actualización: {FECHA_TEXTOS}</div>
+        {copia && <div style={{ margin: "20px 0 8px", padding: "14px 18px", border: `1px solid ${C.border}`, borderRadius: 12, background: C.bone, fontSize: 13.5, lineHeight: 1.7 }}>
+          <div style={{ fontSize: 12, color: C.walnut, textTransform: "uppercase", letterSpacing: "0.07em", fontWeight: 700 }}>Copia del contrato aceptado</div>
+          <div><b>Clínica (responsable del tratamiento):</b> {copia.clinica}</div>
+          <div><b>Aceptado por:</b> {copia.admin || "el administrador de la clínica"}{copia.email ? ` (${copia.email})` : ""}</div>
+          <div><b>Fecha de aceptación:</b> {copia.fecha ? new Date(copia.fecha).toLocaleString("es-ES", { dateStyle: "long", timeStyle: "short" }) : "—"}</div>
+          <div><b>Versión aceptada:</b> {copia.version} · <b>Copia generada:</b> {new Date().toLocaleDateString("es-ES", { dateStyle: "long" })}</div>
+          <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>La aceptación se hizo de forma electrónica en Praxi y queda registrada con fecha, hora y usuario.</div>
+        </div>}
         {children}
         <div style={{ marginTop: 48, paddingTop: 20, borderTop: `1px solid ${C.border}`, fontSize: 13, color: C.muted, display: "flex", gap: 18, flexWrap: "wrap" }}>
           <A href="/privacidad">Privacidad</A>
