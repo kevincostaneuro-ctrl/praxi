@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { supabase } from "../supabase.js";
 import { C, st } from "./estilos.js";
-import { VERSION_TERMINOS } from "../legal.js";
+import { COPIAS_SEGURIDAD, VERSION_TERMINOS } from "../legal.js";
 
 const DIA = 86400000;
 const claveCopia = id => `praxi_copia_${id}`;
@@ -22,7 +22,9 @@ export function diasSinCopia(clinicaId, ahora = Date.now()) {
 }
 
 // Aviso suave para el administrador si hace más de 7 días que no descarga sus datos
+// Desaparece solo cuando haya copias automáticas (COPIAS_SEGURIDAD = true en legal.js)
 export function AvisoCopia({ clinica, onIr, onCerrar }) {
+  if (COPIAS_SEGURIDAD) return null;
   const dias = diasSinCopia(clinica.id);
   if (dias !== null && dias < 7) return null;
   return (
